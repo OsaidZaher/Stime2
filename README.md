@@ -1,0 +1,1 @@
+This is my second attempt of my Stime full stack project. The issue with the first one was the conflicting CSS rules that "NEXTUI" and "Shadcn" use. Hence I created a new project using the same source code as the previous but decided to not use the NextUI library.

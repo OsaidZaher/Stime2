@@ -1,6 +1,6 @@
 import * as React from "react";
 import Autoplay from "embla-carousel-autoplay";
-
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -9,30 +9,44 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useTheme } from "next-themes"; // Import from next-themes for theme detection
 
 export function CrousalLoop() {
+  const { theme } = useTheme(); // Hook to get the current theme (light, dark, or system)
+
+  // Array of image URLs for light and dark themes
+  const images = ["/img1.png", "/img3.png", "/img4.png"];
+  const imagesDark = ["/img1dark.png", "/im3dark.png", "/img4dark.png"];
+
+  // Choose the appropriate array based on the theme
+  const imageArray = theme === "dark" ? imagesDark : images;
+
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
   );
 
   return (
     <Carousel
-      plugins={[
-        Autoplay({
-          delay: 2000,
-        }),
-      ]}
+      plugins={[Autoplay({ delay: 2000 })]}
       className="w-full max-w-96"
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
-        {Array.from({ length: 5 }).map((_, index) => (
+        {imageArray.map((src, index) => (
           <CarouselItem key={index}>
             <div className="p-1">
               <Card>
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  <span className="text-4xl font-semibold">{index + 1}</span>
+                <CardContent className="flex aspect-square items-center justify-center p-0">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={src}
+                      alt={`Carousel image ${index + 1}`}
+                      layout="fill" // Set layout to fill for responsive behavior
+                      objectFit="cover" // Maintain aspect ratio while covering the area
+                      className="rounded-lg" // Optional: for rounded corners
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </div>

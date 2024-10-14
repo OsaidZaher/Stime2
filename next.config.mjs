@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
-    config.cache = false; // Disable Webpack cache temporarily
+    config.cache = false;
     return config;
   },
 };

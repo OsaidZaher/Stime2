@@ -113,3 +113,9 @@
   box-shadow: none !important;
   transition: none !important;
 }
+.timer-right {
+  margin-left: 800px;
+}
+.timer-up {
+  margin-bottom: 2000px;
+}

@@ -10,12 +10,11 @@ import {
   IconHome,
   IconRobot,
   IconBook2,
-  IconClock,
   IconGraph,
+  IconHistory,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "@/components/ui/themetoggle";
 export function SideBar() {
   const [showLogo, setShowLogo] = useState(false);
   const [open, setOpen] = useState(false);
@@ -53,7 +52,7 @@ export function SideBar() {
     },
     {
       label: "Analytics",
-      href: "#",
+      href: "/dashboard/study-graphs",
       icon: (
         <IconGraph className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
@@ -70,6 +69,13 @@ export function SideBar() {
       href: "#",
       icon: (
         <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "History",
+      href: "/dashboard/study-history",
+      icon: (
+        <IconHistory className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {

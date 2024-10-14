@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/themeprovider";
+import { Toaster } from "sonner";
+import ClientSessionProvider from "@/components/client-session-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,17 +31,20 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} min-h-screen flex flex-col`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <main className="flex-grow">{children}</main>
-          <footer className="mt-auto">
-            <Footer />
-          </footer>
-        </ThemeProvider>
+        <ClientSessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <main className="flex-grow">{children}</main>
+            <footer className="mt-auto">
+              <Footer />
+            </footer>
+            <Toaster />
+          </ThemeProvider>
+        </ClientSessionProvider>
       </body>
     </html>
   );

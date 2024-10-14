@@ -1,10 +1,15 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect } from "react"; // Combine imports for useState and useEffect
+
+import { useSession } from "next-auth/react";
+import { Timer } from "@/components/clock";
 import { Roboto_Mono } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ButtonAdapted } from "@/components/ui/buttonAdaptation";
+
 import {
   Sheet,
   SheetClose,
@@ -32,100 +37,237 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
-// Type definition for the addSubject function
+// Type definition for Subject
+interface Subject {
+  id: number;
+  name: string;
+}
+
+// Type definition for the StudySessionProps
 interface StudySessionProps {
-  subjects: string[];
+  subjects: Subject[];
   addSubject: (newSubject: string) => void;
 }
 
 export default function StudySession() {
-  const [subjects, setSubjects] = React.useState<string[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true); // Loading state
+  const { data: session, status } = useSession();
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch subjects from the database on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchSubjects = async () => {
-      try {
-        const response = await fetch("/api/functionality/getSubjects"); // Adjusted API route to fetch subjects
-        if (response.ok) {
-          const data = await response.json();
-          setSubjects(data.subjects); // Update the subjects state with data from the database
-        } else {
-          console.error("Failed to fetch subjects");
+      if (status === "authenticated" && session) {
+        try {
+          const response = await fetch("/api/functionality/subjectAdd");
+          console.log("Fetch response:", response);
+          if (response.ok) {
+            const data = await response.json();
+            setSubjects(data.subjects);
+          } else {
+            console.error("Failed to fetch subjects");
+            toast.error("Failed to fetch subjects");
+          }
+        } catch (error) {
+          console.error("Error fetching subjects:", error);
+          toast.error("Error fetching subjects");
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching subjects:", error);
-      } finally {
-        setLoading(false); // Loading complete
       }
     };
 
-    fetchSubjects();
-  }, []);
+    if (status === "authenticated") {
+      fetchSubjects();
+    }
+  }, [status, session]);
 
-  // Add new subject and update the state
-  const addSubject = (newSubject: string) => {
-    if (!subjects.includes(newSubject) && newSubject.trim() !== "") {
-      setSubjects((prevSubjects) => [...prevSubjects, newSubject]); // Add new subject to state
+  const addSubject = async (newSubject: string) => {
+    if (status !== "authenticated") {
+      toast.error("You must be logged in to add a subject");
+      return;
+    }
+
+    if (
+      newSubject.trim() &&
+      !subjects.some((subject) => subject.name === newSubject)
+    ) {
+      try {
+        const response = await fetch("/api/functionality/subjectAdd", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: newSubject }),
+        });
+
+        if (response.ok) {
+          const addedSubject = await response.json();
+          setSubjects((prevSubjects) => [...prevSubjects, addedSubject]);
+          toast.success("Subject added successfully");
+        }
+      } catch (error) {
+        console.error("Error adding subject:", error);
+        toast.error("Error adding subject");
+      }
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>; // Loading indication
+  if (status === "loading") {
+    return <div>Loading...</div>;
   }
 
-  return <SheetDemo subjects={subjects} addSubject={addSubject} />;
-}
+  if (status === "unauthenticated") {
+    return <div>Please sign in to access this page.</div>;
+  }
 
-// Updated props typing for SheetDemo
-export function SheetDemo({ subjects, addSubject }: StudySessionProps) {
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline">Start Study</Button>
-      </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Study Session Details</SheetTitle>
-          <SheetDescription>Add your study session details.</SheetDescription>
-        </SheetHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <SelectDemo subjects={subjects} />
-          </div>
-          <Input placeholder="Add topic" id="topic" />
-          <div className="grid grid-cols-4 items-center gap-4">
-            <DialogDemo addSubject={addSubject} />
-          </div>
-        </div>
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button type="submit">Start session</Button>
-          </SheetClose>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+    <div>
+      <SheetDemo subjects={subjects} addSubject={addSubject} />
+    </div>
   );
 }
 
-// SelectDemo Component
-interface SelectDemoProps {
-  subjects: string[];
+interface SheetDemoProps {
+  subjects: Subject[];
+  addSubject: (newSubject: string) => void;
 }
 
-export function SelectDemo({ subjects }: SelectDemoProps) {
+export function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
+  const [startTimer, setStartTimer] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
+  const [topic, setTopic] = useState("");
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
+
+  const handleStartSession = () => {
+    if (!selectedSubject || !topic) {
+      toast.error(
+        "Please select a subject and enter a topic before starting the session."
+      );
+      return;
+    }
+    setStartTimer(true);
+    setStartTime(new Date());
+  };
+
+  const handleSaveSession = async () => {
+    if (!selectedSubject || !topic || !startTime) {
+      toast.error(
+        "Please fill in all fields and start the timer before saving."
+      );
+      return;
+    }
+
+    const endTime = new Date();
+    setEndTime(endTime);
+
+    try {
+      const response = await fetch("/api/functionality/studySession", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subjectId: selectedSubject,
+          topic,
+          startTime,
+          endTime,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Study session saved successfully!");
+        resetSession();
+      } else {
+        toast.error("Failed to save study session");
+      }
+    } catch (error) {
+      console.error("Error saving study session:", error);
+      toast.error("An error occurred while saving the study session");
+    }
+  };
+
+  const resetSession = () => {
+    setSelectedSubject(null);
+    setTopic("");
+    setStartTime(null);
+    setEndTime(null);
+    setStartTimer(false);
+  };
+
   return (
-    <Select>
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="pointer-events-auto">
+        <Timer startTimer={startTimer} onReset={resetSession} />
+        <Sheet>
+          <SheetTrigger asChild>
+            <div className="mt-5 ml-4">
+              <ButtonAdapted
+                className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl"
+                variant="outline"
+              >
+                Start Study
+              </ButtonAdapted>
+              <ButtonAdapted
+                className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl mr"
+                variant="outline"
+                onClick={handleSaveSession}
+              >
+                Save Session
+              </ButtonAdapted>
+            </div>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Study Session Details</SheetTitle>
+              <SheetDescription>
+                Add your study session details.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="grid gap-4 py-4">
+              <SelectDemo
+                subjects={subjects}
+                onSubjectSelect={setSelectedSubject}
+              />
+              <Input
+                placeholder="Add topic"
+                id="topic"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+              />
+              <DialogDemo addSubject={addSubject} />
+            </div>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button type="submit" onClick={handleStartSession}>
+                  Start session
+                </Button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </div>
+  );
+}
+
+interface SelectDemoProps {
+  subjects: Subject[];
+  onSubjectSelect: (subjectId: number) => void;
+}
+
+export function SelectDemo({ subjects, onSubjectSelect }: SelectDemoProps) {
+  return (
+    <Select onValueChange={(value) => onSubjectSelect(parseInt(value))}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a subject" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Subjects</SelectLabel>
-          {subjects.map((subject, index) => (
-            <SelectItem key={index} value={subject.toLowerCase()}>
-              {subject}
+          {subjects.map((subject) => (
+            <SelectItem key={subject.id} value={subject.id.toString()}>
+              {subject.name}
             </SelectItem>
           ))}
         </SelectGroup>
@@ -134,15 +276,14 @@ export function SelectDemo({ subjects }: SelectDemoProps) {
   );
 }
 
-// DialogDemo Component
 interface DialogDemoProps {
   addSubject: (newSubject: string) => void;
 }
 
 export function DialogDemo({ addSubject }: DialogDemoProps) {
-  const [newSubject, setNewSubject] = React.useState<string>("");
-  const [subjectAdded, setSubjectAdded] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState<string>("");
+  const [newSubject, setNewSubject] = useState("");
+  const [subjectAdded, setSubjectAdded] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleAddSubject = async () => {
     if (newSubject.trim() === "") {
@@ -154,21 +295,16 @@ export function DialogDemo({ addSubject }: DialogDemoProps) {
     try {
       const response = await fetch("/api/functionality/subjectAdd", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newSubject }),
       });
 
       if (response.ok) {
-        addSubject(newSubject); // Update parent state with the new subject
-        setNewSubject(""); // Reset the input field
-        setErrorMessage(""); // Clear any error messages
-        setSubjectAdded(true); // Show success message
-
-        setTimeout(() => {
-          setSubjectAdded(false); // Hide success message after delay
-        }, 1500);
+        addSubject(newSubject);
+        setNewSubject("");
+        setErrorMessage("");
+        setSubjectAdded(true);
+        setTimeout(() => setSubjectAdded(false), 1500);
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Failed to add subject");
@@ -205,17 +341,15 @@ export function DialogDemo({ addSubject }: DialogDemoProps) {
         </div>
         <DialogFooter className="flex items-center justify-start space-x-4">
           {errorMessage && (
-            <p className="text-red-600 mr-10 font-semibold text-lg robotoMono.className">
+            <p className="text-red-600 mr-10 font-semibold text-lg">
               {errorMessage}
             </p>
           )}
-
           {subjectAdded && (
             <p className="text-green-600 mr-20 font-semibold">
               New Subject Added!
             </p>
           )}
-
           <Button type="submit" onClick={handleAddSubject}>
             Add subject
           </Button>

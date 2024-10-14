@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// POST request to add a new subject
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    console.log("Session in POST:", session);
+
+    if (!session || !session.user || !session.user.id) {
+      console.log("Unauthorized: No valid session");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { name } = await request.json();
 
-    // Validate the name field
     if (!name || typeof name !== "string") {
       return NextResponse.json(
         { error: "Invalid subject name" },
@@ -14,40 +22,52 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if the subject already exists
-    const existingSubject = await prisma.subject.findUnique({
-      where: { name },
+    const userId = session.user.id;
+    console.log("User ID from session:", userId);
+
+    // Verify user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
-    if (existingSubject) {
-      return NextResponse.json(
-        { error: "Subject already exists" },
-        { status: 400 }
-      );
+    if (!user) {
+      console.log("User not found in database");
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Create a new subject
+    // Create new subject
     const newSubject = await prisma.subject.create({
-      data: { name },
+      data: { name, userId },
     });
+
+    console.log("New subject created:", newSubject);
 
     return NextResponse.json(newSubject, { status: 201 });
   } catch (error) {
-    console.error("Error creating subject:", error);
+    console.error("Error adding subject:", error);
     return NextResponse.json(
-      { error: "Failed to create subject" },
+      { error: "Failed to add subject" },
       { status: 500 }
     );
   }
 }
 
-// GET request to retrieve the list of subjects
 export async function GET() {
   try {
-    // Fetch all subjects from the database
-    const subjects = await prisma.subject.findMany();
+    const session = await getServerSession(authOptions);
+    console.log("Session in GET:", session);
 
-    return NextResponse.json(subjects, { status: 200 });
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id; // Use user ID directly as a string
+
+    // Fetch all subjects for the current user from the database
+    const subjects = await prisma.subject.findMany({
+      where: { userId },
+    });
+    return NextResponse.json({ subjects }, { status: 200 });
   } catch (error) {
     console.error("Error fetching subjects:", error);
     return NextResponse.json(

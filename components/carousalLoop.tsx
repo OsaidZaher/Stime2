@@ -9,16 +9,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useTheme } from "next-themes"; // Import from next-themes for theme detection
-
+import { useTheme } from "next-themes";
 export function CrousalLoop() {
-  const { theme } = useTheme(); // Hook to get the current theme (light, dark, or system)
+  const { theme } = useTheme();
 
-  // Array of image URLs for light and dark themes
   const images = ["/img1.png", "/img3.png", "/img4.png"];
   const imagesDark = ["/img1dark.png", "/im3dark.png", "/img4dark.png"];
 
-  // Choose the appropriate array based on the theme
   const imageArray = theme === "dark" ? imagesDark : images;
 
   const plugin = React.useRef(

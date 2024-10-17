@@ -134,7 +134,7 @@ interface SheetDemoProps {
   addSubject: (newSubject: string) => void;
 }
 
-export function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
+function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
   const [startTimer, setStartTimer] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
   const [topic, setTopic] = useState("");
@@ -256,7 +256,7 @@ interface SelectDemoProps {
   onSubjectSelect: (subjectId: number) => void;
 }
 
-export function SelectDemo({ subjects, onSubjectSelect }: SelectDemoProps) {
+function SelectDemo({ subjects, onSubjectSelect }: SelectDemoProps) {
   return (
     <Select onValueChange={(value) => onSubjectSelect(parseInt(value))}>
       <SelectTrigger className="w-[180px]">
@@ -280,7 +280,7 @@ interface DialogDemoProps {
   addSubject: (newSubject: string) => void;
 }
 
-export function DialogDemo({ addSubject }: DialogDemoProps) {
+function DialogDemo({ addSubject }: DialogDemoProps) {
   const [newSubject, setNewSubject] = useState("");
   const [subjectAdded, setSubjectAdded] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

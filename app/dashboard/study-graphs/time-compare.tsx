@@ -10,7 +10,6 @@ import {
   YAxis,
   ResponsiveContainer,
 } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -26,6 +25,17 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+interface ChartDataItem {
+  day: string;
+  thisWeek: number;
+  lastWeek: number;
+}
+
+interface TrendState {
+  percentage: number;
+  isUp: boolean;
+}
+
 const chartConfig = {
   thisWeek: {
     label: "This Week",
@@ -38,28 +48,22 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ComparativeChart() {
-  const [chartData, setChartData] = useState([]);
-  const [trend, setTrend] = useState({ percentage: 0, isUp: true });
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
+  const [trend, setTrend] = useState<TrendState>({ percentage: 0, isUp: true });
 
   useEffect(() => {
     async function fetchData() {
       const response = await fetch("/api/functionality/comparative-graph");
-      const data = await response.json();
+      const data: ChartDataItem[] = await response.json();
       setChartData(data);
 
       // Calculate trend
-      const thisWeekTotal = data.reduce(
-        (sum: any, day: { thisWeek: any }) => sum + day.thisWeek,
-        0
-      );
-      const lastWeekTotal = data.reduce(
-        (sum: any, day: { lastWeek: any }) => sum + day.lastWeek,
-        0
-      );
+      const thisWeekTotal = data.reduce((sum, day) => sum + day.thisWeek, 0);
+      const lastWeekTotal = data.reduce((sum, day) => sum + day.lastWeek, 0);
       const trendPercentage =
         ((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100;
       setTrend({
-        percentage: Math.abs(trendPercentage).toFixed(1),
+        percentage: Math.abs(trendPercentage),
         isUp: trendPercentage > 0,
       });
     }
@@ -116,7 +120,7 @@ export function ComparativeChart() {
           <div className="grid gap-1">
             <div className="flex items-center gap-1 font-medium leading-none">
               {trend.isUp ? "Trending up" : "Trending down"} by{" "}
-              {trend.percentage}% this week
+              {trend.percentage.toFixed(1)}% this week
               {trend.isUp ? (
                 <TrendingUp className="h-4 w-4 text-green-500" />
               ) : (

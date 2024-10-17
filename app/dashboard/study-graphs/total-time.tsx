@@ -17,6 +17,16 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+interface ChartDataItem {
+  week: string;
+  hours: number;
+}
+
+interface StudySession {
+  startTime: string;
+  duration: number;
+}
+
 const chartConfig = {
   hours: {
     label: "Study Hours",
@@ -25,7 +35,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function TotalTimeChart() {
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
   const [thisWeekTotal, setThisWeekTotal] = useState(0);
   const [lastWeekTotal, setLastWeekTotal] = useState(0);
 
@@ -36,30 +46,27 @@ export default function TotalTimeChart() {
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
-        const data = await response.json();
+        const data: StudySession[] = await response.json();
 
         const now = new Date();
         const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
         const thisWeekSessions = data.filter(
-          (session: { startTime: string | number | Date }) =>
-            new Date(session.startTime) >= oneWeekAgo
+          (session) => new Date(session.startTime) >= oneWeekAgo
         );
         const lastWeekSessions = data.filter(
-          (session: { startTime: string | number | Date }) =>
+          (session) =>
             new Date(session.startTime) >= twoWeeksAgo &&
             new Date(session.startTime) < oneWeekAgo
         );
 
         const thisWeekHours = thisWeekSessions.reduce(
-          (total: number, session: { duration: number }) =>
-            total + session.duration / 3600,
+          (total, session) => total + session.duration / 3600,
           0
         );
         const lastWeekHours = lastWeekSessions.reduce(
-          (total: number, session: { duration: number }) =>
-            total + session.duration / 3600,
+          (total, session) => total + session.duration / 3600,
           0
         );
 

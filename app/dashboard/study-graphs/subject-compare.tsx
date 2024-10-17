@@ -18,6 +18,26 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+// Define interfaces for type safety
+interface StudySession {
+  startTime: string;
+  duration: number;
+  subject: {
+    name: string;
+  };
+}
+
+interface ChartDataItem {
+  subject: string;
+  time: number;
+  fill: string;
+}
+
+interface ChartConfigItem {
+  label: string;
+  color: string;
+}
+
 const colors = [
   "hsl(var(--chart-1))",
   "hsl(var(--chart-2))",
@@ -27,8 +47,8 @@ const colors = [
 ];
 
 export function SubjectStudyChart() {
-  const [chartData, setChartData] = useState([]);
-  const [mostStudiedSubject, setMostStudiedSubject] = useState("");
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
+  const [mostStudiedSubject, setMostStudiedSubject] = useState<string>("");
 
   useEffect(() => {
     fetchStudySessions();
@@ -37,20 +57,20 @@ export function SubjectStudyChart() {
   const fetchStudySessions = async () => {
     try {
       const response = await fetch("/api/functionality/studySession");
-      const data = await response.json();
-      console.log("All fetched data:", data); // Log all data
+      const data: StudySession[] = await response.json();
+      console.log("All fetched data:", data);
       processStudySessions(data);
     } catch (error) {
       console.error("Error fetching study sessions:", error);
     }
   };
 
-  const processStudySessions = (sessions: any[]) => {
+  const processStudySessions = (sessions: StudySession[]) => {
     console.log("All sessions:", sessions);
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0); // Set to start of day
+    sevenDaysAgo.setHours(0, 0, 0, 0);
 
     const recentSessions = sessions.filter((session) => {
       const sessionDate = new Date(session.startTime);
@@ -59,41 +79,53 @@ export function SubjectStudyChart() {
 
     console.log("Recent sessions:", recentSessions);
 
-    const subjectTotals = recentSessions.reduce((acc, session) => {
-      const { subject, duration } = session;
-      if (!acc[subject.name]) {
-        acc[subject.name] = 0;
-      }
-      acc[subject.name] += duration;
-      return acc;
-    }, {});
-    console.log("Subject totals:", subjectTotals); // Debug log
+    const subjectTotals: Record<string, number> = recentSessions.reduce(
+      (acc, session) => {
+        const { subject, duration } = session;
+        if (!acc[subject.name]) {
+          acc[subject.name] = 0;
+        }
+        acc[subject.name] += duration;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    console.log("Subject totals:", subjectTotals);
 
     const sortedSubjects = Object.entries(subjectTotals)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
-    console.log("Sorted subjects:", sortedSubjects); // Debug log
 
-    const processedData = sortedSubjects.map(([subject, time], index) => ({
-      subject,
-      time,
-      fill: colors[index % colors.length],
-    }));
+    console.log("Sorted subjects:", sortedSubjects);
 
-    console.log("Processed chart data:", processedData); // Debug log
+    const processedData: ChartDataItem[] = sortedSubjects.map(
+      ([subject, time], index) => ({
+        subject,
+        time,
+        fill: colors[index % colors.length],
+      })
+    );
+
+    console.log("Processed chart data:", processedData);
     setChartData(processedData);
     setMostStudiedSubject(sortedSubjects[0]?.[0] || "No subjects studied");
   };
 
-  const chartConfig = chartData.reduce((acc, item, index) => {
-    acc[`color${index + 1}`] = {
-      label: item.subject,
-      color: item.fill,
-    };
-    return acc;
-  }, {});
+  const chartConfig: Record<string, ChartConfigItem> = chartData.reduce(
+    (acc, item, index) => {
+      acc[`color${index + 1}`] = {
+        label: item.subject,
+        color: item.fill,
+      };
+      return acc;
+    },
+    {} as Record<string, ChartConfigItem>
+  );
 
-  console.log("Rendering with chart data:", chartData); // Debug log
+  const renderActiveShape = (props: PieSectorDataItem) => {
+    return <Sector {...props} outerRadius={(props.outerRadius || 0) + 10} />;
+  };
 
   return (
     <Card className="w-full max-w-[700px]">
@@ -121,9 +153,7 @@ export function SubjectStudyChart() {
                   outerRadius={120}
                   strokeWidth={5}
                   activeIndex={0}
-                  activeShape={(props: PieSectorDataItem) => (
-                    <Sector {...props} outerRadius={props.outerRadius + 10} />
-                  )}
+                  activeShape={renderActiveShape}
                 />
               </PieChart>
             </ResponsiveContainer>

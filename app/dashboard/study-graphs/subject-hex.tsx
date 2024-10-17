@@ -24,16 +24,29 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartConfig = {
+interface StudySession {
+  startTime: string;
+  duration: number;
+  subject: {
+    name: string;
+  };
+}
+
+interface ChartDataItem {
+  subject: string;
+  duration: number;
+}
+
+const chartConfig: ChartConfig = {
   duration: {
     label: "Study Time",
     color: "hsl(var(--chart-1))",
   },
-} satisfies ChartConfig;
+};
 
 export function SubjectHexagon() {
-  const [subjectData, setSubjectData] = useState([]);
-  const [mostStudiedSubject, setMostStudiedSubject] = useState("");
+  const [subjectData, setSubjectData] = useState<ChartDataItem[]>([]);
+  const [mostStudiedSubject, setMostStudiedSubject] = useState<string>("");
 
   useEffect(() => {
     fetchStudySessions();
@@ -42,7 +55,7 @@ export function SubjectHexagon() {
   const fetchStudySessions = async () => {
     try {
       const response = await fetch("/api/functionality/studySession");
-      const data = await response.json();
+      const data: StudySession[] = await response.json();
       console.log("All fetched data:", data);
       processStudySessions(data);
     } catch (error) {
@@ -50,7 +63,7 @@ export function SubjectHexagon() {
     }
   };
 
-  const processStudySessions = (sessions) => {
+  const processStudySessions = (sessions: StudySession[]) => {
     console.log("All sessions:", sessions);
 
     const sevenDaysAgo = new Date();
@@ -64,23 +77,28 @@ export function SubjectHexagon() {
 
     console.log("Recent sessions:", recentSessions);
 
-    const subjectTotals = recentSessions.reduce((acc, session) => {
-      const { subject, duration } = session;
-      if (!acc[subject.name]) {
-        acc[subject.name] = 0;
-      }
-      acc[subject.name] += duration;
-      return acc;
-    }, {});
+    const subjectTotals = recentSessions.reduce<Record<string, number>>(
+      (acc, session) => {
+        const { subject, duration } = session;
+        if (!acc[subject.name]) {
+          acc[subject.name] = 0;
+        }
+        acc[subject.name] += duration;
+        return acc;
+      },
+      {}
+    );
 
     const sortedSubjects = Object.entries(subjectTotals)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 6);
 
-    const processedData = sortedSubjects.map(([subject, duration]) => ({
-      subject,
-      duration,
-    }));
+    const processedData: ChartDataItem[] = sortedSubjects.map(
+      ([subject, duration]) => ({
+        subject,
+        duration,
+      })
+    );
 
     console.log("Processed chart data:", processedData);
     setSubjectData(processedData);
@@ -105,11 +123,7 @@ export function SubjectHexagon() {
                   cursor={false}
                   content={<ChartTooltipContent />}
                 />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{ fontSize: 12 }} // Adjust font size if necessary
-                  angle={50} // Rotate the labels for better readability
-                />
+                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
                 <PolarGrid />
                 <Radar
                   dataKey="duration"

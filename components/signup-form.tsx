@@ -166,6 +166,7 @@ export default function SignupForm() {
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
+          {/*
           <button
             className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)] outline-none"
             type="button"
@@ -177,8 +178,9 @@ export default function SignupForm() {
             </span>
             <BottomGradient />
           </button>
+          */}
           <button
-            className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)] outline-none"
+            className="relative group/btn flex space-x-2 items-center mt-2 justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)] outline-none"
             type="button"
             onClick={(e) => handleOAuthSignIn("google", e)}
           >

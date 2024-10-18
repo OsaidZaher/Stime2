@@ -1,20 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { IconBrandDiscord } from "@tabler/icons-react";
+import { IconBrandGithub } from "@tabler/icons-react";
 import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
 import {
   IconArrowLeft,
-  IconBrandTabler,
-  IconSettings,
-  IconUserBolt,
   IconHome,
-  IconRobot,
   IconBook2,
   IconGraph,
   IconHistory,
 } from "@tabler/icons-react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 export function SideBar() {
   const [showLogo, setShowLogo] = useState(false);
   const [open, setOpen] = useState(false);
@@ -43,13 +38,7 @@ export function SideBar() {
         <IconBook2 className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
-    {
-      label: "ChatBot",
-      href: "#",
-      icon: (
-        <IconRobot className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
+
     {
       label: "Analytics",
       href: "/dashboard/study-graphs",
@@ -57,20 +46,7 @@ export function SideBar() {
         <IconGraph className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
-    {
-      label: "Profile",
-      href: "#",
-      icon: (
-        <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
-    {
-      label: "Settings",
-      href: "#",
-      icon: (
-        <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
+
     {
       label: "History",
       href: "/dashboard/study-history",
@@ -86,10 +62,10 @@ export function SideBar() {
       ),
     },
     {
-      label: "Discord",
-      href: "#",
+      label: "Github",
+      href: "https://github.com/OsaidZaher",
       icon: (
-        <IconBrandDiscord className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <IconBrandGithub className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
@@ -119,7 +95,7 @@ export function SideBar() {
           <div>
             <SidebarLink
               link={{
-                label: "Osaid Zaher",
+                label: "User",
                 href: "#",
                 icon: (
                   <Image

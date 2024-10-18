@@ -1,47 +1,79 @@
+import Link from "next/link";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandGithub,
-  IconBrandX,
+  IconBrandLinkedin,
 } from "@tabler/icons-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Footer() {
   return (
     <footer>
-      <div className=" text-center text-sm">
+      <div className="text-center text-sm">
         <p>
           &copy; {new Date().getFullYear()}{" "}
           <span className="font-bold"> Stime</span>. All rights reserved.
         </p>
         <ToggleGroup type="single">
           <nav>
+            {/* Using Link for internal navigation */}
             <ToggleGroupItem value="About">
-              <a href="/about" className="mx-2">
+              <Link href="/about" className="mx-2">
                 About
-              </a>
+              </Link>
             </ToggleGroupItem>
             <ToggleGroupItem value="Contact">
-              <a href="/contact" className="mx-2">
+              <Link href="/contact" className="mx-2">
                 Contact
-              </a>
+              </Link>
             </ToggleGroupItem>
             <ToggleGroupItem value="privacy">
-              <a href="/privacy" className="mx-2">
+              <Link href="/privacy" className="mx-2">
                 Privacy Policy
+              </Link>
+            </ToggleGroupItem>
+
+            {/* Using <a> for external links */}
+            <ToggleGroupItem value="instagram">
+              <a
+                href="https://www.instagram.com/os.aid_z/?hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mx-2"
+              >
+                <IconBrandInstagram />
               </a>
             </ToggleGroupItem>
-            <ToggleGroupItem value="privacy">
-              <IconBrandInstagram />
+            <ToggleGroupItem value="facebook">
+              <a
+                href="https://www.facebook.com/osaid.zaher.7/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mx-2"
+              >
+                <IconBrandFacebook />
+              </a>
             </ToggleGroupItem>
-            <ToggleGroupItem value="privacy">
-              <IconBrandFacebook />
+            <ToggleGroupItem value="linkedin">
+              <a
+                href="https://www.linkedin.com/in/osaid-zaher-8056b8297/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mx-2"
+              >
+                <IconBrandLinkedin />
+              </a>
             </ToggleGroupItem>
-            <ToggleGroupItem value="privacy">
-              <IconBrandX />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="privacy">
-              <IconBrandGithub />
+            <ToggleGroupItem value="github">
+              <a
+                href="https://github.com/OsaidZaher"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mx-2"
+              >
+                <IconBrandGithub />
+              </a>
             </ToggleGroupItem>
           </nav>
         </ToggleGroup>

@@ -24,24 +24,26 @@ export function CrousalLoop() {
 
   return (
     <Carousel
-      plugins={[Autoplay({ delay: 2000 })]}
-      className="w-full max-w-96"
+      plugins={[Autoplay({ delay: 1500 })]}
+      className="w-full max-w-l" // Adjust width to make it appear longer
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
         {imageArray.map((src, index) => (
           <CarouselItem key={index}>
-            <div className="p-1">
-              <Card>
+            <div className="p-2">
+              <Card className="shadow-lg">
+                {" "}
+                {/* Optional: Add shadow for depth */}
                 <CardContent className="flex aspect-square items-center justify-center p-0">
                   <div className="relative w-full h-full">
                     <Image
                       src={src}
                       alt={`Carousel image ${index + 1}`}
-                      layout="fill" // Set layout to fill for responsive behavior
-                      objectFit="cover" // Maintain aspect ratio while covering the area
-                      className="rounded-lg" // Optional: for rounded corners
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-lg"
                     />
                   </div>
                 </CardContent>

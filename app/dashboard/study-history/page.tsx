@@ -12,18 +12,16 @@ async function getStudySessions(): Promise<StudySession[]> {
 
   const data = await response.json();
 
-  // Map the data to include the subject name, topic, and duration
   const formattedData = data.map((session: any) => ({
     id: session.id,
-    subjectName: session.subject.name, // Extract the subject name
-    topic: session.topic, // Use the topic from the session
-    duration: calculateDuration(session.duration), // Calculate the duration
+    subjectName: session.subject.name,
+    topic: session.topic,
+    duration: calculateDuration(session.duration),
   }));
 
   return formattedData;
 }
 
-// Function to calculate duration
 function calculateDuration(durationInSeconds: number): string {
   const hours = Math.floor(durationInSeconds / 3600);
   const minutes = Math.floor((durationInSeconds % 3600) / 60);
@@ -63,11 +61,13 @@ export default function StudySessionsPage() {
   }, []);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-10 font-semibold">
       {isLoading ? (
         <p>Loading study sessions...</p>
       ) : (
-        <DataTable columns={columns} data={data} />
+        <div className="text-blue-700 dark:text-blue-800 ">
+          <DataTable columns={columns} data={data} />
+        </div>
       )}
     </div>
   );

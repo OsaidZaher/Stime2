@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ButtonAdapted } from "@/components/ui/buttonAdaptation";
+import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 
 import {
   Sheet,
@@ -140,6 +141,7 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
   const [topic, setTopic] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
+  const [showText, setShowText] = useState(true);
 
   const handleStartSession = () => {
     if (!selectedSubject || !topic) {
@@ -150,6 +152,7 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
     }
     setStartTimer(true);
     setStartTime(new Date());
+    setShowText(false);
   };
 
   const handleSaveSession = async () => {
@@ -196,58 +199,61 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="pointer-events-auto">
-        <Timer startTimer={startTimer} onReset={resetSession} />
-        <Sheet>
-          <SheetTrigger asChild>
-            <div className="mt-5 ml-4">
-              <ButtonAdapted
-                className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl"
-                variant="outline"
-              >
-                Start Study
-              </ButtonAdapted>
-              <ButtonAdapted
-                className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl mr"
-                variant="outline"
-                onClick={handleSaveSession}
-              >
-                Save Session
-              </ButtonAdapted>
-            </div>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Study Session Details</SheetTitle>
-              <SheetDescription>
-                Add your study session details.
-              </SheetDescription>
-            </SheetHeader>
-            <div className="grid gap-4 py-4">
-              <SelectDemo
-                subjects={subjects}
-                onSubjectSelect={setSelectedSubject}
-              />
-              <Input
-                placeholder="Add topic"
-                id="topic"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              />
-              <DialogDemo addSubject={addSubject} />
-            </div>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button type="submit" onClick={handleStartSession}>
-                  Start session
-                </Button>
-              </SheetClose>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
+    <>
+      {showText && <Text />}
+      <div className=" relative inset-0 flex items-center justify-center z-50">
+        <div className="pointer-events-auto">
+          <Timer startTimer={startTimer} onReset={resetSession} />
+          <Sheet>
+            <SheetTrigger asChild>
+              <div className="mt-5 ml-4">
+                <ButtonAdapted
+                  className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl"
+                  variant="outline"
+                >
+                  Start Study
+                </ButtonAdapted>
+                <ButtonAdapted
+                  className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl mr"
+                  variant="outline"
+                  onClick={handleSaveSession}
+                >
+                  Save Session
+                </ButtonAdapted>
+              </div>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Study Session Details</SheetTitle>
+                <SheetDescription>
+                  Add your study session details.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="grid gap-4 py-4">
+                <SelectDemo
+                  subjects={subjects}
+                  onSubjectSelect={setSelectedSubject}
+                />
+                <Input
+                  placeholder="Add topic"
+                  id="topic"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                />
+                <DialogDemo addSubject={addSubject} />
+              </div>
+              <SheetFooter>
+                <SheetClose asChild>
+                  <Button type="submit" onClick={handleStartSession}>
+                    Start session
+                  </Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -356,5 +362,23 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function Text() {
+  return (
+    <div className="mt-32 ml-[500px] p-10">
+      <TypewriterEffectSmooth
+        words={[
+          { text: "Start  ", className: "text-7xl" },
+          { text: "your", className: "text-7xl" },
+          {
+            text: "Study Session.",
+            className:
+              "text-blue-600 dark:text-blue-300 great-vibes-regular text-7xl",
+          },
+        ]}
+      />
+    </div>
   );
 }

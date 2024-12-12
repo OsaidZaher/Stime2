@@ -1,4 +1,6 @@
 "use client";
+
+import { signOut } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import { IconBrandGithub } from "@tabler/icons-react";
 import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
@@ -22,6 +24,19 @@ export function SideBar() {
       setShowLogo(false); // Hide logo when sidebar is closed
     }
   }, [open]);
+
+
+ const handleLogOut = async()=>{
+  try{
+    await signOut({callbackUrl:'/'})
+  }catch(error){
+    console.error("failed to logout", error)
+  }
+ }
+
+
+
+
 
   const links = [
     {
@@ -57,6 +72,7 @@ export function SideBar() {
     {
       label: "Logout",
       href: "#",
+      onClick: handleLogOut,
       icon: (
         <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),

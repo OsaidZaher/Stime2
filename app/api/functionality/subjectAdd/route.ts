@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/auth.config";
+import { cookies } from "next/headers";
+import { headers } from "next/headers";
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = cookies();
+    const headersList = headers();
+
     const session = await getServerSession(authOptions);
     console.log("Session in POST:", session);
 
@@ -54,7 +59,11 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
+    const cookieStore = cookies();
+    const headersList = headers();
+
     const session = await getServerSession(authOptions);
+
     console.log("Session in GET:", session);
 
     if (!session || !session.user || !session.user.id) {

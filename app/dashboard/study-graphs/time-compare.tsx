@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import {
   Area,
@@ -47,15 +47,29 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ComparativeChart({
-  initialData,
-  initialTrend,
-}: {
-  initialData: ChartDataItem[];
-  initialTrend: TrendState;
-}) {
-  const [chartData, setChartData] = useState<ChartDataItem[]>(initialData);
-  const [trend, setTrend] = useState<TrendState>(initialTrend);
+export function ComparativeChart() {
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
+  const [trend, setTrend] = useState<TrendState>({ percentage: 0, isUp: true });
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch("/api/functionality/comparative-graph");
+      const data: ChartDataItem[] = await response.json();
+      setChartData(data);
+
+      // Calculate trend
+      const thisWeekTotal = data.reduce((sum, day) => sum + day.thisWeek, 0);
+      const lastWeekTotal = data.reduce((sum, day) => sum + day.lastWeek, 0);
+      const trendPercentage =
+        ((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100;
+      setTrend({
+        percentage: Math.abs(trendPercentage),
+        isUp: trendPercentage > 0,
+      });
+    }
+
+    fetchData();
+  }, []);
 
   return (
     <Card className="w-full max-w-[700px]">

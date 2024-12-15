@@ -4,9 +4,10 @@ import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
 import {
   IconClock,
   IconBook,
-  IconRobot,
   IconCalendar,
+  IconGraph,
 } from "@tabler/icons-react";
+import { SubjectContent, HoursStudyContent } from "./ui/dashboard_content";
 
 export function Grid() {
   return (
@@ -19,6 +20,7 @@ export function Grid() {
           header={item.header}
           className={item.className}
           icon={item.icon}
+          link={item.link}
         />
       ))}
     </BentoGrid>
@@ -31,23 +33,24 @@ const items = [
   {
     title: "Your most studied subject!",
     description: "You spent the most hours studying this subject",
-    header: <Skeleton />,
+    header: <SubjectContent />,
     className: "md:col-span-2",
     icon: <IconBook className="h-4 w-4 text-neutral-500" />,
   },
   {
     title: "Hours of Studying!",
-    description: "This is how many hours oyu have studied",
-    header: <Skeleton />,
+    description: "This is how many hours you have studied this week",
+    header: <HoursStudyContent />,
     className: "md:col-span-1",
     icon: <IconClock className="h-4 w-4 text-neutral-500" />,
   },
   {
-    title: "StudyBot",
-    description: "Want some tips for studying ?",
+    title: "Analytics",
+    link: "/study-graphs",
+    description: "Check how you are doing!",
     header: <Skeleton />,
     className: "md:col-span-1",
-    icon: <IconRobot className="h-4 w-4 text-neutral-500" />,
+    icon: <IconGraph className="h-4 w-4 text-neutral-500" />,
   },
   {
     title: "Upcoming Exams",

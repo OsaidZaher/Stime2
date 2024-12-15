@@ -23,6 +23,7 @@
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@tabler/icons-react": "^3.15.0",
     "@tanstack/react-table": "^8.20.5",
+    "autoprefixer": "^10.4.20",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
@@ -32,7 +33,7 @@
     "embla-carousel-react": "^8.2.1",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.438.0",
-    "next": "^14.2.7",
+    "next": "^15.1.0",
     "next-auth": "^4.24.8",
     "next-themes": "^0.3.0",
     "react": "^18",
@@ -50,9 +51,9 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "postcss": "^8",
+    "postcss": "^8.4.49",
     "prisma": "^5.20.0",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.16",
     "typescript": "^5"
   }
 }

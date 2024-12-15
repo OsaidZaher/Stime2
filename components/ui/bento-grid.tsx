@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export const BentoGrid = ({
   className,
@@ -25,14 +26,16 @@ export const BentoGridItem = ({
   description,
   header,
   icon,
+  link,
 }: {
   className?: string;
   title?: string | React.ReactNode;
   description?: string | React.ReactNode;
   header?: React.ReactNode;
   icon?: React.ReactNode;
+  link?: string;
 }) => {
-  return (
+  const content = (
     <div
       className={cn(
         "row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 dark:bg-black dark:border-white/[0.2] bg-white border border-transparent justify-between flex flex-col space-y-4",
@@ -51,4 +54,6 @@ export const BentoGridItem = ({
       </div>
     </div>
   );
+
+  return link ? <Link href={link}>{content}</Link> : content;
 };

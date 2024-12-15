@@ -159,7 +159,9 @@ export function SubjectStudyChart() {
             </ResponsiveContainer>
           </ChartContainer>
         ) : (
-          <div>No data available for the past 7 days</div>
+          <div className="text-center mt-4">
+            No data available for the past 7 days
+          </div>
         )}
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">

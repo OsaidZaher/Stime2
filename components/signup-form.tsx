@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { FormEvent, useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -8,28 +10,26 @@ import { IconBrandGoogle, IconBrandFacebook } from "@tabler/icons-react";
 import { signIn } from "next-auth/react";
 
 export default function SignupForm() {
+  const router = useRouter();
+
   const [passwordError, setPasswordError] = useState<string | null>(null); // To track password validation error
   const [formError, setFormError] = useState<string | null>(null); // To track form validation error
 
   const handleOAuthSignIn = async (
     provider: string,
     e: React.MouseEvent<HTMLButtonElement>
-  )=>{
-    e.preventDefault
+  ) => {
+    e.preventDefault;
 
-    try{
-
-      const res = signIn(provider,{
-        redirect:  true,
-        callbackUrl: '/dashboard'
-      })
-
-    }catch(error){
-      console.error("failed to sign in from:", error)
-
+    try {
+      const res = signIn(provider, {
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
+    } catch (error) {
+      console.error("failed to sign in from:", error);
     }
-  }
-
+  };
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -89,7 +89,7 @@ export default function SignupForm() {
       // Check for success or specific errors
       if (res.ok) {
         console.log("Registration Successful", result);
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       } else {
         if (result.error === "Email already registered") {
           setFormError(
@@ -194,7 +194,7 @@ export default function SignupForm() {
           <button
             className="relative group/btn flex space-x-2 items-center mt-2 justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)] outline-none"
             type="button"
-            onClick={(e) => handleOAuthSignIn("google", e, )}
+            onClick={(e) => handleOAuthSignIn("google", e)}
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-neutral-700 dark:text-neutral-300 text-sm">

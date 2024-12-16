@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
     // Use the user ID as a string
     const userId = session.user.id;
 
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+    const startDate = new Date(startTime.toISOString());
+    const endDate = new Date(endTime.toISOString());
 
     // Calculate duration in seconds
     const duration = Math.floor(

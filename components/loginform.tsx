@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -8,6 +9,8 @@ import { IconBrandFacebook, IconBrandGoogle } from "@tabler/icons-react";
 import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const [error, setError] = useState<string | null>(null); // Track login errors
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,7 +46,7 @@ export default function LoginForm() {
       }
     } else {
       // Successful login - redirect to the dashboard
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     }
   };
 

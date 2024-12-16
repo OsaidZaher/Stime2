@@ -1,17 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { authOptions } from "@/app/auth.config";
-import { cookies } from "next/headers";
-import { headers } from "next/headers";
-
-const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const headersList = headers();
     const session = (await getServerSession(authOptions)) as Session | null;
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,16 +14,24 @@ export async function POST(req: NextRequest) {
     const { subjectId, topic, startTime, endTime } = await req.json();
 
     // Ensure subjectId is a number
-    const parsedSubjectId = parseInt(subjectId, 10);
-    if (isNaN(parsedSubjectId)) {
+    const parsedSubjectId = Number(subjectId);
+
+    if (!subjectId || isNaN(parsedSubjectId)) {
       return NextResponse.json({ error: "Invalid subjectId" }, { status: 400 });
     }
 
     // Use the user ID as a string
     const userId = session.user.id;
 
-    const startDate = new Date(startTime.toISOString());
-    const endDate = new Date(endTime.toISOString());
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date format" },
+        { status: 400 }
+      );
+    }
 
     // Calculate duration in seconds
     const duration = Math.floor(
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
     );
 
     // Verify that the subject belongs to the current user
-    const subject = await prisma.subject.findUnique({
+    const subject = await prisma.subject.findFirst({
       where: {
         id: parsedSubjectId,
         userId: userId,
@@ -74,9 +76,6 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const cookieStore = cookies();
-    const headersList = headers();
-
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

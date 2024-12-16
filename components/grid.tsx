@@ -46,11 +46,11 @@ const items = [
   },
   {
     title: "Analytics",
-    link: "/study-graphs",
     description: "Check how you are doing!",
     header: <Skeleton />,
-    className: "md:col-span-1",
-    icon: <IconGraph className="h-4 w-4 text-neutral-500" />,
+    className: "md:col-span-1 ",
+    icon: <IconGraph className="h-28 w-4 text-neutral-500" />,
+    link: "/dashboard/study-graphs",
   },
   {
     title: "Upcoming Exams",

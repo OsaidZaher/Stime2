@@ -25,18 +25,13 @@ export function SideBar() {
     }
   }, [open]);
 
-
- const handleLogOut = async()=>{
-  try{
-    await signOut({callbackUrl:'/'})
-  }catch(error){
-    console.error("failed to logout", error)
-  }
- }
-
-
-
-
+  const handleLogOut = async () => {
+    try {
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      console.error("failed to logout", error);
+    }
+  };
 
   const links = [
     {

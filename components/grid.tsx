@@ -32,14 +32,14 @@ const Skeleton = () => (
 const items = [
   {
     title: "Your most studied subject!",
-    description: "You spent the most hours studying this subject",
+    description: "You spent the most hours studying this subject this month!",
     header: <SubjectContent />,
     className: "md:col-span-2",
     icon: <IconBook className="h-4 w-4 text-neutral-500" />,
   },
   {
     title: "Hours of Studying!",
-    description: "This is how many hours you have studied this week",
+    description: "This is how many hours you have studied this month!",
     header: <HoursStudyContent />,
     className: "md:col-span-1",
     icon: <IconClock className="h-4 w-4 text-neutral-500" />,

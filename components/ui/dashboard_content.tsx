@@ -2,6 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Calendar } from "@/components/ui/calendar";
+
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
 interface StudySession {
   startTime: string;
   duration: number;
@@ -101,5 +114,84 @@ export function HoursStudyContent() {
     <h1 className="text-blue-600 dark:text-blue-300 great-vibes-regular text-8xl text-center mt-16">
       {thisMonthTotal}
     </h1>
+  );
+}
+
+const chartData = [
+  { month: "", desktop: 186, mobile: 80 },
+  { month: "", desktop: 305, mobile: 200 },
+  { month: "", desktop: 237, mobile: 120 },
+  { month: "", desktop: 73, mobile: 190 },
+  { month: "", desktop: 209, mobile: 130 },
+  { month: "", desktop: 214, mobile: 140 },
+];
+const chartConfig = {
+  desktop: {
+    label: "trends",
+    color: "purple",
+    icon: TrendingDown,
+  },
+  mobile: {
+    label: "trends",
+    color: "blue",
+    icon: TrendingUp,
+  },
+} satisfies ChartConfig;
+export function DemoChart() {
+  return (
+    <div className="w-full border-black rounded-lg p-4 outline-1">
+      {" "}
+      <ChartContainer config={chartConfig}>
+        <AreaChart
+          accessibilityLayer
+          data={chartData}
+          margin={{ left: 15, right: 15 }}
+          height={270}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="line" />}
+          />
+          <Area
+            dataKey="mobile"
+            type="natural"
+            fill="var(--color-mobile)"
+            fillOpacity={0.7}
+            stroke="blue-300"
+            stackId="a"
+          />
+          <Area
+            dataKey="desktop"
+            type="natural"
+            fill="var(--color-desktop)"
+            fillOpacity={0.4}
+            stroke=""
+            stackId="a"
+          />
+          <ChartLegend content={<ChartLegendContent />} />
+        </AreaChart>
+      </ChartContainer>
+    </div>
+  );
+}
+
+export function CalendarDemo() {
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+
+  return (
+    <Calendar
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      className="rounded-md border"
+    />
   );
 }

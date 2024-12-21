@@ -7,7 +7,12 @@ import {
   IconCalendar,
   IconGraph,
 } from "@tabler/icons-react";
-import { SubjectContent, HoursStudyContent } from "./ui/dashboard_content";
+import {
+  SubjectContent,
+  HoursStudyContent,
+  DemoChart,
+  CalendarDemo,
+} from "./ui/dashboard_content";
 
 export function Grid() {
   return (
@@ -47,16 +52,16 @@ const items = [
   {
     title: "Analytics",
     description: "Check how you are doing!",
-    header: <Skeleton />,
-    className: "md:col-span-1 ",
-    icon: <IconGraph className="h-28 w-4 text-neutral-500" />,
+    header: <DemoChart />,
+    className: "md:col-span-1",
+    icon: <IconClock className="h-10 w-4 text-neutral-500" />,
     link: "/dashboard/study-graphs",
   },
   {
     title: "Upcoming Exams",
     description: "Start studying before your exams are too close",
     header: <Skeleton />,
-    className: "md:col-span-2",
-    icon: <IconCalendar className="h-4 w-4 text-neutral-500" />,
+    className: "md:col-span-2 ",
+    icon: <IconCalendar className="h-10 w-4 text-neutral-500" />,
   },
 ];

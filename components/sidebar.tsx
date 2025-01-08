@@ -10,6 +10,7 @@ import {
   IconBook2,
   IconGraph,
   IconHistory,
+  IconCalendar,
 } from "@tabler/icons-react";
 import Image from "next/image";
 export function SideBar() {
@@ -54,6 +55,13 @@ export function SideBar() {
       href: "/dashboard/study-graphs",
       icon: (
         <IconGraph className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "Calendar",
+      href: "/dashboard/calendar",
+      icon: (
+        <IconCalendar className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
 

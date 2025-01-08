@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { Calendar } from "@/components/ui/calendar";
 
 import {
   ChartConfig,
@@ -14,6 +13,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+
+import { Calendar } from "@/components/ui/calendar";
 
 interface StudySession {
   startTime: string;

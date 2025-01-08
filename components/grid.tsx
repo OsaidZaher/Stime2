@@ -1,12 +1,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
-import {
-  IconClock,
-  IconBook,
-  IconCalendar,
-  IconGraph,
-} from "@tabler/icons-react";
+import { IconClock, IconBook, IconCalendar } from "@tabler/icons-react";
 import {
   SubjectContent,
   HoursStudyContent,
@@ -62,6 +57,7 @@ const items = [
     description: "Start studying before your exams are too close",
     header: <Skeleton />,
     className: "md:col-span-2 ",
-    icon: <IconCalendar className="h-10 w-4 text-neutral-500" />,
+    icon: <IconCalendar className="h-4 w-4 text-neutral-500" />,
+    link: "/dashboard/calendar",
   },
 ];

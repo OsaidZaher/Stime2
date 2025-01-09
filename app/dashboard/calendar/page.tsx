@@ -1,6 +1,11 @@
 "use client";
 
 import * as React from "react";
+
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,11 +30,50 @@ import {
 export default function CardWithForm() {
   const [examName, setExamName] = React.useState("");
   const [date, setDate] = React.useState<Date>();
+  const { data: session } = useSession();
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Exam:", examName, "Date:", date);
-    // Add your submission logic here
+
+    if (!session) {
+      toast?.error("You must be signed in to add an exam");
+      return;
+    }
+
+    if (!examName || !date) {
+      toast?.error("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/functionality/calendar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          examName,
+          date,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create exam");
+      }
+
+      const exam = await response.json();
+
+      setExamName("");
+      setDate(undefined);
+
+      toast?.success("Exam added successfully!");
+
+      router.refresh();
+    } catch (error) {
+      console.error("Error adding exam:", error);
+      toast?.error("Failed to add exam");
+    }
   };
 
   return (

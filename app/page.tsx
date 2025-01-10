@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 import { motion } from "framer-motion";
 import SignupForm from "@/components/signup-form";
-import { CrousalLoop } from "@/components/carousalLoop";
 import { ModeToggle } from "@/components/ui/themetoggle";
 import LoginButton from "@/components/loginbutton";
+import { CardStackUsage } from "@/components/ui/cardStackUse";
 
 export default function Home() {
   const [showText, setShowText] = useState(false);
@@ -81,7 +81,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           >
-            <CrousalLoop />
+            <CardStackUsage />
           </motion.div>
 
           {/* Signup Form */}

@@ -27,6 +27,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { Calendar2 } from "@/components/ui/calendar2";
+
 export default function CardWithForm() {
   const [examName, setExamName] = React.useState("");
   const [date, setDate] = React.useState<Date>();
@@ -77,10 +79,15 @@ export default function CardWithForm() {
   };
 
   return (
-    <div className="div">
-      <Card className="w-[500px] h-[400px] ml-48 mt-40">
+    <div className="flex items-center justify-center space-x-8">
+      {/* Calendar Section */}
+      <div className="flex-shrink-0">
+        <Calendar2 />
+      </div>
+
+      {/* Card Section */}
+      <Card className="w-[450px] h-[380px]">
         <CardHeader>
-          <div className="div"></div>
           <CardTitle>Upcoming exam?</CardTitle>
           <CardDescription>Add it right here!</CardDescription>
         </CardHeader>

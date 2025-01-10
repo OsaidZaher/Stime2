@@ -106,7 +106,7 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-xl p-4 md:p-8 shadow-input bg-white dark:bg-black ">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-xl p-4 md:p-8 shadow-input bg-white dark:bg-black outline outline-2 outline-neutral-200 dark:outline-neutral-800">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Join{" "}
         <span className="text-blue-600 dark:text-blue-300 great-vibes-regular">

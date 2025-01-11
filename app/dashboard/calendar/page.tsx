@@ -27,6 +27,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { ExamTable } from "@/components/ui/examTable";
 import { Calendar2 } from "@/components/ui/calendar2";
 
 export default function CardWithForm() {
@@ -79,63 +80,71 @@ export default function CardWithForm() {
   };
 
   return (
-    <div className="flex items-center justify-center space-x-8">
+    <div className="flex items-start justify-center space-x-8 space-y-3">
       {/* Calendar Section */}
       <div className="flex-shrink-0">
         <Calendar2 />
       </div>
 
-      {/* Card Section */}
-      <Card className="w-[450px] h-[380px]">
-        <CardHeader>
-          <CardTitle>Upcoming exam?</CardTitle>
-          <CardDescription>Add it right here!</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="grid w-full items-center gap-6">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Exam Name</Label>
-                <Input
-                  id="name"
-                  placeholder="What exam is it?"
-                  value={examName}
-                  onChange={(e) => setExamName(e.target.value)}
-                />
+      {/* Table and Card Section */}
+      <div className="flex flex-col space-y-8">
+        <ExamTable />
+
+        <Card className="w-[550px] h-[350px]">
+          <CardHeader>
+            <CardTitle>Upcoming exam?</CardTitle>
+            <CardDescription>Add it right here!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <div className="grid w-full items-center gap-6">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="name">Exam Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="What exam is it?"
+                    value={examName}
+                    onChange={(e) => setExamName(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="date">Exam Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="date"
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? (
+                          format(date, "PPP")
+                        ) : (
+                          <span>Pick exam date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="date">Exam Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick exam date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button onClick={handleSubmit}>Add Exam</Button>
-        </CardFooter>
-      </Card>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button onClick={handleSubmit}>Add Exam</Button>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 }

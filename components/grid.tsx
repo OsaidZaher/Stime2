@@ -36,6 +36,7 @@ const items = [
     header: <SubjectContent />,
     className: "md:col-span-2",
     icon: <IconBook className="h-4 w-4 text-neutral-500" />,
+    link: "/dashboard/demoDashboard",
   },
   {
     title: "Hours of Studying!",

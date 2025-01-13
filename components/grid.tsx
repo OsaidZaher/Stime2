@@ -51,7 +51,6 @@ const items = [
     header: <DemoChart />,
     className: "md:col-span-1",
     icon: <IconClock className="h-10 w-4 text-neutral-500" />,
-    link: "/dashboard/study-graphs",
   },
   {
     title: "Upcoming Exams",
@@ -59,6 +58,5 @@ const items = [
     header: <Skeleton />,
     className: "md:col-span-2 ",
     icon: <IconCalendar className="h-4 w-4 text-neutral-500" />,
-    link: "/dashboard/calendar",
   },
 ];

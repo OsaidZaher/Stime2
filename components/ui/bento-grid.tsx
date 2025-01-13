@@ -38,7 +38,7 @@ export const BentoGridItem = ({
   const content = (
     <div
       className={cn(
-        "row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-xl p-4 dark:bg-black dark:border-transparent bg-white border border-b-slate-50 justify-between flex flex-col space-y-4",
+        "row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-xl p-4 dark:bg-black dark:border-transparent bg-white border border-b-slate-50 justify-between flex flex-col space-y-4 h-full", // Added h-full
         className
       )}
     >
@@ -55,5 +55,11 @@ export const BentoGridItem = ({
     </div>
   );
 
-  return link ? <Link href={link}>{content}</Link> : content;
+  return link ? (
+    <Link href={link} className={cn("block h-full", className)}>
+      {content}
+    </Link>
+  ) : (
+    content
+  );
 };

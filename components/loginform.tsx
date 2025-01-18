@@ -55,14 +55,13 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:login-form-bg outline-none">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input dark:bg-black dark:border-transparent bg-white border border-b-slate-200">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Login to{" "}
         <span className="text-blue-600 dark:text-blue-300 great-vibes-regular font-bold">
           Stime
         </span>
       </h2>
-
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>

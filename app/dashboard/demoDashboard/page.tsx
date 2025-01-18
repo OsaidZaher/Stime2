@@ -41,7 +41,7 @@ export default function StarsCard() {
     setIsOpen(false);
   };
 
-  const handleDropdownOpen = (open) => {
+  const handleDropdownOpen = (open: boolean) => {
     setIsOpen(open);
     if (open) {
       setTempGoal(weeklyGoal); // Reset temp goal when opening
@@ -72,10 +72,9 @@ export default function StarsCard() {
       </CardContent>
       <CardFooter className="flex justify-between items-center">
         <span className="text-m text-gray-600 dark:text-gray-400">
-          You have {7 - weeklyGoal} days until you hit your goal!
-          {if (weeklyGoal==0{
-            "You have hit your goal!"
-          })}
+          {weeklyGoal === 0
+            ? "You have hit your goal!"
+            : `You have ${7 - weeklyGoal} days until you hit your goal!`}
         </span>
         <DropdownMenu open={isOpen} onOpenChange={handleDropdownOpen}>
           <DropdownMenuTrigger asChild>

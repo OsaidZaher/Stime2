@@ -5,9 +5,8 @@ import React, { useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
-import { IconBrandFacebook, IconBrandGoogle } from "@tabler/icons-react";
+import { IconBrandFacebook, IconBrandGoogleFilled } from "@tabler/icons-react";
 import { signIn } from "next-auth/react";
-
 export default function LoginForm() {
   const router = useRouter();
 
@@ -56,9 +55,9 @@ export default function LoginForm() {
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input dark:bg-black dark:border-transparent bg-white border border-b-slate-200">
-      <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+      <h2 className="font-bold  text-neutral-800 dark:text-neutral-200 text-2xl">
         Login to{" "}
-        <span className="text-blue-600 dark:text-blue-300 great-vibes-regular font-bold">
+        <span className="text-blue-600 dark:text-blue-300 great-vibes-regular font-bold text-3xl">
           Stime
         </span>
       </h2>
@@ -111,9 +110,9 @@ export default function LoginForm() {
             onClick={() => handleOAuthSignIn("google")}
             className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
           >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+            <IconBrandGoogleFilled className="h-4 w-4 text-blue-600 dark:text-blue-300 " />
             <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Google
+              Continue with Google
             </span>
             <BottomGradient />
           </button>

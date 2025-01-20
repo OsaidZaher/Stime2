@@ -36,20 +36,15 @@ export default function Home() {
               ]}
             />
           </div>
-          <p className="mt-4">
-            The tool to make you that straight A student. Track your study time
-            with{" "}
+          <p className="mt-4 text-xl">
+            The tool to make you that straight A student. with{" "}
             <span className="text-blue-600 dark:text-blue-300 font-semibold">
               Stime.
             </span>
           </p>
         </section>
 
-        {/* Content Section */}
-        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-start">
-          <CardStackUsage />
-          <SignupForm />
-        </div>
+        {/*<SignupForm />  */}
       </main>
     </div>
   );

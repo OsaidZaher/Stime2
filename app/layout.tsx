@@ -19,24 +19,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Link to the favicon */}
         <link rel="icon" href="/logo_no_bg.png" type="image/png" />
-
-        {/* Google Fonts link */}
         <link
           href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+      <body
+        className={`${inter.className} min-h-screen flex flex-col`}
+        suppressHydrationWarning
+      >
         <ClientSessionProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
+            storageKey="theme-preference"
           >
             <main className="flex-grow">{children}</main>
             <footer className="mt-auto">

@@ -44,7 +44,7 @@ export default function Home() {
           </p>
         </section>
 
-        {/*<SignupForm />  */}
+        <SignupForm />
       </main>
     </div>
   );

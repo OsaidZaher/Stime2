@@ -54,8 +54,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input dark:bg-black dark:border-transparent bg-white border border-b-slate-200">
-      <h2 className="font-bold  text-neutral-800 dark:text-neutral-200 text-2xl">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-3xl p-4 md:p-8 shadow-input dark:bg-black dark:border-transparent bg-white border border-b-slate-200">
+      <h2 className="font-bold text-neutral-800 dark:text-neutral-200 text-2xl">
         Login to{" "}
         <span className="text-blue-600 dark:text-blue-300 great-vibes-regular font-bold text-3xl">
           Stime
@@ -82,7 +82,6 @@ export default function LoginForm() {
           />
         </LabelInputContainer>
 
-        {/* Display error message in red */}
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
         <button
@@ -90,28 +89,47 @@ export default function LoginForm() {
           type="submit"
         >
           Login &rarr;
-          <BottomGradient />
         </button>
+
+        <div className="mt-3 text-center">
+          <button
+            type="button"
+            className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+          >
+            Don't have an account? Create one
+          </button>
+        </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
-          {/* <button
-            className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-            onClick={() => handleOAuthSignIn("facebook")}
-          >
-            <IconBrandFacebook className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Facebook
-            </span>
-            <BottomGradient />
-          </button> */}
           <button
+            className="flex items-center justify-center border border-gray-300 rounded-md px-4 py-2 bg-white relative group/btn hover:bg-gray-50 transition-all duration-300"
             onClick={() => handleOAuthSignIn("google")}
-            className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+            type="button"
           >
-            <IconBrandGoogleFilled className="h-4 w-4 text-blue-600 dark:text-blue-300 " />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+            <div className="h-5 w-5 mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <path
+                  fill="#EA4335"
+                  d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                ></path>
+                <path
+                  fill="#4285F4"
+                  d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                ></path>
+                <path
+                  fill="#FBBC05"
+                  d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                ></path>
+                <path
+                  fill="#34A853"
+                  d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                ></path>
+                <path fill="none" d="M0 0h48v48H0z"></path>
+              </svg>
+            </div>
+            <span className="text-gray-700 font-medium">
               Continue with Google
             </span>
             <BottomGradient />

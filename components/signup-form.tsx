@@ -9,7 +9,34 @@ import { cn } from "@/lib/utils";
 import { IconBrandGoogle, IconBrandFacebook } from "@tabler/icons-react";
 import { signIn } from "next-auth/react";
 
-export default function SignupForm() {
+export default function SignupPopup({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  if (!isOpen) return null; // Don't render the modal if it's not open
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      {/* Modal Content */}
+      <div className="bg-white dark:bg-black rounded-lg p-6 shadow-lg max-w-lg w-full relative">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+        >
+          &times;
+        </button>
+
+        {/* Signup Form */}
+        <SignupForm />
+      </div>
+    </div>
+  );
+}
+function SignupForm() {
   const router = useRouter();
 
   const [passwordError, setPasswordError] = useState<string | null>(null); // To track password validation error
@@ -106,16 +133,16 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-xl p-4 md:p-8 shadow-input bg-white dark:bg-black outline outline-2 outline-neutral-200 dark:outline-neutral-800">
-      <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-xl p-4 md:p-8 shadow-input bg-white dark:bg-black ">
+      <h2 className="font-bold text-3xl text-neutral-800 dark:text-neutral-200 mb-2">
         Join{" "}
-        <span className="text-blue-600 dark:text-blue-300 great-vibes-regular">
+        <span className="text-blue-600 dark:text-blue-400 great-vibes-regular">
           Stime
         </span>
       </h2>
-      <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+      <p className="text-neutral-600 text-sm max-w-sm mx-auto mb-8 dark:text-neutral-300">
         Sign up to start your{" "}
-        <span className="text-blue-600 dark:text-blue-300 font-semibold">
+        <span className="text-blue-600 dark:text-blue-400 font-semibold">
           Stime
         </span>{" "}
         journey!
@@ -123,9 +150,11 @@ export default function SignupForm() {
 
       <form className="my-8" onSubmit={handleSubmit}>
         {formError && <p className="text-red-500 text-sm mb-4">{formError}</p>}
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-6">
           <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
+            <Label htmlFor="firstname" className="text-left block mb-2">
+              First name
+            </Label>
             <Input
               id="firstname"
               placeholder="Name"
@@ -135,7 +164,9 @@ export default function SignupForm() {
           </LabelInputContainer>
 
           <LabelInputContainer>
-            <Label htmlFor="lastname">Last name</Label>
+            <Label htmlFor="lastname" className="text-left block mb-2">
+              Last name
+            </Label>
             <Input
               id="lastname"
               placeholder="Last Name"
@@ -145,7 +176,9 @@ export default function SignupForm() {
           </LabelInputContainer>
         </div>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email" className="text-left block mb-2">
+            Email Address
+          </Label>
           <Input
             id="email"
             placeholder="name@gmail.com"
@@ -154,7 +187,9 @@ export default function SignupForm() {
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="text-left block mb-2">
+            Password
+          </Label>
           <Input
             id="password"
             placeholder="••••••••"
@@ -174,35 +209,6 @@ export default function SignupForm() {
           Sign up &rarr;
           <BottomGradient />
         </button>
-
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        <div className="flex flex-col space-y-4">
-          {/*
-          <button
-            className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)] outline-none"
-            type="button"
-            // onClick={(e) => handleOAuthSignIn("facebook", e)}
-          >
-            <IconBrandFacebook className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Facebook
-            </span>
-            <BottomGradient />
-          </button>
-          */}
-          <button
-            className="relative group/btn flex space-x-2 items-center mt-2 justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)] outline-none"
-            type="button"
-            onClick={(e) => handleOAuthSignIn("google", e)}
-          >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Google
-            </span>
-            <BottomGradient />
-          </button>
-        </div>
       </form>
     </div>
   );

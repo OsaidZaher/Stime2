@@ -32,7 +32,7 @@ export function ModeToggle() {
       variant="outline"
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="border-none shadow-none relative"
+      className="border-none shadow-none relative bg-transparent hover:bg-transparent" // Added these classes
     >
       <div className="relative w-[1.2rem] h-[1.2rem]">
         <Sun

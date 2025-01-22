@@ -1,7 +1,8 @@
 "use client";
 import { cn } from "@/lib/utils";
-import Link, { LinkProps } from "next/link";
-import React, { useState, createContext, useContext } from "react";
+import Link from "next/link";
+import type React from "react";
+import { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 
@@ -15,6 +16,8 @@ interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
+  isHovered: boolean;
+  setIsHovered: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SidebarContext = createContext<SidebarContextProps | undefined>(
@@ -41,12 +44,15 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+    <SidebarContext.Provider
+      value={{ open, setOpen, animate, isHovered, setIsHovered }}
+    >
       {children}
     </SidebarContext.Provider>
   );
@@ -84,22 +90,40 @@ export const DesktopSidebar = ({
   children,
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, setOpen, animate, isHovered, setIsHovered } = useSidebar();
   return (
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-white dark:bg-black w-[300px] flex-shrink-0 outline-4 shadow-lg",
+          "h-full px-4 py-4 hidden md:flex md:flex-col bg-transparent flex-shrink-0 outline-4 relative",
           className
         )}
         animate={{
-          width: animate ? (open ? "300px" : "60px") : "300px",
+          width: animate ? (isHovered ? "200px" : "60px") : "300px",
         }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
-        {children}
+        <motion.div
+          className="absolute inset-0 shadow-lg border-slate-100 dark:border-slate-950 bg-[rgb(252,252,252)] dark:bg-[#000000]"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: isHovered ? 1 : 0,
+            borderRight: isHovered ? "2px solid #e5e7eb dark:#414141 " : "none",
+          }}
+          transition={{ duration: 0.2 }}
+        />
+        <motion.div
+          className="relative z-10 flex flex-col w-full"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: isHovered ? 1 : 0,
+          }}
+          transition={{ duration: 0.2 }}
+        >
+          {children}
+        </motion.div>
       </motion.div>
     </>
   );
@@ -115,7 +139,7 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
         )}
         {...props}
       >
@@ -163,7 +187,26 @@ export const SidebarLink = ({
   link: Links & { onClick?: () => void };
   className?: string;
 }) => {
-  const { open, animate } = useSidebar();
+  const { open, animate, isHovered } = useSidebar();
+
+  const baseContent = (
+    <>
+      <div>{link.icon}</div>
+      <motion.span
+        animate={{
+          display: animate
+            ? isHovered
+              ? "inline-block"
+              : "none"
+            : "inline-block",
+          opacity: animate ? (isHovered ? 1 : 0) : 1,
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        {link.label}
+      </motion.span>
+    </>
+  );
 
   if (link.onClick && link.href === "#") {
     return (
@@ -174,21 +217,7 @@ export const SidebarLink = ({
           className
         )}
       >
-        {link.icon}
-
-        <motion.span
-          animate={{
-            display: animate
-              ? open
-                ? "inline-block"
-                : "none"
-              : "inline-block",
-            opacity: animate ? (open ? 1 : 0) : 1,
-          }}
-          className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-        >
-          {link.label}
-        </motion.span>
+        {baseContent}
       </div>
     );
   }
@@ -201,17 +230,23 @@ export const SidebarLink = ({
         className
       )}
     >
-      {link.icon}
-
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-      >
-        {link.label}
-      </motion.span>
+      {baseContent}
     </Link>
+  );
+};
+
+export const SidebarTime = () => {
+  const { isHovered } = useSidebar();
+  return (
+    <motion.div
+      className="absolute bottom-4 left-4 text-md text-neutral-500"
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: isHovered ? 1 : 0, // Show the text when hovered
+      }}
+      transition={{ duration: 0.3 }} // Optional smooth transition
+    >
+      Stime
+    </motion.div>
   );
 };

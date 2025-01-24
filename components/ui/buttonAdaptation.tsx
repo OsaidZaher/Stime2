@@ -11,7 +11,7 @@ import { useRef } from "react";
 import { cn } from "@/lib/utils";
 
 export function ButtonAdapted({
-  borderRadius = "1.75rem",
+  borderRadius = "1rem",
   children,
   as: Component = "button",
   containerClassName,
@@ -32,7 +32,7 @@ export function ButtonAdapted({
   return (
     <Component
       className={cn(
-        "bg-transparent relative text-5xl  h-16 w-48 p-[1px] overflow-hidden mr-12",
+        "bg-transparent relative h-24  w-64 p-[1px] overflow-hidden ",
         containerClassName
       )}
       style={{
@@ -47,7 +47,7 @@ export function ButtonAdapted({
         <MovingBorder duration={duration} rx="30%" ry="30%">
           <div
             className={cn(
-              "h-28 w-44 opacity-[0.8] bg-[radial-gradient(var(--sky-500)_40%,transparent_60%)]",
+              "h-48 opacity-[0.8] bg-[radial-gradient(var(--sky-500)_40%,transparent_60%)]",
               borderClassName
             )}
           />
@@ -56,7 +56,7 @@ export function ButtonAdapted({
 
       <div
         className={cn(
-          "relative bg-slate-900/[0.8] border border-slate-800 backdrop-blur-xl text-white flex items-center justify-center w-full h-full text-sm antialiased",
+          "relative bg-slate-900/[0.9]  border shadow-lg border-spacing-4 border-slate-800 backdrop-blur-xl text-white flex items-center justify-center w-full h-full text-sm antialiased",
           className
         )}
         style={{

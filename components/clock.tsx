@@ -1,6 +1,8 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { ChevronUp, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TimerProps {
   startTimer: boolean;
@@ -51,7 +53,8 @@ export function Timer({ startTimer, onReset }: TimerProps) {
     return () => clearInterval(interval);
   }, [isRunning, isPaused, minutes, seconds]);
 
-  const togglePause = () => {
+  const togglePause = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Prevent event bubbling
     setIsPaused(!isPaused);
   };
 
@@ -100,46 +103,188 @@ export function Timer({ startTimer, onReset }: TimerProps) {
   };
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center justify-between w-full max-w-6xl mx-auto p-8 ">
       <div className="flex items-center">
-        <div className="flex flex-col">
-          <button onClick={incrementMinutes} className="p-1">
-            <ChevronUp size={15} />
-          </button>
-          <button onClick={decrementMinutes} className="p-1">
-            <ChevronDown size={15} />
-          </button>
+        {/* Minutes */}
+        <div className="flex items-center group">
+          <div className="flex flex-col ">
+            <button
+              onClick={incrementMinutes}
+              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+            >
+              <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+            </button>
+            <button
+              onClick={decrementMinutes}
+              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+            >
+              <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+            </button>
+          </div>
+          <span className="text-[12rem] font-bold tabular-nums transition-colors">
+            {String(minutes).padStart(2, "0")}
+          </span>
         </div>
-        <span className="text-7xl font-bold mx-1">
-          {String(minutes).padStart(2, "0")}
-        </span>
+
+        <span className="text-[12rem] font-bold mx-4">:</span>
+
+        {/* Seconds */}
+        <div className="flex items-center group">
+          <span className="text-[12rem] font-bold tabular-nums transition-colors">
+            {String(seconds).padStart(2, "0")}
+          </span>
+          <div className="flex flex-col ml-2">
+            <button
+              onClick={incrementSeconds}
+              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+            >
+              <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+            </button>
+            <button
+              onClick={decrementSeconds}
+              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+            >
+              <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+            </button>
+          </div>
+        </div>
       </div>
-      <span className="text-7xl font-bold">:</span>
+
+      {/* Controls */}
+      <div className="flex flex-col space-y-6 ml-12 mt-20">
+        <button
+          onClick={togglePause}
+          className={cn(
+            "p-8 rounded-full transition-all duration-200 ease-in-out",
+            "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
+            "text-white shadow-lg hover:shadow-xl",
+            "transform hover:scale-105 active:scale-95"
+          )}
+        >
+          {isPaused ? <Play size={40} /> : <Pause size={40} />}
+        </button>
+        <button
+          onClick={resetTimer}
+          className={cn(
+            "p-8 rounded-full transition-all duration-200 ease-in-out",
+            "bg-neutral-200 hover:bg-neutral-300 dark:bg-slate-800 dark:hover:bg-slate-700",
+            "text-neutral-700 dark:text-neutral-200 shadow-lg hover:shadow-xl",
+            "transform hover:scale-105 active:scale-95"
+          )}
+        >
+          <RotateCcw size={40} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface StopwatchProps {
+  startStopwatch: boolean;
+  onReset: () => void;
+}
+
+export function Stopwatch({ startStopwatch, onReset }: StopwatchProps) {
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  //const [milliseconds, setMilliseconds] = useState(0) //Removed
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (startStopwatch) {
+      setIsRunning(true);
+      setIsPaused(false);
+    } else {
+      resetStopwatch();
+    }
+  }, [startStopwatch]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isRunning && !isPaused) {
+      interval = setInterval(() => {
+        if (seconds < 59) {
+          setSeconds(seconds + 1);
+        } else {
+          setSeconds(0);
+          setMinutes(minutes + 1);
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isRunning, isPaused, minutes, seconds]);
+
+  const togglePause = () => {
+    setIsPaused(!isPaused);
+  };
+
+  const resetStopwatch = () => {
+    setMinutes(0);
+    setSeconds(0);
+    //setMilliseconds(0) //Removed
+    setIsRunning(false);
+    setIsPaused(false);
+    onReset();
+  };
+
+  return (
+    <div className="flex items-center justify-between w-full max-w-6xl mx-auto p-8">
       <div className="flex items-center">
-        <span className="text-7xl font-bold mx-1">
-          {String(seconds).padStart(2, "0")}
-        </span>
-        <div className="flex flex-col">
-          <button onClick={incrementSeconds} className="p-1">
-            <ChevronUp size={15} />
-          </button>
-          <button onClick={decrementSeconds} className="p-1">
-            <ChevronDown size={15} />
-          </button>
+        {/* Minutes */}
+        <div className="flex items-center group">
+          <span className="text-[12rem] font-bold tabular-nums transition-colors">
+            {String(minutes).padStart(2, "0")}
+          </span>
         </div>
+
+        <span className="text-[12rem] font-bold mx-4">:</span>
+
+        {/* Seconds */}
+        <div className="flex items-center group">
+          <span className="text-[12rem] font-bold tabular-nums transition-colors">
+            {String(seconds).padStart(2, "0")}
+          </span>
+        </div>
+
+        {/* Removed Milliseconds display */}
+        {/* <span className="text-[12rem] font-bold mx-4">.</span>
+
+        {/* Milliseconds */}
+        {/* <div className="flex items-center group">
+          <span className="text-[12rem] font-bold tabular-nums transition-colors">
+            {String(milliseconds).padStart(2, "0")}
+          </span>
+        </div> */}
       </div>
-      <button
-        onClick={togglePause}
-        className="p-2 bg-blue-500 text-white rounded-full"
-      >
-        {isPaused ? <Play size={50} /> : <Pause size={50} />}
-      </button>
-      <button
-        onClick={resetTimer}
-        className="p-2 bg-gray-500 text-white rounded-full"
-      >
-        <RotateCcw size={50} />
-      </button>
+
+      {/* Controls */}
+      <div className="flex flex-col space-y-6 ml-12 mt-20">
+        <button
+          onClick={togglePause}
+          className={cn(
+            "p-8 rounded-full transition-all duration-200 ease-in-out",
+            "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
+            "text-white shadow-lg hover:shadow-xl",
+            "transform hover:scale-105 active:scale-95"
+          )}
+        >
+          {isPaused ? <Play size={40} /> : <Pause size={40} />}
+        </button>
+        <button
+          onClick={resetStopwatch}
+          className={cn(
+            "p-8 rounded-full transition-all duration-200 ease-in-out",
+            "bg-neutral-200 hover:bg-neutral-300 dark:bg-slate-800 dark:hover:bg-slate-700",
+            "text-neutral-700 dark:text-neutral-200 shadow-lg hover:shadow-xl",
+            "transform hover:scale-105 active:scale-95"
+          )}
+        >
+          <RotateCcw size={40} />
+        </button>
+      </div>
     </div>
   );
 }

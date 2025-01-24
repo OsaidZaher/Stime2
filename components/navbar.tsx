@@ -1,4 +1,5 @@
 "use client";
+import { signOut } from "next-auth/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -68,3 +69,11 @@ export function NotificationBell() {
     </Popover>
   );
 }
+
+const handleLogOut = async () => {
+  try {
+    await signOut({ callbackUrl: "/" });
+  } catch (error) {
+    console.error("failed to logout", error);
+  }
+};

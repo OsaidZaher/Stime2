@@ -1,5 +1,5 @@
 import { ModeToggle } from "@/components/ui/themetoggle";
-import { SideBar } from "@/components/sidebar";
+import SideBar from "@/components/sidebar";
 import { UserDrop, NotificationBell } from "@/components/navbar";
 
 export default function DashboardLayout({
@@ -8,23 +8,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen flex flex-col">
-      <div className="flex justify-between items-center p-4">
-        {/* Left-aligned "Stime" */}
-        <h1 className="text-blue-600 dark:text-blue-300 great-vibes-regular text-3xl ml-2 mt-2">
-          Stime
-        </h1>
-
-        {/* Right-aligned components with consistent spacing */}
+    <div className="min-h-screen flex flex-col">
+      {/* Top Navbar */}
+      <header className="flex items-center justify-end p-4 ">
         <div className="flex items-center space-x-4">
           <ModeToggle />
           <NotificationBell />
           <UserDrop />
         </div>
-      </div>
-      <div className="flex flex-grow">
-        <SideBar />
-        <div className="flex-grow p-4">{children}</div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex flex-1">
+        <aside>
+          <SideBar />
+        </aside>
+        <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
   );

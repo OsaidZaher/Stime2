@@ -3,23 +3,20 @@
 import { useState, useEffect } from "react"; // Combine imports for useState and useEffect
 
 import { useSession } from "next-auth/react";
-import { Timer } from "@/components/clock";
-import { Roboto_Mono } from "next/font/google";
+import { Timer, Stopwatch } from "@/components/clock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ButtonAdapted } from "@/components/ui/buttonAdaptation";
-import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
-
+import { SidebarInset } from "@/components/ui/sidebar";
 import {
   Sheet,
   SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetFooter,
 } from "@/components/ui/sheet";
 import {
   Select,
@@ -56,6 +53,7 @@ export default function StudySession() {
   const { data: session, status } = useSession();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showTimer, setShowTimer] = useState(true);
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -115,6 +113,10 @@ export default function StudySession() {
     }
   };
 
+  const toggleView = () => {
+    setShowTimer((prev) => !prev);
+  };
+
   if (status === "loading") {
     return <div>Loading...</div>;
   }
@@ -124,24 +126,50 @@ export default function StudySession() {
   }
 
   return (
-    <div>
-      <SheetDemo subjects={subjects} addSubject={addSubject} />
-    </div>
+    <SidebarInset>
+      <div className="absolute top-4 right-4 z-50">
+        <Button
+          className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
+          variant="outline"
+          onClick={toggleView}
+        >
+          {showTimer ? "Show Stopwatch" : "Show Timer"}
+        </Button>
+      </div>
+      {/* Move StudyMenu to the top */}
+      <div className=" ml-[750px] top-0 "></div>
+      {/* Ensure main content is centered */}
+      <main className="flex items-center justify-center min-h-screen bg-background">
+        <SheetDemo
+          subjects={subjects}
+          addSubject={addSubject}
+          showTimer={showTimer}
+          toggleView={toggleView}
+        />
+      </main>
+    </SidebarInset>
   );
 }
 
 interface SheetDemoProps {
   subjects: Subject[];
   addSubject: (newSubject: string) => void;
+  showTimer: boolean;
+  toggleView: () => void;
 }
 
-function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
+function SheetDemo({
+  subjects,
+  addSubject,
+  showTimer,
+  toggleView,
+}: SheetDemoProps) {
   const [startTimer, setStartTimer] = useState(false);
+  const [startStopwatch, setStartStopwatch] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
   const [topic, setTopic] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-  const [showText, setShowText] = useState(true);
 
   const handleStartSession = () => {
     if (!selectedSubject || !topic) {
@@ -150,9 +178,15 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
       );
       return;
     }
-    setStartTimer(true);
+
+    // Start the appropriate timer based on current view
+    if (showTimer) {
+      setStartTimer(true);
+    } else {
+      setStartStopwatch(true);
+    }
+
     setStartTime(new Date());
-    setShowText(false);
   };
 
   const handleSaveSession = async () => {
@@ -175,6 +209,7 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
           topic,
           startTime,
           endTime,
+          timerType: showTimer ? "timer" : "stopwatch",
         }),
       });
 
@@ -196,30 +231,43 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
     setStartTime(null);
     setEndTime(null);
     setStartTimer(false);
+    setStartStopwatch(false);
   };
 
   return (
     <>
-      {showText && <Text />}
-      <div className=" relative inset-0 flex items-center justify-center z-50">
+      <div className="relative inset-0 flex items-center justify-center z-50">
         <div className="pointer-events-auto">
-          <Timer startTimer={startTimer} onReset={resetSession} />
           <Sheet>
             <SheetTrigger asChild>
-              <div className="mt-5 ml-4">
-                <ButtonAdapted
-                  className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl"
-                  variant="outline"
-                >
-                  Start Study
-                </ButtonAdapted>
-                <ButtonAdapted
-                  className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-xl mr"
-                  variant="outline"
-                  onClick={handleSaveSession}
-                >
-                  Save Session
-                </ButtonAdapted>
+              <div className="mt-[-175px] space-y-0 ml-10">
+                {/* Display Timer or Stopwatch based on `showTimer` */}
+                {showTimer ? (
+                  <Timer startTimer={startTimer} onReset={resetSession} />
+                ) : (
+                  <Stopwatch
+                    startStopwatch={startStopwatch}
+                    onReset={resetSession}
+                  />
+                )}
+                <div className="ml-24 space-x-20 mt-4">
+                  {/* Start Study Button */}
+                  <Button
+                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
+                    variant="outline"
+                  >
+                    Start Study
+                  </Button>
+
+                  {/* Save Session Button */}
+                  <Button
+                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
+                    variant="outline"
+                    onClick={handleSaveSession}
+                  >
+                    Save Session
+                  </Button>
+                </div>
               </div>
             </SheetTrigger>
             <SheetContent>
@@ -244,7 +292,13 @@ function SheetDemo({ subjects, addSubject }: SheetDemoProps) {
               </div>
               <SheetFooter>
                 <SheetClose asChild>
-                  <Button type="submit" onClick={handleStartSession}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartSession(); // Use the existing handleStartSession method
+                    }}
+                  >
                     Start session
                   </Button>
                 </SheetClose>
@@ -264,7 +318,7 @@ interface SelectDemoProps {
 
 function SelectDemo({ subjects, onSubjectSelect }: SelectDemoProps) {
   return (
-    <Select onValueChange={(value) => onSubjectSelect(parseInt(value))}>
+    <Select onValueChange={(value) => onSubjectSelect(Number.parseInt(value))}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a subject" />
       </SelectTrigger>
@@ -362,23 +416,5 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function Text() {
-  return (
-    <div className="mt-32 ml-[500px] p-10">
-      <TypewriterEffectSmooth
-        words={[
-          { text: "Start  ", className: "text-7xl" },
-          { text: "your", className: "text-7xl" },
-          {
-            text: "Study Session.",
-            className:
-              "text-blue-600 dark:text-blue-300 great-vibes-regular text-7xl",
-          },
-        ]}
-      />
-    </div>
   );
 }

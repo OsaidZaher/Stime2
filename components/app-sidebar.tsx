@@ -17,73 +17,40 @@ import {
 
 // This is sample data.
 const data = {
-  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
   navMain: [
     {
-      title: "Study Session",
+      title: "Stime",
       url: "#",
+      className:
+        "text-blue-600 dark:text-blue-300 great-vibes-regular text-3xl mt-5 ml-4 gap-y-4", // Add the classes here
       items: [
+        {
+          title: "   ",
+          url: "#",
+        },
+        {
+          title: "Home",
+          url: "#",
+        },
+        {
+          title: "Study Session",
+          url: "#",
+          isActive: true,
+        },
+        {
+          title: "History",
+          url: "#",
+        },
+        {
+          title: "Calendar",
+          url: "#",
+        },
         {
           title: "Analytics",
           url: "#",
         },
         {
-          title: "Exams",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Building Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
+          title: "Discord",
           url: "#",
         },
       ],
@@ -94,12 +61,14 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader></SidebarHeader>
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
+        {/* Render each parent group */}
         {data.navMain.map((item) => (
           <SidebarGroup key={item.title}>
-            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+            {/* Apply inline styles from the style property */}
+            <SidebarGroupLabel className={item.className}>
+              {item.title}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items.map((item) => (

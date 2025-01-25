@@ -49,6 +49,10 @@ const data = {
           title: "Analytics",
           url: "/dashboard/study-graphs",
         },
+        {
+          title: "Discord",
+          url: "#",
+        },
       ],
     },
   ],

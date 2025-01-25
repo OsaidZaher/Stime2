@@ -30,28 +30,24 @@ const data = {
         },
         {
           title: "Home",
-          url: "#",
+          url: "/dashboard",
         },
         {
           title: "Study Session",
-          url: "#",
+          url: "/dashboard/studysession",
           isActive: true,
         },
         {
           title: "History",
-          url: "#",
+          url: "/dashboard/study-history",
         },
         {
           title: "Calendar",
-          url: "#",
+          url: "/dashboard/calendar",
         },
         {
           title: "Analytics",
-          url: "#",
-        },
-        {
-          title: "Discord",
-          url: "#",
+          url: "/dashboard/study-graphs",
         },
       ],
     },

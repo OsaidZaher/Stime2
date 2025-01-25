@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Combine imports for useState and useEffect
+import { useState, useEffect, useRef } from "react"; // Combine imports for useState and useEffect
 
 import { useSession } from "next-auth/react";
-import { Timer, Stopwatch } from "@/components/clock";
+import { Timer, Stopwatch, AlarmPicker, AlarmPopup } from "@/components/clock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -127,15 +127,7 @@ export default function StudySession() {
 
   return (
     <SidebarInset>
-      <div className="absolute top-4 right-4 z-50">
-        <Button
-          className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
-          variant="outline"
-          onClick={toggleView}
-        >
-          {showTimer ? "Show Stopwatch" : "Show Timer"}
-        </Button>
-      </div>
+      <div className="absolute top-4 right-4 z-50"></div>
       {/* Move StudyMenu to the top */}
       <div className=" ml-[750px] top-0 "></div>
       {/* Ensure main content is centered */}
@@ -170,6 +162,9 @@ function SheetDemo({
   const [topic, setTopic] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
+  const [selectedAlarm, setSelectedAlarm] = useState<string | null>(null); // Track selected alarm
+  const alarmAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [showAlarmPopup, setShowAlarmPopup] = useState(false);
 
   const handleStartSession = () => {
     if (!selectedSubject || !topic) {
@@ -234,6 +229,29 @@ function SheetDemo({
     setStartStopwatch(false);
   };
 
+  const handleTimerEnd = () => {
+    if (selectedAlarm && alarmAudioRef.current) {
+      try {
+        const audioElement = alarmAudioRef.current;
+        audioElement.currentTime = 0;
+        audioElement.play();
+        setShowAlarmPopup(true);
+      } catch (error) {
+        console.error("Error with alarm audio:", error);
+      }
+    }
+    handleSaveSession();
+  };
+  const handleStopAlarm = () => {
+    if (alarmAudioRef.current) {
+      const audioElement = alarmAudioRef.current;
+      audioElement.pause();
+      audioElement.currentTime = 0;
+      audioElement.src = "";
+    }
+    setShowAlarmPopup(false);
+  };
+
   return (
     <>
       <div className="relative inset-0 flex items-center justify-center z-50">
@@ -243,14 +261,19 @@ function SheetDemo({
               <div className="mt-[-175px] space-y-0 ml-10">
                 {/* Display Timer or Stopwatch based on `showTimer` */}
                 {showTimer ? (
-                  <Timer startTimer={startTimer} onReset={resetSession} />
+                  <Timer
+                    startTimer={startTimer}
+                    onReset={resetSession}
+                    onTimerEnd={handleTimerEnd}
+                    selectedAlarm={selectedAlarm || ""}
+                  />
                 ) : (
                   <Stopwatch
                     startStopwatch={startStopwatch}
                     onReset={resetSession}
                   />
                 )}
-                <div className="ml-24 space-x-20 mt-4">
+                <div className="flex ml-20 mt-4 space-x-20 items-start">
                   {/* Start Study Button */}
                   <Button
                     className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
@@ -260,13 +283,33 @@ function SheetDemo({
                   </Button>
 
                   {/* Save Session Button */}
-                  <Button
-                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
-                    variant="outline"
-                    onClick={handleSaveSession}
-                  >
-                    Save Session
-                  </Button>
+                  <div className="flex flex-col">
+                    <Button
+                      className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation;
+                        handleSaveSession();
+                      }}
+                    >
+                      Save Session
+                    </Button>
+                  </div>
+
+                  {/* Right Section: AlarmPicker and Show Stopwatch */}
+                  <div className="flex flex-col space-y-4">
+                    <AlarmPicker onAlarmSelect={setSelectedAlarm} />
+                    <Button
+                      className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleView();
+                      }}
+                    >
+                      {showTimer ? "Study Stopwatch" : "Study Timer"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </SheetTrigger>
@@ -296,7 +339,7 @@ function SheetDemo({
                     type="submit"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleStartSession(); // Use the existing handleStartSession method
+                      handleStartSession();
                     }}
                   >
                     Start session
@@ -307,10 +350,17 @@ function SheetDemo({
           </Sheet>
         </div>
       </div>
+      {selectedAlarm && (
+        <audio
+          ref={alarmAudioRef}
+          src={`/sounds/${selectedAlarm}`}
+          preload="auto"
+        ></audio>
+      )}
+      {showAlarmPopup && <AlarmPopup onStop={handleStopAlarm} />}
     </>
   );
 }
-
 interface SelectDemoProps {
   subjects: Subject[];
   onSubjectSelect: (subjectId: number) => void;

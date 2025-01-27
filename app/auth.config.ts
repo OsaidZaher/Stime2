@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
       }
       if (account?.provider === "google" && profile?.sub) {
         token.id = profile.sub;
+        token.picture;
       }
       return token;
     },
@@ -66,6 +67,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.lastname = (token.lastname as string) || "";
+        session.user.image = token.picture as string;
       }
       return session;
     },

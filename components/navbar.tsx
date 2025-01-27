@@ -1,5 +1,5 @@
 "use client";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -14,15 +14,32 @@ import {
 import { LogOut, Settings, User } from "lucide-react";
 
 export function UserDrop() {
+  const { data: session } = useSession();
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return "UN";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarImage
-            src="/placeholder.svg?height=40&width=40"
-            alt="User profile"
-          />
-          <AvatarFallback>UN</AvatarFallback>
+          {session?.user?.image ? (
+            <AvatarImage
+              src={session.user.image}
+              alt="User profile"
+              onError={(e) => {
+                // If image fails to load, clear the src to show fallback
+                e.currentTarget.src = "";
+              }}
+            />
+          ) : null}
+          <AvatarFallback>{getInitials(session?.user?.name)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

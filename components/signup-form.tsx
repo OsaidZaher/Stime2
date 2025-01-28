@@ -62,38 +62,32 @@ function SignupForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Collect form data
     const formData = new FormData(e.currentTarget);
 
-    // Validate that all fields are filled in
     const firstname = formData.get("firstname")?.toString().trim();
     const lastname = formData.get("lastname")?.toString().trim();
     const email = formData.get("email")?.toString().trim();
     const password = formData.get("password")?.toString().trim();
 
-    // Check if any field is empty
     if (!firstname || !lastname || !email || !password) {
       setFormError("Please fill in all fields before submitting.");
-      return; // Stop form submission if any field is empty
+      return;
     } else {
-      setFormError(null); // Clear form error if all fields are filled
+      setFormError(null);
     }
 
-    // Password validation criteria
     const passwordRequirements =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
-    // Check if password meets the criteria
     if (!passwordRequirements.test(password)) {
       setPasswordError(
         "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
       );
-      return; // Stop form submission if the password doesn't meet the criteria
+      return;
     } else {
-      setPasswordError(null); // Clear the error if the password is valid
+      setPasswordError(null);
     }
 
-    // Create data object to send to backend
     const data = {
       name: firstname,
       lastname: lastname,
@@ -101,7 +95,6 @@ function SignupForm() {
       password: password,
     };
 
-    // Try submitting the form data
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -113,10 +106,21 @@ function SignupForm() {
 
       const result = await res.json();
 
-      // Check for success or specific errors
       if (res.ok) {
         console.log("Registration Successful", result);
-        router.push("/dashboard");
+
+        // Automatically sign in the user after registration
+        const signInResult = await signIn("credentials", {
+          redirect: false,
+          email: email,
+          password: password,
+        });
+
+        if (signInResult?.ok) {
+          router.push("/dashboard"); // Redirect after successful sign-in
+        } else {
+          setFormError("Failed to sign in. Please try logging in manually.");
+        }
       } else {
         if (result.error === "Email already registered") {
           setFormError(

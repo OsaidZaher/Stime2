@@ -49,11 +49,11 @@ export default function Home() {
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
                   <p className="text-sm font-medium text-amber-800">
-                    Hi 👋, App is under development 🙃
+                    Hi 👋, App is under development.🙃
                   </p>
                 </div>
                 <p className="mt-2 text-sm text-amber-700">
-                  Please create an account as OAuth is under verification.
+                  Please create an account as app needs verification by Google.
                 </p>
               </CardContent>
             </Card>

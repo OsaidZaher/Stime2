@@ -1,5 +1,5 @@
 import { ComparativeChart } from "./time-compare";
-import { SubjectStudyChart } from "./subject-compare";
+import StudyStatistics5 from "./subject-compare";
 import TotalTimeChart from "./total-time";
 import SubjectHexagon from "./subject-hex";
 
@@ -11,7 +11,7 @@ export default function StudyGraph() {
         style={{ gridTemplateColumns: "600px 600px" }}
       >
         <ComparativeChart />
-        <SubjectStudyChart />
+        <StudyStatistics5 />
         <TotalTimeChart />
         <SubjectHexagon />
       </div>

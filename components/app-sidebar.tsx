@@ -1,21 +1,20 @@
-import * as React from "react";
+"use client";
 
-import { SearchForm } from "@/components/search-form";
-import { VersionSwitcher } from "@/components/version-switcher";
+import * as React from "react";
+import { usePathname } from "next/navigation";
+
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -59,25 +58,29 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const path = usePathname();
+
   return (
     <Sidebar {...props}>
       <SidebarContent>
-        {/* Render each parent group */}
         {data.navMain.map((item) => (
           <SidebarGroup key={item.title}>
-            {/* Apply inline styles from the style property */}
             <SidebarGroupLabel className={item.className}>
               {item.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={item.isActive}>
-                      <a href={item.url}>{item.title}</a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {item.items.map((subItem) => {
+                  const isActive = path === subItem.url;
+
+                  return (
+                    <SidebarMenuItem key={subItem.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <a href={subItem.url}>{subItem.title}</a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

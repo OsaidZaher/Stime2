@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Pie, PieChart, Sector, ResponsiveContainer } from "recharts";
-import { PieSectorDataItem } from "recharts/types/polar/Pie";
+import { Pie, PieChart, Cell, ResponsiveContainer, Sector } from "recharts";
 import {
   Card,
   CardContent,
@@ -12,13 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Button } from "@/components/ui/button";
 
-// Define interfaces for type safety
 interface StudySession {
   startTime: string;
   duration: number;
@@ -46,9 +44,11 @@ const colors = [
   "hsl(var(--chart-5))",
 ];
 
-export function SubjectStudyChart() {
+const RADIAN = Math.PI / 180;
+
+const StudyStatistics5 = () => {
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
-  const [mostStudiedSubject, setMostStudiedSubject] = useState<string>("");
+  const [showVisualization, setShowVisualization] = useState(true);
 
   useEffect(() => {
     fetchStudySessions();
@@ -58,7 +58,6 @@ export function SubjectStudyChart() {
     try {
       const response = await fetch("/api/functionality/studySession");
       const data: StudySession[] = await response.json();
-      console.log("All fetched data:", data);
       processStudySessions(data);
     } catch (error) {
       console.error("Error fetching study sessions:", error);
@@ -66,8 +65,6 @@ export function SubjectStudyChart() {
   };
 
   const processStudySessions = (sessions: StudySession[]) => {
-    console.log("All sessions:", sessions);
-
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     sevenDaysAgo.setHours(0, 0, 0, 0);
@@ -76,8 +73,6 @@ export function SubjectStudyChart() {
       const sessionDate = new Date(session.startTime);
       return sessionDate >= sevenDaysAgo;
     });
-
-    console.log("Recent sessions:", recentSessions);
 
     const subjectTotals: Record<string, number> = recentSessions.reduce(
       (acc, session) => {
@@ -91,13 +86,9 @@ export function SubjectStudyChart() {
       {} as Record<string, number>
     );
 
-    console.log("Subject totals:", subjectTotals);
-
     const sortedSubjects = Object.entries(subjectTotals)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
-
-    console.log("Sorted subjects:", sortedSubjects);
 
     const processedData: ChartDataItem[] = sortedSubjects.map(
       ([subject, time], index) => ({
@@ -107,9 +98,53 @@ export function SubjectStudyChart() {
       })
     );
 
-    console.log("Processed chart data:", processedData);
     setChartData(processedData);
-    setMostStudiedSubject(sortedSubjects[0]?.[0] || "No subjects studied");
+  };
+
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    subject,
+  }: any) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.7; // Reduce this value to move text closer to the center
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor="middle" // Centering the text
+        dominantBaseline="central"
+        fontSize="13"
+        fontWeight="bold"
+      >
+        {`${subject}`}
+      </text>
+    );
+  };
+
+  const renderActiveShape = (props: any) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
+      props;
+    return (
+      <g>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius + 10}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+      </g>
+    );
   };
 
   const chartConfig: Record<string, ChartConfigItem> = chartData.reduce(
@@ -123,55 +158,94 @@ export function SubjectStudyChart() {
     {} as Record<string, ChartConfigItem>
   );
 
-  const renderActiveShape = (props: PieSectorDataItem) => {
-    return <Sector {...props} outerRadius={(props.outerRadius || 0) + 10} />;
+  const renderContent = () => {
+    if (showVisualization) {
+      return (
+        <>
+          <CardHeader className="items-center pb-0">
+            <CardTitle>Study Pie</CardTitle>
+          </CardHeader>
+          <CardContent className="pb-3">
+            {chartData.length > 0 ? (
+              <ChartContainer
+                className="mx-auto aspect-square max-h-[300px]"
+                config={chartConfig}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent />}
+                    />
+                    <Pie
+                      data={chartData}
+                      dataKey="time"
+                      nameKey="subject"
+                      cx="50%"
+                      cy="55%"
+                      outerRadius={136}
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      activeShape={renderActiveShape}
+                      activeIndex={0}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={colors[index % colors.length]}
+                        />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            ) : (
+              <div className="text-center mt-4">No data available</div>
+            )}
+          </CardContent>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center ">
+              Your Most Studied Subjects
+            </CardTitle>
+            <CardDescription className="text-center">
+              Past 7 days
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {["🥇", "🥈", "🥉", "4", "5"].map((rank, index) => (
+                <li key={rank} className="flex items-center space-x-2">
+                  <span className="text-3xl w-8 text-center">{rank}</span>
+                  <span className="text-lg">
+                    {chartData[index]?.subject || "No subject yet"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </>
+      );
+    }
   };
 
   return (
-    <Card className="w-full max-w-[700px]">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Top 5 studied subjects!</CardTitle>
-        <CardDescription>Past 7 days</CardDescription>
-      </CardHeader>
-      <CardContent className="pb-4">
-        {chartData.length > 0 ? (
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-                <Pie
-                  data={chartData}
-                  dataKey="time"
-                  nameKey="subject"
-                  innerRadius={60}
-                  outerRadius={120}
-                  strokeWidth={5}
-                  activeIndex={0}
-                  activeShape={renderActiveShape}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        ) : (
-          <div className="text-center mt-4">
-            No data available for the past 7 days
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Your most studied subject is {mostStudiedSubject}!
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Based on total study time in the last 7 days.
-        </div>
+    <Card className="w-full max-w-md h-[450px] flex flex-col">
+      {renderContent()}
+      <CardFooter className="mt-auto">
+        <Button
+          onClick={() => setShowVisualization(!showVisualization)}
+          className="w-full"
+        >
+          {showVisualization ? "Show Leaderboard" : "Show Visualization"}
+        </Button>
       </CardFooter>
     </Card>
   );
-}
+};
+
+export default StudyStatistics5;

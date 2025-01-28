@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
       }
       if (account?.provider === "google" && profile?.sub) {
         token.id = profile.sub;
+        console.log("Profile", profile);
         token.picture;
       }
       return token;

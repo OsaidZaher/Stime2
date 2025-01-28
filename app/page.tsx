@@ -27,7 +27,7 @@ export default function Home() {
               />
             </div>
             <p className="text-xl">
-              The tool to make you that straight A student.
+              The tool to make you that straight-A student.
             </p>
           </section>
 

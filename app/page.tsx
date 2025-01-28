@@ -3,15 +3,7 @@
 import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 import { ModeToggle } from "@/components/ui/themetoggle";
 import LoginForm from "@/components/loginform";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
   return (
@@ -52,7 +44,7 @@ export default function Home() {
           </div>
 
           {/* Centered Card */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className=" mt-[450px] inset-0 flex items-center justify-center">
             <Card className="max-w-md bg-amber-50 border-amber-200">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">

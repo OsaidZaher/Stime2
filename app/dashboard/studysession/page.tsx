@@ -233,22 +233,9 @@ function SheetDemo({
     if (selectedAlarm && alarmAudioRef.current) {
       try {
         const audioElement = alarmAudioRef.current;
-
-        // Make sure the audio element is properly configured
-        audioElement.src = `/sounds/${selectedAlarm}`;
-        audioElement.load(); // Important: load the audio before playing
-
-        const playPromise = audioElement.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              setShowAlarmPopup(true);
-            })
-            .catch((error) => {
-              console.error("Error playing alarm:", error);
-              // Show error toast or handle error appropriately
-            });
-        }
+        audioElement.currentTime = 0;
+        audioElement.play();
+        setShowAlarmPopup(true);
       } catch (error) {
         console.error("Error with alarm audio:", error);
       }

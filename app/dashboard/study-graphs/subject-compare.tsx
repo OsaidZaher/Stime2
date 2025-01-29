@@ -63,6 +63,9 @@ const StudyStatistics5 = () => {
       console.error("Error fetching study sessions:", error);
     }
   };
+  const capitalizeWord = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
 
   const processStudySessions = (sessions: StudySession[]) => {
     const sevenDaysAgo = new Date();
@@ -124,7 +127,7 @@ const StudyStatistics5 = () => {
         fontSize="13"
         fontWeight="bold"
       >
-        {`${subject}`}
+        {capitalizeWord(`${subject}`)}
       </text>
     );
   };
@@ -218,11 +221,12 @@ const StudyStatistics5 = () => {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {["🥇", "🥈", "🥉", "4", "5"].map((rank, index) => (
+              {["🥇", "🥈", "🥉", "4.", "5."].map((rank, index) => (
                 <li key={rank} className="flex items-center space-x-2">
                   <span className="text-3xl w-8 text-center">{rank}</span>
                   <span className="text-lg">
-                    {chartData[index]?.subject || "No subject yet"}
+                    {capitalizeWord(chartData[index].subject) ||
+                      "No subject yet"}
                   </span>
                 </li>
               ))}

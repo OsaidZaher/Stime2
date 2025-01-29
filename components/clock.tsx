@@ -112,14 +112,6 @@ export function Timer({
     onReset();
   };
 
-  const playAlarm = () => {
-    const alarmSound = new Audio(`/sounds/${selectedAlarm}`);
-    alarmSound.preload = "auto";
-    alarmSound.play().catch((error) => {
-      console.error("Error playing alarm:", error);
-    });
-  };
-
   return (
     <div className="flex items-center justify-between w-full max-w-6xl mx-auto p-8">
       <div className="flex items-center">
@@ -421,22 +413,22 @@ interface AlarmPopupProps {
 
 export const AlarmPopup: React.FC<AlarmPopupProps> = ({ onStop }) => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div className="bg-background rounded-lg shadow-lg p-6 w-80 text-center">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Alarm</h2>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onStop}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-muted-foreground hover:text-foreground"
           >
-            <X className="w-6 h-6" />
-          </button>
+            <X className="w-5 h-5" />
+            <span className="sr-only">Close</span>
+          </Button>
         </div>
-        <p>Your timer has ended!</p>
-        <Button
-          className="mt-4 bg-red-500 text-white hover:bg-red-600"
-          onClick={onStop}
-        >
+        <p className="text-foreground">Your timer has ended!</p>
+        <Button variant="destructive" className="mt-4 w-full" onClick={onStop}>
           Stop Alarm
         </Button>
       </div>

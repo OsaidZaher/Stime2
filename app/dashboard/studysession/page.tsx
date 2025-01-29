@@ -233,9 +233,22 @@ function SheetDemo({
     if (selectedAlarm && alarmAudioRef.current) {
       try {
         const audioElement = alarmAudioRef.current;
-        audioElement.currentTime = 0;
-        audioElement.play();
-        setShowAlarmPopup(true);
+
+        // Make sure the audio element is properly configured
+        audioElement.src = `/sounds/${selectedAlarm}`;
+        audioElement.load(); // Important: load the audio before playing
+
+        const playPromise = audioElement.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setShowAlarmPopup(true);
+            })
+            .catch((error) => {
+              console.error("Error playing alarm:", error);
+              // Show error toast or handle error appropriately
+            });
+        }
       } catch (error) {
         console.error("Error with alarm audio:", error);
       }
@@ -361,30 +374,6 @@ function SheetDemo({
     </>
   );
 }
-interface SelectDemoProps {
-  subjects: Subject[];
-  onSubjectSelect: (subjectId: number) => void;
-}
-
-function SelectDemo({ subjects, onSubjectSelect }: SelectDemoProps) {
-  return (
-    <Select onValueChange={(value) => onSubjectSelect(Number.parseInt(value))}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a subject" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Subjects</SelectLabel>
-          {subjects.map((subject) => (
-            <SelectItem key={subject.id} value={subject.id.toString()}>
-              {subject.name}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
-}
 
 interface DialogDemoProps {
   addSubject: (newSubject: string) => void;
@@ -466,5 +455,29 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+interface SelectDemoProps {
+  subjects: Subject[];
+  onSubjectSelect: (subjectId: number) => void;
+}
+
+function SelectDemo({ subjects, onSubjectSelect }: SelectDemoProps) {
+  return (
+    <Select onValueChange={(value) => onSubjectSelect(Number.parseInt(value))}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select a subject" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Subjects</SelectLabel>
+          {subjects.map((subject) => (
+            <SelectItem key={subject.id} value={subject.id.toString()}>
+              {subject.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 }

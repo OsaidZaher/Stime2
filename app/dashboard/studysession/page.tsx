@@ -55,62 +55,32 @@ export default function StudySession() {
   const [loading, setLoading] = useState(true);
   const [showTimer, setShowTimer] = useState(true);
 
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      if (status === "authenticated" && session) {
-        try {
-          const response = await fetch("/api/functionality/subjectAdd");
-          console.log("Fetch response:", response);
-          if (response.ok) {
-            const data = await response.json();
-            setSubjects(data.subjects);
-          } else {
-            console.error("Failed to fetch subjects");
-            toast.error("Failed to fetch subjects");
-          }
-        } catch (error) {
-          console.error("Error fetching subjects:", error);
-          toast.error("Error fetching subjects");
-        } finally {
-          setLoading(false);
+  const fetchSubjects = async () => {
+    if (status === "authenticated" && session) {
+      try {
+        const response = await fetch("/api/functionality/subjectAdd");
+        if (response.ok) {
+          const data = await response.json();
+          setSubjects(data.subjects);
+        } else {
+          toast.error("Failed to fetch subjects");
         }
+      } catch (error) {
+        toast.error("Error fetching subjects");
+      } finally {
+        setLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     if (status === "authenticated") {
       fetchSubjects();
     }
   }, [status, session]);
 
   const addSubject = async (newSubject: string) => {
-    if (status !== "authenticated") {
-      toast.error("You must be logged in to add a subject");
-      return;
-    }
-
-    if (
-      newSubject.trim() &&
-      !subjects.some((subject) => subject.name === newSubject)
-    ) {
-      try {
-        const response = await fetch("/api/functionality/subjectAdd", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name: newSubject }),
-        });
-
-        if (response.ok) {
-          const addedSubject = await response.json();
-          setSubjects((prevSubjects) => [...prevSubjects, addedSubject]);
-          toast.success("Subject added successfully");
-        }
-      } catch (error) {
-        console.error("Error adding subject:", error);
-        toast.error("Error adding subject");
-      }
-    }
+    fetchSubjects(); // Refresh subject list after adding
   };
 
   const toggleView = () => {
@@ -247,7 +217,6 @@ function SheetDemo({
       const audioElement = alarmAudioRef.current;
       audioElement.pause();
       audioElement.currentTime = 0;
-      audioElement.src = "";
     }
     setShowAlarmPopup(false);
   };
@@ -368,13 +337,11 @@ interface DialogDemoProps {
 
 function DialogDemo({ addSubject }: DialogDemoProps) {
   const [newSubject, setNewSubject] = useState("");
-  const [subjectAdded, setSubjectAdded] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleAddSubject = async () => {
-    if (newSubject.trim() === "") {
-      setErrorMessage("Empty field");
-      setSubjectAdded(false);
+    if (!newSubject.trim()) {
+      setErrorMessage("Subject name cannot be empty");
       return;
     }
 
@@ -386,11 +353,10 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
       });
 
       if (response.ok) {
-        addSubject(newSubject);
+        addSubject(newSubject); // Use the passed addSubject method
         setNewSubject("");
         setErrorMessage("");
-        setSubjectAdded(true);
-        setTimeout(() => setSubjectAdded(false), 1500);
+        toast.success("Subject added successfully");
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Failed to add subject");
@@ -421,7 +387,10 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
               id="name"
               className="col-span-3"
               value={newSubject}
-              onChange={(e) => setNewSubject(e.target.value)}
+              onChange={(e) => {
+                setNewSubject(e.target.value);
+                setErrorMessage(""); // Clear error when typing
+              }}
             />
           </div>
         </div>
@@ -429,11 +398,6 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
           {errorMessage && (
             <p className="text-red-600 mr-10 font-semibold text-lg">
               {errorMessage}
-            </p>
-          )}
-          {subjectAdded && (
-            <p className="text-green-600 mr-20 font-semibold">
-              New Subject Added!
             </p>
           )}
           <Button type="submit" onClick={handleAddSubject}>

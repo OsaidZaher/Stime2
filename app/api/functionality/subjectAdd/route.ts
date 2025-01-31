@@ -18,7 +18,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name } = await request.json();
+    const body = await request.json();
+    const { name } = body;
 
     if (!name || typeof name !== "string") {
       return NextResponse.json(
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const userId = session.user.id;
+    const userId = session.user.id.toString();
     console.log("User ID from session:", userId);
 
     // Verify user exists
@@ -40,9 +41,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Create new subject
     const newSubject = await prisma.subject.create({
-      data: { name, userId },
+      data: {
+        name: body.name,
+        userId: session.user.id,
+      },
     });
 
     console.log("New subject created:", newSubject);
@@ -70,9 +73,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id; // Use user ID directly as a string
+    const userId = session.user.id.toString(); // Use user ID directly as a string
 
-    // Fetch all subjects for the current user from the database
     const subjects = await prisma.subject.findMany({
       where: { userId },
     });

@@ -238,7 +238,7 @@ const StudyStatistics5 = () => {
   };
 
   return (
-    <Card className="w-full max-w-md h-[450px] flex flex-col">
+    <Card className="w-full max-w-md h-[450px] mx-auto flex flex-col  mt-[20px]">
       {renderContent()}
       <CardFooter className="mt-auto">
         <Button

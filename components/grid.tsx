@@ -47,7 +47,7 @@ const items = [
   },
   {
     title: "Analytics",
-    description: "Check how you are doing!",
+    description: "",
     header: <DemoChart />,
     className: "md:col-span-1",
     icon: <IconClock className="h-10 w-4 text-neutral-500" />,

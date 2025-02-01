@@ -106,7 +106,7 @@ export function SubjectHexagon() {
   };
 
   return (
-    <Card className="w-full max-w-[700px]">
+    <Card className="w-full max-w-[700px] mt-[-75px] ">
       <CardHeader className="items-center pb-0">
         <CardTitle>Top 6 studied subjects!</CardTitle>
         <CardDescription>Past 7 days</CardDescription>

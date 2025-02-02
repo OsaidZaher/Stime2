@@ -35,14 +35,13 @@ function Calendar2({
     fetchExams();
   }, []);
 
-  // Create a modifier for exam dates
   const examDays = exams.map((exam) => new Date(exam.date));
 
   return (
-    <Card className="w-[700px] h-[725px] flex items-center justify-center mr-3 mt-3">
+    <Card className="w-[550px] h-[350px] flex items-center justify-center mr-3">
       <DayPicker
         showOutsideDays={showOutsideDays}
-        className={cn("w-full h-full p-6", className)}
+        className={cn("w-full h-full p-4", className)}
         modifiers={{
           exam: examDays,
         }}
@@ -54,30 +53,30 @@ function Calendar2({
         }}
         classNames={{
           months: "flex flex-col space-y-6",
-          month: "space-y-6",
-          caption: "flex justify-center pt-2 relative items-center h-16",
-          caption_label: "text-2xl font-semibold",
-          nav: "space-x-3 flex items-center",
+          month: "space-y-4",
+          caption: "flex justify-center pt-1 relative items-center h-10",
+          caption_label: "text-xl font-bold",
+          nav: "space-x-1 flex items-center",
           nav_button: cn(
             buttonVariants({ variant: "outline" }),
-            "h-11 w-14 bg-transparent p-0 opacity-70 hover:opacity-100"
+            "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100"
           ),
-          nav_button_previous: "absolute left-2",
-          nav_button_next: "absolute right-2",
-          table: "w-full border-collapse h-[400px]",
-          head_row: "flex justify-between mb-3",
+          nav_button_previous: "absolute left-1",
+          nav_button_next: "absolute right-1",
+          table: "w-full border-collapse h-[300px]",
+          head_row: "flex justify-between mb-1 font-large",
           head_cell:
-            "text-muted-foreground rounded-md w-14 font-medium text-lg text-center",
-          row: "flex justify-between w-full mt-3",
+            "text-muted-foreground rounded-md w-8 font-medium text-lg text-center",
+          row: "flex justify-between w-full mt-1",
           cell: cn(
-            "relative p-0 text-center text-lg flex justify-center items-center h-20",
+            "relative p-0 text-center text-sm flex justify-center items-center h-8",
             props.mode === "range"
               ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
               : "[&:has([aria-selected])]:rounded-md"
           ),
           day: cn(
             buttonVariants({ variant: "ghost" }),
-            "h-14 w-14 p-0 font-medium text-lg hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+            "h-8 w-8 p-0 font-normal text-md hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           ),
           day_range_start: "day-range-start",
           day_range_end: "day-range-end",

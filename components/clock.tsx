@@ -2,8 +2,9 @@
 
 import * as React from "react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronUp, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TimerProps {
@@ -124,7 +125,7 @@ export function Timer({
                 incrementMinutes();
                 e.preventDefault();
               }}
-              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+              className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
             >
               <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
             </button>
@@ -134,7 +135,7 @@ export function Timer({
                 decrementMinutes();
                 e.preventDefault();
               }}
-              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+              className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
             >
               <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
             </button>
@@ -158,7 +159,7 @@ export function Timer({
                 incrementSeconds();
                 e.preventDefault();
               }}
-              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+              className="p-2 rounded-lg  transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
             >
               <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
             </button>
@@ -168,7 +169,7 @@ export function Timer({
                 decrementSeconds();
                 e.preventDefault();
               }}
-              className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+              className="p-2 rounded-lg  transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
             >
               <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
             </button>
@@ -339,58 +340,104 @@ const alarms = [
   { id: "telephone_ring.mp3", name: "Ring 2" },
 ];
 
-interface AlarmPickerProps {
+// Improved hook with better preloading and error handling
+export const useAlarm = (selectedAlarm: string, onAlarmEnd: () => void) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio();
+    audio.src = `/sounds/${selectedAlarm}`;
+    audio.preload = "auto";
+    audio.loop = true;
+
+    const handleCanPlayThrough = () => {
+      setIsLoaded(true);
+    };
+
+    const handleError = (e: ErrorEvent) => {
+      console.error("Error loading audio:", e);
+      setIsLoaded(false);
+    };
+
+    audio.addEventListener("canplaythrough", handleCanPlayThrough);
+    audio.addEventListener("error", handleError);
+    audioRef.current = audio;
+
+    return () => {
+      if (audioRef.current) {
+        audio.removeEventListener("canplaythrough", handleCanPlayThrough);
+        audio.removeEventListener("error", handleError);
+        audio.pause();
+        audio.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, [selectedAlarm]);
+
+  const playAlarm = async () => {
+    if (!audioRef.current || !isLoaded) {
+      console.warn("Audio not ready to play");
+      return;
+    }
+
+    try {
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = 1;
+      await audioRef.current.play();
+    } catch (error) {
+      console.error("Error playing alarm:", error);
+    }
+  };
+
+  const stopAlarm = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      onAlarmEnd();
+    }
+  };
+
+  return { playAlarm, stopAlarm, isLoaded };
+};
+
+// Improved AlarmPicker component
+export function AlarmPicker({
+  onAlarmSelect,
+}: {
   onAlarmSelect: (alarm: string) => void;
-}
+}) {
+  const [selectedAlarm, setSelectedAlarm] = useState("iphone_alarm.mp3");
 
-export function AlarmPicker({ onAlarmSelect }: AlarmPickerProps) {
-  const [selectedAlarm, setSelectedAlarm] = React.useState<string | null>(null);
-
-  const handleAlarmSelect = (e: React.MouseEvent, alarmId: string) => {
-    e.stopPropagation();
+  const handleAlarmSelect = (alarmId: string) => {
     setSelectedAlarm(alarmId);
     onAlarmSelect(alarmId);
   };
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+      <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
-          onClick={(e) => e.stopPropagation()}
         >
           <span className="truncate">
-            {selectedAlarm
-              ? `${alarms.find((a) => a.id === selectedAlarm)?.name}`
-              : "Pick Alarm"}
+            {alarms.find((a) => a.id === selectedAlarm)?.name || "Pick Alarm"}
           </span>
           <Bell className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-36 text-center"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <DropdownMenuContent className="w-36 text-center">
         <DropdownMenuLabel>Select an Alarm</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
-          value={selectedAlarm || ""}
-          onValueChange={(alarmId) => {
-            const event = window.event as MouseEvent;
-            event.stopPropagation();
-            setSelectedAlarm(alarmId);
-            onAlarmSelect(alarmId);
-          }}
+          value={selectedAlarm}
+          onValueChange={handleAlarmSelect}
         >
           {alarms.map((alarm) => (
             <DropdownMenuRadioItem
               key={alarm.id}
               value={alarm.id}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAlarmSelect(e, alarm.id);
-              }}
               className={`flex justify-between items-center h-10 ${
                 selectedAlarm === alarm.id ? "bg-accent" : ""
               }`}
@@ -405,18 +452,13 @@ export function AlarmPicker({ onAlarmSelect }: AlarmPickerProps) {
   );
 }
 
-import { X } from "lucide-react";
-
-interface AlarmPopupProps {
-  onStop: () => void;
-}
-
-export const AlarmPopup: React.FC<AlarmPopupProps> = ({ onStop }) => {
+// Improved AlarmPopup component
+export const AlarmPopup = ({ onStop }: { onStop: () => void }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-background rounded-lg shadow-lg p-6 w-80 text-center">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Alarm</h2>
+          <h2 className="text-lg font-semibold">Time's Up!</h2>
           <Button
             variant="ghost"
             size="icon"

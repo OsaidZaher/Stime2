@@ -29,7 +29,7 @@ import {
 
 import { ExamTable } from "@/components/ui/examTable";
 import { Calendar2 } from "@/components/ui/calendar2";
-
+import GradeCard from "@/components/gradeCards";
 export default function CardWithForm() {
   const [examName, setExamName] = React.useState("");
   const [date, setDate] = React.useState<Date>();
@@ -80,10 +80,11 @@ export default function CardWithForm() {
   };
 
   return (
-    <div className="flex items-start justify-center space-x-8 space-y-3">
+    <div className="flex items-start justify-center space-x-8 ">
       {/* Calendar Section */}
-      <div className="flex-shrink-0">
+      <div className="flex flex-col space-y-8">
         <Calendar2 />
+        <GradeCard />
       </div>
 
       {/* Table and Card Section */}

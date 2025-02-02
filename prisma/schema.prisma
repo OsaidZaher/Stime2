@@ -3,9 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
 model User {
   id            String         @id @default(cuid())
   name          String
@@ -14,6 +15,7 @@ model User {
   password      String
   createdAt     DateTime       @default(now())
   exams         Exam[]
+  userGrades    UserGrade[]   
   studySessions StudySession[]
   subjects      Subject[]
 }
@@ -26,6 +28,7 @@ model Subject {
   user          User           @relation(fields: [userId], references: [id])
 
   @@unique([name, userId])
+  userGrades    UserGrade[]    // Relation to UserGrade
 }
 
 model StudySession {
@@ -48,4 +51,13 @@ model Exam {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model UserGrade {
+  id        String   @id @default(cuid())
+  grades    String[] 
+  userId    String
+  subjectId Int      // Foreign key to Subject model
+  user      User     @relation(fields: [userId], references: [id])
+  subject   Subject  @relation(fields: [subjectId], references: [id])
 }

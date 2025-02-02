@@ -3,7 +3,13 @@
 import { useState, useEffect, useRef } from "react"; // Combine imports for useState and useEffect
 
 import { useSession } from "next-auth/react";
-import { Timer, Stopwatch, AlarmPicker, AlarmPopup } from "@/components/clock";
+import {
+  Timer,
+  Stopwatch,
+  AlarmPicker,
+  AlarmPopup,
+  useAlarm,
+} from "@/components/clock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,8 +138,7 @@ function SheetDemo({
   const [topic, setTopic] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-  const [selectedAlarm, setSelectedAlarm] = useState<string | null>(null); // Track selected alarm
-  const alarmAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [selectedAlarm, setSelectedAlarm] = useState("iphone_alarm.mp3");
   const [showAlarmPopup, setShowAlarmPopup] = useState(false);
 
   const handleStartSession = () => {
@@ -199,28 +204,25 @@ function SheetDemo({
     setStartStopwatch(false);
   };
 
-  const handleTimerEnd = () => {
-    if (selectedAlarm && alarmAudioRef.current) {
-      try {
-        const audioElement = alarmAudioRef.current;
-        audioElement.currentTime = 0;
-        audioElement.play();
-        setShowAlarmPopup(true);
-      } catch (error) {
-        console.error("Error with alarm audio:", error);
-      }
+  const { playAlarm, stopAlarm, isLoaded } = useAlarm(selectedAlarm, () =>
+    setShowAlarmPopup(false)
+  );
+
+  const handleTimerEnd = async () => {
+    if (isLoaded) {
+      await playAlarm();
+      setShowAlarmPopup(true);
+    } else {
+      console.warn("Alarm audio not loaded yet");
+      // You might want to show a fallback notification here
     }
     handleSaveSession();
   };
+
   const handleStopAlarm = () => {
-    if (alarmAudioRef.current) {
-      const audioElement = alarmAudioRef.current;
-      audioElement.pause();
-      audioElement.currentTime = 0;
-    }
+    stopAlarm();
     setShowAlarmPopup(false);
   };
-
   return (
     <>
       <div className="relative inset-0 flex items-center justify-center z-50">
@@ -228,7 +230,6 @@ function SheetDemo({
           <Sheet>
             <SheetTrigger asChild>
               <div className="mt-[-175px] space-y-0 ml-10">
-                {/* Display Timer or Stopwatch based on `showTimer` */}
                 {showTimer ? (
                   <Timer
                     startTimer={startTimer}
@@ -243,7 +244,6 @@ function SheetDemo({
                   />
                 )}
                 <div className="flex ml-20 mt-4 space-x-20 items-start">
-                  {/* Start Study Button */}
                   <Button
                     className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
                     variant="outline"
@@ -319,13 +319,7 @@ function SheetDemo({
           </Sheet>
         </div>
       </div>
-      {selectedAlarm && (
-        <audio
-          ref={alarmAudioRef}
-          src={`/sounds/${selectedAlarm}`}
-          preload="auto"
-        ></audio>
-      )}
+
       {showAlarmPopup && <AlarmPopup onStop={handleStopAlarm} />}
     </>
   );

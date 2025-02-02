@@ -91,9 +91,12 @@ export function ExamTable() {
 
   return (
     <Card className="h-[350px] w-[550px]">
-      <CardHeader>
+      <CardHeader className="pb-0">
         <CardTitle>Exam Countdown</CardTitle>
       </CardHeader>
+      <CardContent className="text-sm text-slate-700 py-2">
+        Press on the row to edit.
+      </CardContent>
       <Table>
         <TableHeader>
           <TableRow>

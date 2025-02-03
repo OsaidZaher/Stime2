@@ -13,7 +13,7 @@ export default function StudyGraph() {
       </div>
 
       <div>
-        <GradeCard />
+        <SubjectHexagon />
       </div>
       <div className="">
         <TotalTimeChart />
@@ -33,7 +33,7 @@ export default function StudyGraph() {
         />
       </div>
 
-      <div>{/*<SubjectHexagon />*/}</div>
+      <div></div>
     </div>
   );
 }

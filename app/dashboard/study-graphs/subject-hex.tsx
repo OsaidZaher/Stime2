@@ -106,8 +106,8 @@ export function SubjectHexagon() {
   };
 
   return (
-    <Card className="w-full max-w-[700px] mt-[-75px] ">
-      <CardHeader className="items-center pb-0">
+    <Card className="w-full max-w-[700px] mx-auto">
+      <CardHeader className="text-center">
         <CardTitle>Top 6 studied subjects!</CardTitle>
         <CardDescription>Past 7 days</CardDescription>
       </CardHeader>
@@ -115,15 +115,19 @@ export function SubjectHexagon() {
         {subjectData.length > 0 ? (
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
+            className="w-full aspect-square max-w-[500px] mx-auto"
           >
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={subjectData}>
                 <ChartTooltip
                   cursor={false}
                   content={<ChartTooltipContent />}
                 />
-                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fontSize: 12 }}
+                  tickLine={false}
+                />
                 <PolarGrid />
                 <Radar
                   dataKey="duration"

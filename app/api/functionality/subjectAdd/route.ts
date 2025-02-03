@@ -4,17 +4,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/auth.config";
 import { cookies } from "next/headers";
 import { headers } from "next/headers";
-
 export async function POST(request: Request) {
   try {
-    const cookieStore = cookies();
-    const headersList = headers();
-
     const session = await getServerSession(authOptions);
-    console.log("Session in POST:", session);
-
     if (!session || !session.user || !session.user.id) {
-      console.log("Unauthorized: No valid session");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -29,37 +22,53 @@ export async function POST(request: Request) {
     }
 
     const userId = session.user.id.toString();
-    console.log("User ID from session:", userId);
 
-    // Verify user exists
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const formattedName = name.charAt(0).toUpperCase() + name.slice(1).trim();
 
-    if (!user) {
-      console.log("User not found in database");
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    // Normalize for case-insensitive check
+    const normalizedName = formattedName.toLowerCase();
+
+    try {
+      const existingSubject = await prisma.subject.findFirst({
+        where: {
+          userId: userId,
+          name: {
+            equals: normalizedName,
+            mode: "insensitive",
+          },
+        },
+      });
+
+      if (existingSubject) {
+        return NextResponse.json(
+          { error: "A subject with this name already exists" },
+          { status: 409 }
+        );
+      }
+
+      const newSubject = await prisma.subject.create({
+        data: {
+          name: formattedName,
+          userId: userId,
+        },
+      });
+
+      return NextResponse.json(newSubject, { status: 201 });
+    } catch (prismaError) {
+      console.error("Prisma error:", prismaError);
+      return NextResponse.json(
+        { error: "Error processing subject", details: String(prismaError) },
+        { status: 500 }
+      );
     }
-
-    const newSubject = await prisma.subject.create({
-      data: {
-        name: body.name,
-        userId: session.user.id,
-      },
-    });
-
-    console.log("New subject created:", newSubject);
-
-    return NextResponse.json(newSubject, { status: 201 });
   } catch (error) {
-    console.error("Error adding subject:", error);
+    console.error("Unexpected error:", error);
     return NextResponse.json(
-      { error: "Failed to add subject" },
+      { error: "Failed to add subject", details: String(error) },
       { status: 500 }
     );
   }
 }
-
 export async function GET() {
   try {
     const cookieStore = cookies();

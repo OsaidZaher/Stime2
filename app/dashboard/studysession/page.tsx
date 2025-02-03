@@ -347,13 +347,19 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
       });
 
       if (response.ok) {
-        addSubject(newSubject); // Use the passed addSubject method
+        const data = await response.json();
+        addSubject(newSubject);
         setNewSubject("");
         setErrorMessage("");
         toast.success("Subject added successfully");
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.error || "Failed to add subject");
+
+        if (response.status === 409) {
+          setErrorMessage("A subject with this name already exists");
+        } else {
+          setErrorMessage(errorData.error || "Failed to add subject");
+        }
       }
     } catch (error) {
       console.error("Error adding subject:", error);

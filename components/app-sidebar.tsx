@@ -41,7 +41,7 @@ const data = {
           url: "/dashboard/study-history",
         },
         {
-          title: "Calendar",
+          title: "Exams",
           url: "/dashboard/calendar",
         },
         {

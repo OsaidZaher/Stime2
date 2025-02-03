@@ -35,6 +35,7 @@ export default function CardWithForm() {
   const [date, setDate] = React.useState<Date>();
   const { data: session } = useSession();
   const router = useRouter();
+  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +70,7 @@ export default function CardWithForm() {
 
       setExamName("");
       setDate(undefined);
+      setRefreshTrigger((prev) => prev + 1);
 
       toast?.success("Exam added successfully!");
 
@@ -89,7 +91,7 @@ export default function CardWithForm() {
 
       {/* Table and Card Section */}
       <div className="flex flex-col space-y-8">
-        <ExamTable />
+        <ExamTable refreshTrigger={refreshTrigger} />
 
         <Card className="w-[550px] h-[350px]">
           <CardHeader>

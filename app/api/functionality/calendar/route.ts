@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { authOptions } from "@/app/auth.config";
+import { json } from "stream/consumers";
+import { error } from "console";
+import next from "next";
 
 export async function POST(req: NextRequest) {
   try {
@@ -62,5 +65,35 @@ export async function GET() {
       { error: "Failed to fetch exams" },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "invalid session" }, { status: 404 });
+    }
+
+    const body = await request.json();
+    const { examId } = body;
+
+    if (!examId) {
+      return NextResponse.json(
+        { error: "No examId recieved" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.exam.delete({
+      where: {
+        id: examId,
+      },
+    });
+
+    return NextResponse.json({ message: "Subject exam deleted successfully" });
+  } catch (error) {
+    console.error("error deleting exam", error);
+    NextResponse.json({ error: "Failed to delete exam" }, { status: 500 });
   }
 }

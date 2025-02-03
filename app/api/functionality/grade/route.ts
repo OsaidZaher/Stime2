@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/auth.config";
-// You can import cookies and headers if needed,
-// but in this example they are not used beyond session checks.
 
 export async function POST(request: Request) {
   try {
@@ -15,11 +13,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Parse the JSON body.
     const body = await request.json();
     const { subject, grade } = body;
 
-    // Validate input.
     if (!subject || typeof subject !== "string") {
       return NextResponse.json(
         { error: "Invalid subject name" },
@@ -50,7 +46,6 @@ export async function POST(request: Request) {
       },
     });
 
-    // If the subject doesn't exist, create it.
     if (!subjectRecord) {
       subjectRecord = await prisma.subject.create({
         data: {
@@ -60,8 +55,6 @@ export async function POST(request: Request) {
       });
     }
 
-    // Create a new UserGrade record.
-    // Note: We store the grade inside an array (as per your schema).
     const newGrade = await prisma.userGrade.create({
       data: {
         grades: [grade], // grade is wrapped in an array
@@ -111,58 +104,45 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const subjectIdParam = searchParams.get("subjectId");
+    const body = await request.json();
+    const { gradeId } = body;
 
-    if (!subjectIdParam) {
+    if (!gradeId) {
       return NextResponse.json(
-        { error: "Subject ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const subjectId = parseInt(subjectIdParam, 10);
-
-    if (isNaN(subjectId)) {
-      return NextResponse.json(
-        { error: "Invalid subject ID format" },
+        { error: "Grade ID is required" },
         { status: 400 }
       );
     }
 
     const userId = session.user.id.toString();
 
-    const subject = await prisma.subject.findFirst({
+    const grade = await prisma.userGrade.findFirst({
       where: {
-        id: subjectId,
+        id: gradeId,
         userId,
       },
     });
 
-    if (!subject) {
-      return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+    if (!grade) {
+      return NextResponse.json(
+        { error: "Grade not found or unauthorized" },
+        { status: 404 }
+      );
     }
 
-    await prisma.userGrade.deleteMany({
+    await prisma.userGrade.delete({
       where: {
-        subjectId,
-        userId,
-      },
-    });
-
-    await prisma.subject.delete({
-      where: {
-        id: subjectId,
+        id: gradeId,
       },
     });
 
     return NextResponse.json({
-      message: "Subject and grades deleted successfully",
+      message: "Grade deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting subject:", error);
+    console.error("Error deleting grade:", error);
     return NextResponse.json(
-      { error: "Failed to delete subject" },
+      { error: "Failed to delete grade" },
       { status: 500 }
     );
   }

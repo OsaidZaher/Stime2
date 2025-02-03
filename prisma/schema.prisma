@@ -61,3 +61,4 @@ model UserGrade {
   user      User     @relation(fields: [userId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
 }
+ 

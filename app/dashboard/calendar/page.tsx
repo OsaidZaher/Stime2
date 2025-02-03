@@ -85,7 +85,7 @@ export default function CardWithForm() {
     <div className="flex items-start justify-center space-x-8 ">
       {/* Calendar Section */}
       <div className="flex flex-col space-y-8">
-        <Calendar2 />
+        <Calendar2 refreshTrigger={refreshTrigger} />
         <GradeCard />
       </div>
 

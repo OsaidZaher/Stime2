@@ -16,10 +16,10 @@ function Calendar2({
   className,
   classNames,
   showOutsideDays = true,
+  refreshTrigger = 0, // Add a default value
   ...props
-}: CalendarProps) {
+}: CalendarProps & { refreshTrigger?: number }) {
   const [exams, setExams] = useState<Exam[]>([]);
-
   useEffect(() => {
     const fetchExams = async () => {
       try {
@@ -33,7 +33,7 @@ function Calendar2({
     };
 
     fetchExams();
-  }, []);
+  }, [refreshTrigger]);
 
   const examDays = exams.map((exam) => new Date(exam.date));
 

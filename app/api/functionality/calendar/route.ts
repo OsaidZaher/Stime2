@@ -3,9 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { authOptions } from "@/app/auth.config";
-import { json } from "stream/consumers";
-import { error } from "console";
-import next from "next";
 
 export async function POST(req: NextRequest) {
   try {

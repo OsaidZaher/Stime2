@@ -161,7 +161,7 @@ export default function TotalTimeChart() {
 
   return (
     <div className="">
-      <Card className="w-full max-w-[700px] mt-4">
+      <Card className="w-full max-w-lg ">
         <Select value={timeFrame} onValueChange={setTimeFrame}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a Time frame" />
@@ -188,7 +188,7 @@ export default function TotalTimeChart() {
           </CardDescription>
         </CardHeader>
         <CardContent className="pb-4">
-          <div className="w-full h-[525px]">
+          <div className="w-full h-[350px]">
             <ResponsiveContainer>
               <BarChart
                 data={chartData}

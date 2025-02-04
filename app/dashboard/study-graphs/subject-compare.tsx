@@ -238,16 +238,16 @@ const StudyStatistics5 = () => {
   };
 
   return (
-    <Card className="w-full max-w-md h-[450px] mx-auto flex flex-col  mt-[20px]">
-      {renderContent()}
-      <CardFooter className="mt-auto">
+    <Card className="w-full max-w-lg h-[400px] mx-auto flex flex-col ">
+      <CardTitle>
         <Button
           onClick={() => setShowVisualization(!showVisualization)}
-          className="w-full"
+          className="max-w-md mt-2 ml-2"
         >
           {showVisualization ? "Show Leaderboard" : "Show Visualization"}
         </Button>
-      </CardFooter>
+      </CardTitle>
+      {renderContent()}
     </Card>
   );
 };

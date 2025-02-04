@@ -16,7 +16,13 @@ import { Button } from "./button";
 
 const EXAM_PER_CARD = 5;
 
-export function ExamTable({ refreshTrigger }: { refreshTrigger?: number }) {
+export function ExamTable({
+  refreshTrigger,
+  onExamDeleted,
+}: {
+  refreshTrigger?: number;
+  onExamDeleted?: () => void;
+}) {
   const [exams, setExams] = useState<Exam[]>([]);
   const [countdowns, setCountdowns] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -102,6 +108,8 @@ export function ExamTable({ refreshTrigger }: { refreshTrigger?: number }) {
       if (currentPage >= totalPages) {
         setCurrentPage(Math.max(0, totalPages - 1));
       }
+
+      onExamDeleted?.();
 
       console.log("Exam deleted successfully");
     } catch (error) {

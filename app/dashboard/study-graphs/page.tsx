@@ -1,28 +1,15 @@
 // page.tsx
-import { ComparativeChart } from "./time-compare";
 import StudyStatistics5 from "./subject-compare";
 import TotalTimeChart from "./total-time";
-import SubjectHexagon from "./subject-hex";
-import { StudySessionsStats, GradeCard, StudyGoalCard } from "./totalSessions";
+import { StudySessionsStats } from "./totalSessions";
 
 export default function StudyGraph() {
   return (
-    <div className="p-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-min group-hover/bento:translate-x-2 transition duration-200">
-      <div>
-        <StudyStatistics5 />
-      </div>
-
-      <div>
-        <SubjectHexagon />
-      </div>
-      <div className="">
-        <TotalTimeChart />
-      </div>
-
-      <div>
-        <StudyGoalCard />
-      </div>
-      <div className="">
+    <div className="grid grid-cols-2">
+      <div
+        className="space-y-4 col-end-1
+      "
+      >
         <StudySessionsStats
           weekSessions={10}
           monthSessions={40}
@@ -31,9 +18,9 @@ export default function StudyGraph() {
           monthAverage="3h 15m"
           yearAverage="4h 10m"
         />
+        <TotalTimeChart />
       </div>
-
-      <div></div>
+      <StudyStatistics5 />
     </div>
   );
 }

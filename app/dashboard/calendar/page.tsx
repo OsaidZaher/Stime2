@@ -80,6 +80,9 @@ export default function CardWithForm() {
       toast?.error("Failed to add exam");
     }
   };
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   return (
     <div className="flex items-start justify-center space-x-8 ">
@@ -91,7 +94,10 @@ export default function CardWithForm() {
 
       {/* Table and Card Section */}
       <div className="flex flex-col space-y-8">
-        <ExamTable refreshTrigger={refreshTrigger} />
+        <ExamTable
+          refreshTrigger={refreshTrigger}
+          onExamDeleted={handleRefresh}
+        />
 
         <Card className="w-[550px] h-[350px]">
           <CardHeader>

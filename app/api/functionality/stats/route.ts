@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { AuthOptions } from "next-auth";
 import { authOptions } from "@/app/auth.config";
 
 export async function GET(req: NextRequest) {
@@ -14,6 +13,7 @@ export async function GET(req: NextRequest) {
     const userId = session.user.id;
     const now = new Date();
 
+    // Calculate date ranges
     const weekStart = new Date(now);
     weekStart.setDate(now.getDate() - 7);
 
@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
     const yearStart = new Date(now);
     yearStart.setFullYear(now.getFullYear() - 1);
 
+    // Get study sessions for each time period
     const [weekSessions, monthSessions, yearSessions] = await Promise.all([
+      // Week sessions
       prisma.studySession.findMany({
         where: {
           userId,
@@ -32,6 +34,7 @@ export async function GET(req: NextRequest) {
           },
         },
       }),
+      // Month sessions
       prisma.studySession.findMany({
         where: {
           userId,
@@ -40,6 +43,7 @@ export async function GET(req: NextRequest) {
           },
         },
       }),
+      // Year sessions
       prisma.studySession.findMany({
         where: {
           userId,
@@ -50,18 +54,16 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    const averages = (session: any[]) => {
-      if (session.length === 0) {
-        return "0h 0m";
-      }
-
-      const totalDuration = session.reduce((sum, session) => {
-        +sum + session.duarion, 0;
-      });
-      const averageSeconds = Math.round(totalDuration / session.length);
+    // Calculate averages (duration is stored in seconds)
+    const calculateAverage = (sessions: any[]) => {
+      if (sessions.length === 0) return "0h 0m";
+      const totalDuration = sessions.reduce(
+        (sum, session) => sum + session.duration,
+        0
+      );
+      const averageSeconds = Math.round(totalDuration / sessions.length);
       const hours = Math.floor(averageSeconds / 3600);
       const minutes = Math.floor((averageSeconds % 3600) / 60);
-
       return `${hours}h ${minutes}m`;
     };
 
@@ -69,16 +71,16 @@ export async function GET(req: NextRequest) {
       weekSessions: weekSessions.length,
       monthSessions: monthSessions.length,
       yearSessions: yearSessions.length,
-      weekAverage: averages(weekSessions),
-      monthAverage: averages(monthSessions),
-      yearAverage: averages(yearSessions),
+      weekAverage: calculateAverage(weekSessions),
+      monthAverage: calculateAverage(monthSessions),
+      yearAverage: calculateAverage(yearSessions),
     };
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error("failed to fetch stats", error);
+    console.error("Error fetching study session stats:", error);
     return NextResponse.json(
-      { error: "failed to fetch stats" },
+      { error: "Failed to fetch study session statistics" },
       { status: 500 }
     );
   }

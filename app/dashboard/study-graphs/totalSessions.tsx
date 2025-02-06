@@ -10,8 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Toast } from "@/components/ui/toast";
-import { toast } from "sonner";
 
 interface StudySessionsStatsProps {
   weekSessions: number;
@@ -22,14 +20,7 @@ interface StudySessionsStatsProps {
   yearAverage: string;
 }
 
-export function StudySessionsStats({
-  weekSessions,
-  monthSessions,
-  yearSessions,
-  weekAverage,
-  monthAverage,
-  yearAverage,
-}: StudySessionsStatsProps) {
+export function StudySessionsStats() {
   const [showAverage, setShowAverage] = useState(false);
   const [stats, setStats] = useState<StudySessionsStatsProps | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,19 +29,18 @@ export function StudySessionsStats({
     const fetchStats = async () => {
       try {
         const response = await fetch("/api/functionality/stats");
-
         if (!response.ok) {
-          throw new Error("failed to fetch data");
+          throw new Error("Failed to fetch stats");
         }
         const data = await response.json();
         setStats(data);
       } catch (error) {
-        console.log("error fetching stats", error);
-        toast.error("failed to load stats, Osaid will be on it");
+        console.error("Error fetching stats:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchStats();
   }, []);
 

@@ -10,14 +10,7 @@ export default function StudyGraph() {
         className="space-y-4 col-end-1
       "
       >
-        <StudySessionsStats
-          weekSessions={10}
-          monthSessions={40}
-          yearSessions={300}
-          weekAverage="2h 30m"
-          monthAverage="3h 15m"
-          yearAverage="4h 10m"
-        />
+        <StudySessionsStats />
         <TotalTimeChart />
       </div>
       <StudyStatistics5 />

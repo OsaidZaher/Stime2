@@ -257,7 +257,7 @@ function SheetDemo({
                       className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
                       variant="outline"
                       onClick={(e) => {
-                        e.stopPropagation;
+                        e.stopPropagation();
                         handleSaveSession();
                       }}
                     >

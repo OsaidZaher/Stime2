@@ -340,7 +340,6 @@ const alarms = [
   { id: "telephone_ring.mp3", name: "Ring 2" },
 ];
 
-// Improved hook with better preloading and error handling
 export const useAlarm = (selectedAlarm: string, onAlarmEnd: () => void) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -360,14 +359,10 @@ export const useAlarm = (selectedAlarm: string, onAlarmEnd: () => void) => {
       setIsLoaded(false);
     };
 
-    audio.addEventListener("canplaythrough", handleCanPlayThrough);
-    audio.addEventListener("error", handleError);
     audioRef.current = audio;
 
     return () => {
       if (audioRef.current) {
-        audio.removeEventListener("canplaythrough", handleCanPlayThrough);
-        audio.removeEventListener("error", handleError);
         audio.pause();
         audio.src = "";
         audioRef.current = null;
@@ -401,7 +396,6 @@ export const useAlarm = (selectedAlarm: string, onAlarmEnd: () => void) => {
   return { playAlarm, stopAlarm, isLoaded };
 };
 
-// Improved AlarmPicker component
 export function AlarmPicker({
   onAlarmSelect,
 }: {
@@ -416,7 +410,7 @@ export function AlarmPicker({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
         <Button
           variant="outline"
           className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
@@ -455,7 +449,10 @@ export function AlarmPicker({
 // Improved AlarmPopup component
 export const AlarmPopup = ({ onStop }: { onStop: () => void }) => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="bg-background rounded-lg shadow-lg p-6 w-80 text-center">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Time's Up!</h2>

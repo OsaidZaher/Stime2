@@ -5,7 +5,7 @@ import { StudySessionsStats } from "./totalSessions";
 
 export default function StudyGraph() {
   return (
-    <div className="grid grid-cols-2">
+    <div className="grid grid-cols-2 space-x-10">
       <div
         className="space-y-4 col-end-1
       "

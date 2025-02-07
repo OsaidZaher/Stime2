@@ -104,9 +104,7 @@ export default function StudySession() {
   return (
     <SidebarInset>
       <div className="absolute top-4 right-4 z-50"></div>
-      {/* Move StudyMenu to the top */}
       <div className=" ml-[750px] top-0 "></div>
-      {/* Ensure main content is centered */}
       <main className="flex items-center justify-center min-h-screen bg-background">
         <SheetDemo
           subjects={subjects}
@@ -209,13 +207,8 @@ function SheetDemo({
   );
 
   const handleTimerEnd = async () => {
-    if (isLoaded) {
-      await playAlarm();
-      setShowAlarmPopup(true);
-    } else {
-      console.warn("Alarm audio not loaded yet");
-      // You might want to show a fallback notification here
-    }
+    await playAlarm();
+    setShowAlarmPopup(true);
     handleSaveSession();
   };
 
@@ -265,7 +258,6 @@ function SheetDemo({
                     </Button>
                   </div>
 
-                  {/* Right Section: AlarmPicker and Show Stopwatch */}
                   <div className="flex flex-col space-y-4">
                     <AlarmPicker onAlarmSelect={setSelectedAlarm} />
                     <Button

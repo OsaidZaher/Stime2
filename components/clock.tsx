@@ -24,7 +24,7 @@ export function Timer({
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [initialMinutes] = useState(25);
+  const [initialMinutes] = useState(1);
   const [initialSeconds] = useState(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
@@ -359,10 +359,14 @@ export const useAlarm = (selectedAlarm: string, onAlarmEnd: () => void) => {
       setIsLoaded(false);
     };
 
+    audio.addEventListener("canplaythrough", handleCanPlayThrough);
+    audio.addEventListener("error", handleError);
     audioRef.current = audio;
 
     return () => {
       if (audioRef.current) {
+        audio.removeEventListener("canplaythrough", handleCanPlayThrough);
+        audio.removeEventListener("error", handleError);
         audio.pause();
         audio.src = "";
         audioRef.current = null;
@@ -449,10 +453,7 @@ export function AlarmPicker({
 // Improved AlarmPopup component
 export const AlarmPopup = ({ onStop }: { onStop: () => void }) => {
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-background rounded-lg shadow-lg p-6 w-80 text-center">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Time's Up!</h2>

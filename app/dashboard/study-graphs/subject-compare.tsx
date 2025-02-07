@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Pie, PieChart, Cell, ResponsiveContainer, Sector } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -63,6 +63,7 @@ const StudyStatistics5 = () => {
       console.error("Error fetching study sessions:", error);
     }
   };
+
   const capitalizeWord = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
@@ -113,7 +114,7 @@ const StudyStatistics5 = () => {
     percent,
     subject,
   }: any) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.7; // Reduce this value to move text closer to the center
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -122,9 +123,9 @@ const StudyStatistics5 = () => {
         x={x}
         y={y}
         fill="white"
-        textAnchor="middle" // Centering the text
+        textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
-        fontSize="13"
+        fontSize="12"
         fontWeight="bold"
       >
         {capitalizeWord(`${subject}`)}
@@ -165,16 +166,18 @@ const StudyStatistics5 = () => {
     if (showVisualization) {
       return (
         <>
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Study Pie</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl font-semibold text-center">
+              Study Pie
+            </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3">
+          <CardContent className="pb-4">
             {chartData.length > 0 ? (
               <ChartContainer
-                className="mx-auto aspect-square max-h-[300px]"
+                className="mx-auto aspect-square h-[250px]"
                 config={chartConfig}
               >
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer>
                   <PieChart>
                     <ChartTooltip
                       cursor={false}
@@ -185,8 +188,8 @@ const StudyStatistics5 = () => {
                       dataKey="time"
                       nameKey="subject"
                       cx="50%"
-                      cy="55%"
-                      outerRadius={136}
+                      cy="50%"
+                      outerRadius={100}
                       labelLine={false}
                       label={renderCustomizedLabel}
                       activeShape={renderActiveShape}
@@ -212,7 +215,7 @@ const StudyStatistics5 = () => {
       return (
         <>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center ">
+            <CardTitle className="text-xl font-semibold text-center">
               Your Most Studied Subjects
             </CardTitle>
             <CardDescription className="text-center">
@@ -223,10 +226,11 @@ const StudyStatistics5 = () => {
             <ul className="space-y-2">
               {["🥇", "🥈", "🥉", "4.", "5."].map((rank, index) => (
                 <li key={rank} className="flex items-center space-x-2">
-                  <span className="text-3xl w-8 text-center">{rank}</span>
+                  <span className="text-2xl w-8 text-center">{rank}</span>
                   <span className="text-lg">
-                    {capitalizeWord(chartData[index].subject) ||
-                      "No subject yet"}
+                    {chartData[index]
+                      ? capitalizeWord(chartData[index].subject)
+                      : "No subject yet"}
                   </span>
                 </li>
               ))}
@@ -238,16 +242,16 @@ const StudyStatistics5 = () => {
   };
 
   return (
-    <Card className="w-full max-w-lg h-[400px] mx-auto flex flex-col ">
-      <CardTitle>
+    <Card className=" w-[550px] flex flex-col h-[400px]">
+      {renderContent()}
+      <CardFooter className="mt-auto">
         <Button
           onClick={() => setShowVisualization(!showVisualization)}
-          className="max-w-md mt-2 ml-2"
+          className="w-full"
         >
           {showVisualization ? "Show Leaderboard" : "Show Visualization"}
         </Button>
-      </CardTitle>
-      {renderContent()}
+      </CardFooter>
     </Card>
   );
 };

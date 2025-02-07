@@ -2,18 +2,19 @@
 import StudyStatistics5 from "./subject-compare";
 import TotalTimeChart from "./total-time";
 import { StudySessionsStats } from "./totalSessions";
+import GradeChanges from "@/components/gradeImprovement";
 
 export default function StudyGraph() {
   return (
-    <div className="grid grid-cols-2 space-x-10">
-      <div
-        className="space-y-4 col-end-1
-      "
-      >
+    <div className="flex justify-center space-x-8 ">
+      <div className="space-y-8">
         <StudySessionsStats />
         <TotalTimeChart />
       </div>
-      <StudyStatistics5 />
+      <div className="space-y-8">
+        <StudyStatistics5 />
+        <GradeChanges />
+      </div>
     </div>
   );
 }

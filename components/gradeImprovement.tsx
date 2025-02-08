@@ -58,7 +58,8 @@ const GradeChanges = () => {
           <span className="text-lg font-semibold">{newValue}%</span>
           <TrendingUp className="h-4 w-4 text-green-500" />
           <span className="text-sm text-green-500">
-            +{percentageIncrease.toFixed(1)}%
+            {percentageIncrease > 0 ? "+" : ""}
+            {percentageIncrease.toFixed(1)}%
           </span>
         </div>
       );
@@ -73,8 +74,12 @@ const GradeChanges = () => {
     }
   };
 
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   return (
-    <Card className="w-[550px] h-[400px]  ">
+    <Card className="w-[550px] h-[400px]">
       <CardHeader>
         <CardTitle className="text-xl font-bold">
           Recent Grade Changes
@@ -90,7 +95,7 @@ const GradeChanges = () => {
               <React.Fragment key={subject.id}>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium text-gray-600">
-                    {subject.name}
+                    {capitalizeFirstLetter(subject.name)}
                   </span>
                   {renderGradeChange(
                     gradeChange.oldGrade,

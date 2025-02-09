@@ -67,7 +67,7 @@ const GradeChanges = () => {
       return (
         <div className="flex items-center space-x-2">
           <span className="text-lg font-semibold">{oldGrade}</span>
-          <ArrowRight className="h-4 w-4 text-blue-500" />
+          <ArrowRight className="h-4 w-4 text-green-700" />
           <span className="text-lg font-semibold">{newGrade}</span>
         </div>
       );

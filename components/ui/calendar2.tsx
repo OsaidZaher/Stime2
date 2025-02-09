@@ -7,41 +7,37 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import type { Exam } from "@prisma/client";
+import useSWR from "swr";
 
 import { Card } from "@/components/ui/card";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function Calendar2({
+export function Calendar2({
   className,
   classNames,
   showOutsideDays = true,
-  refreshTrigger = 0, // Add a default value
   ...props
-}: CalendarProps & { refreshTrigger?: number }) {
-  const [exams, setExams] = useState<Exam[]>([]);
-  useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const response = await fetch("/api/functionality/calendar");
-        if (!response.ok) throw new Error("Failed to fetch exams");
-        const data = await response.json();
-        setExams(data);
-      } catch (error) {
-        console.error("Error fetching exams:", error);
-      }
-    };
+}: CalendarProps) {
+  // SWR automatically fetches the exams from the API.
+  const { data: exams, error } = useSWR<Exam[]>(
+    "/api/functionality/calendar",
+    fetcher
+  );
 
-    fetchExams();
-  }, [refreshTrigger]);
+  if (error) {
+    console.error("Error fetching exams:", error);
+  }
 
-  const examDays = exams.map((exam) => new Date(exam.date));
+  // Map the exams to Date objects (if available).
+  const examDays = exams ? exams.map((exam) => new Date(exam.date)) : [];
 
   return (
-    <Card className="w-[550px] h-[350px] flex items-center justify-center mr-3">
+    <Card className="w-full max-w-2xl h-[372.5px] flex items-center justify-center ">
       <DayPicker
         showOutsideDays={showOutsideDays}
-        className={cn("w-full h-full p-4", className)}
+        className={cn("w-full h-full p-6", className)}
         modifiers={{
           exam: examDays,
         }}
@@ -52,7 +48,7 @@ function Calendar2({
           },
         }}
         classNames={{
-          months: "flex flex-col space-y-6",
+          months: "flex flex-col space-y-8",
           month: "space-y-4",
           caption: "flex justify-center pt-1 relative items-center h-10",
           caption_label: "text-xl font-bold",
@@ -117,5 +113,3 @@ function Calendar2({
 }
 
 Calendar2.displayName = "Calendar2";
-
-export { Calendar2 };

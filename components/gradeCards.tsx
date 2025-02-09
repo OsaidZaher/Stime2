@@ -180,7 +180,7 @@ export default function GradeCard() {
                             handleDeleteGrade(grade.subjectId, idx)
                           }
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-3 w-3 font text-red-600" />
                         </Button>
                       </Badge>
                     ))}

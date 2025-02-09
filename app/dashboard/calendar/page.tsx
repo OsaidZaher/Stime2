@@ -1,11 +1,9 @@
 "use client";
 
 import * as React from "react";
-
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,18 +24,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { ExamTable } from "@/components/ui/examTable";
 import { Calendar2 } from "@/components/ui/calendar2";
 import GradeCard from "@/components/gradeCards";
+import { mutate } from "swr";
+
 export default function CardWithForm() {
   const [examName, setExamName] = React.useState("");
-  const [date, setDate] = React.useState<Date>();
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
   const { data: session } = useSession();
   const router = useRouter();
-  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
+  ) => {
     e.preventDefault();
 
     if (!session) {
@@ -66,38 +66,35 @@ export default function CardWithForm() {
         throw new Error("Failed to create exam");
       }
 
-      const exam = await response.json();
+      await response.json();
 
       setExamName("");
       setDate(undefined);
-      setRefreshTrigger((prev) => prev + 1);
 
       toast?.success("Exam added successfully!");
 
-      router.refresh();
+      // Invalidate SWR cache so that Calendar2 and ExamTable update.
+      mutate("/api/functionality/calendar");
+
+      // Optionally, if you still need a page refresh:
+      // router.refresh();
     } catch (error) {
       console.error("Error adding exam:", error);
       toast?.error("Failed to add exam");
     }
-  };
-  const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1);
   };
 
   return (
     <div className="flex items-start justify-center space-x-8 ">
       {/* Calendar Section */}
       <div className="flex flex-col space-y-8">
-        <Calendar2 refreshTrigger={refreshTrigger} />
+        <Calendar2 />
         <GradeCard />
       </div>
 
       {/* Table and Card Section */}
       <div className="flex flex-col space-y-8">
-        <ExamTable
-          refreshTrigger={refreshTrigger}
-          onExamDeleted={handleRefresh}
-        />
+        <ExamTable />
 
         <Card className="w-[550px] h-[350px]">
           <CardHeader>

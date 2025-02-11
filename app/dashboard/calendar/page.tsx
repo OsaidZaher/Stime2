@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +32,6 @@ export default function CardWithForm() {
   const [examName, setExamName] = React.useState("");
   const [date, setDate] = React.useState<Date | undefined>(undefined);
   const { data: session } = useSession();
-  const router = useRouter();
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
@@ -73,11 +71,7 @@ export default function CardWithForm() {
 
       toast?.success("Exam added successfully!");
 
-      // Invalidate SWR cache so that Calendar2 and ExamTable update.
       mutate("/api/functionality/calendar");
-
-      // Optionally, if you still need a page refresh:
-      // router.refresh();
     } catch (error) {
       console.error("Error adding exam:", error);
       toast?.error("Failed to add exam");
@@ -87,13 +81,13 @@ export default function CardWithForm() {
   return (
     <div className="flex items-start justify-center space-x-8 ">
       {/* Calendar Section */}
-      <div className="flex flex-col space-y-8">
+      <div className=" space-y-8">
         <Calendar2 />
         <GradeCard />
       </div>
 
       {/* Table and Card Section */}
-      <div className="flex flex-col space-y-8">
+      <div className=" space-y-8">
         <ExamTable />
 
         <Card className="w-[550px] h-[350px]">

@@ -5,16 +5,12 @@ import { authOptions } from "@/app/auth.config";
 
 export async function POST(request: Request) {
   try {
-    // Get session and verify the user is authenticated.
     const session = await getServerSession(authOptions);
-    console.log("Session in POST:", session);
-    if (!session || !session.user || !session.user.id) {
-      console.log("Unauthorized: No valid session");
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { subject, grade } = body;
+    const { subject, grade } = await request.json();
 
     if (!subject || typeof subject !== "string") {
       return NextResponse.json(
@@ -27,42 +23,50 @@ export async function POST(request: Request) {
     }
 
     const userId = session.user.id.toString();
-    console.log("User ID from session:", userId);
 
-    // Verify that the user exists.
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
     if (!user) {
-      console.log("User not found in database");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Look for an existing subject for the user.
-    let subjectRecord = await prisma.subject.findFirst({
+    // Case-insensitive subject check
+    const existingSubject = await prisma.subject.findFirst({
       where: {
-        name: subject,
+        name: {
+          equals: subject,
+          mode: "insensitive",
+        },
         userId,
       },
     });
 
-    if (!subjectRecord) {
-      subjectRecord = await prisma.subject.create({
+    if (existingSubject) {
+      const newGrade = await prisma.userGrade.create({
         data: {
-          name: subject,
+          grades: [grade],
           userId,
+          subjectId: existingSubject.id,
         },
       });
+      return NextResponse.json(newGrade, { status: 201 });
     }
+
+    const newSubject = await prisma.subject.create({
+      data: {
+        name: subject.toLowerCase(),
+        userId,
+      },
+    });
 
     const newGrade = await prisma.userGrade.create({
       data: {
-        grades: [grade], // grade is wrapped in an array
+        grades: [grade],
         userId,
-        subjectId: subjectRecord.id,
+        subjectId: newSubject.id,
       },
     });
-    console.log("New grade added:", newGrade);
 
     return NextResponse.json(newGrade, { status: 201 });
   } catch (error) {
@@ -70,7 +74,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to add grade" }, { status: 500 });
   }
 }
-
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

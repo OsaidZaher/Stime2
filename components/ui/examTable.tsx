@@ -29,7 +29,7 @@ interface ExamTableProps {
 const EXAM_PER_CARD = 4;
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export function ExamTable({ onExamDeleted, className }: ExamTableProps) {
+export function ExamTable() {
   const {
     data: exams,
     error,
@@ -96,7 +96,6 @@ export function ExamTable({ onExamDeleted, className }: ExamTableProps) {
       }
 
       mutate();
-      onExamDeleted?.();
       console.log("Exam deleted successfully");
     } catch (error) {
       console.error("Error deleting exam:", error);
@@ -170,7 +169,7 @@ export function ExamTable({ onExamDeleted, className }: ExamTableProps) {
         <Button
           variant="outline"
           size="icon"
-          disabled={currentPage === 1}
+          disabled={currentPage === 0}
           onClick={() => handleNavigation("left")}
         >
           <ChevronLeft size={16} />

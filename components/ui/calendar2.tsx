@@ -20,7 +20,6 @@ export function Calendar2({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  // SWR automatically fetches the exams from the API.
   const { data: exams, error } = useSWR<Exam[]>(
     "/api/functionality/calendar",
     fetcher
@@ -30,7 +29,6 @@ export function Calendar2({
     console.error("Error fetching exams:", error);
   }
 
-  // Map the exams to Date objects (if available).
   const examDays = exams ? exams.map((exam) => new Date(exam.date)) : [];
 
   return (

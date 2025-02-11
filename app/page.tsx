@@ -9,9 +9,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow flex flex-row h-screen">
-        {/* Left Section */}
         <div className="w-1/2 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-          {/* Welcome section - increased margin bottom from mb-12 to mb-24 */}
           <section className="text-center space-y-4 mb-24">
             <div className="h-12">
               <TypewriterEffect

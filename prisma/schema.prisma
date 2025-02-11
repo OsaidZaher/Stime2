@@ -60,5 +60,6 @@ model UserGrade {
   subjectId Int      // Foreign key to Subject model
   user      User     @relation(fields: [userId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
+  createdAt DateTime @default(now())
 } 
  

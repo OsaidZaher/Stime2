@@ -58,11 +58,6 @@ const data = {
           url: "/dashboard/study-graphs",
           icon: IconGraph,
         },
-        {
-          title: "Discord",
-          url: "#",
-          icon: DiscordLogoIcon,
-        },
       ],
     },
   ],

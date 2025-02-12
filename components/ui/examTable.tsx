@@ -172,9 +172,9 @@ export function ExamTable() {
           disabled={currentPage === 0}
           onClick={() => handleNavigation("left")}
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={16} className="text-blue-700 font-extrabold" />
         </Button>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground ">
           Page {currentPage + 1} of {totalPages}
         </span>
         <Button
@@ -183,7 +183,7 @@ export function ExamTable() {
           disabled={currentPage >= totalPages - 1}
           onClick={() => handleNavigation("right")}
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={16} className="text-blue-700 font-extrabold" />
         </Button>
       </CardFooter>
     </Card>

@@ -92,7 +92,13 @@ export function Calendar2({
             React.ComponentProps<typeof ChevronLeftIcon>,
             "children"
           >) => (
-            <ChevronLeftIcon className={cn("h-6 w-6", className)} {...props} />
+            <ChevronLeftIcon
+              className={cn(
+                "h-6 w-6",
+                (className = "text-blue-600 font-extrabold")
+              )}
+              {...props}
+            />
           ),
           IconRight: ({
             className,
@@ -101,7 +107,13 @@ export function Calendar2({
             React.ComponentProps<typeof ChevronRightIcon>,
             "children"
           >) => (
-            <ChevronRightIcon className={cn("h-6 w-6", className)} {...props} />
+            <ChevronRightIcon
+              className={cn(
+                "h-6 w-6",
+                (className = "text-blue-600 font-extrabold")
+              )}
+              {...props}
+            />
           ),
         }}
         {...props}

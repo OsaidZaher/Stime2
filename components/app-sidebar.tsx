@@ -4,7 +4,7 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { Home, BookOpen, History, Timer } from "lucide-react";
 
-import { IconGraph, IconTestPipe } from "@tabler/icons-react";
+import { IconGraph } from "@tabler/icons-react";
 
 import {
   Sidebar,
@@ -17,7 +17,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { DiscordLogoIcon } from "@radix-ui/react-icons";
 
 const data = {
   navMain: [

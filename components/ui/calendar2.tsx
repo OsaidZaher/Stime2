@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import type * as React from "react";
 import { DayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
@@ -93,10 +92,7 @@ export function Calendar2({
             "children"
           >) => (
             <ChevronLeftIcon
-              className={cn(
-                "h-6 w-6",
-                (className = "text-blue-600 font-extrabold")
-              )}
+              className={cn("h-6 w-6 text-blue-600 font-extrabold")}
               {...props}
             />
           ),
@@ -108,10 +104,7 @@ export function Calendar2({
             "children"
           >) => (
             <ChevronRightIcon
-              className={cn(
-                "h-6 w-6",
-                (className = "text-blue-600 font-extrabold")
-              )}
+              className={cn("h-6 w-6 text-blue-600 font-extrabold")}
               {...props}
             />
           ),

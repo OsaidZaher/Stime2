@@ -1,12 +1,5 @@
-import { Grid } from "@/components/grid";
-import StreakCard from "@/components/ui/streakCard";
+"use client";
+import { LogInCard } from "@/components/ui/logInCard";
 export default function Page() {
-  return (
-    <>
-      <div className="flex flex-row justify-center"></div>
-      <div className=" ">
-        <Grid />g{" "}
-      </div>
-    </>
-  );
+  return <>{<LogInCard />}</>;
 }

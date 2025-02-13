@@ -1,8 +1,10 @@
-"use client";
+/*"use client";
 
 import { useState, useEffect } from "react";
 import { Pen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Goals } from "@prisma/client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,14 +16,41 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { PrismaClient } from "@prisma/client";
 
 export function LogInCard() {
-  const [streak, setStreak] = useState(2);
-  const [target, setTarget] = useState(7);
+  const [streak, setStreak] = useState();
+  const [target, setTarget] = useState();
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
-  const [newTarget, setNewTarget] = useState(target);
+
+
+  const handleSubmit = async (e:React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      const response = await fetch("/api/functionality/grades",{
+        method: "POST",
+        headers:{'Content-type': "application/json"},
+        body: JSON.stringify({
+          target: Number(target)
+        })
+      })
+      if(!response.ok){
+        const data = await response.json();
+        throw new Error(data.error || "Failed to add target");
+      }
+
+      setOpen(false);
+      
+    } catch (error) {
+      console.log(error)
+      
+    }
+    
+  }
+
+
 
   const daysLeft = Math.max(0, target - streak);
 
@@ -42,10 +71,9 @@ export function LogInCard() {
     if (progress < 50) return "text-yellow-500";
   };
 
-  const handleSave = () => {
-    setTarget(Number(newTarget));
-    setOpen(false);
-  };
+
+  
+  
 
   return (
     <Card className="w-full max-w-sm bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-lg">
@@ -69,13 +97,12 @@ export function LogInCard() {
             <div className="space-x-4 py-2 flex ">
               <Input
                 type="number"
-                value={newTarget}
-                onChange={(e) => setNewTarget(e.target.value)}
+                onChange={(e) => setTarget(e.target.value)}
                 min="1"
                 max="7"
                 className="w-20 border-2 border-gray-500 outline-none focus:border-4 focus:border-blue-500 rounded-md p-2 text-center"
               />
-              <Button type="submit" onClick={handleSave}>
+              <Button type="submit" onClick={handleSubmit}>
                 Save changes
               </Button>
             </div>
@@ -129,3 +156,4 @@ export function LogInCard() {
 }
 
 export default LogInCard;
+*/

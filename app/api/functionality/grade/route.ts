@@ -12,16 +12,6 @@ export async function POST(request: Request) {
 
     const { subject, grade } = await request.json();
 
-    if (!subject || typeof subject !== "string") {
-      return NextResponse.json(
-        { error: "Invalid subject name" },
-        { status: 400 }
-      );
-    }
-    if (!grade || typeof grade !== "string") {
-      return NextResponse.json({ error: "Invalid grade" }, { status: 400 });
-    }
-
     const userId = session.user.id.toString();
 
     const user = await prisma.user.findUnique({
@@ -31,7 +21,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Case-insensitive subject check
     const existingSubject = await prisma.subject.findFirst({
       where: {
         name: {

@@ -17,7 +17,6 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
-  Cell,
 } from "recharts";
 import {
   Card,
@@ -122,13 +121,11 @@ export default function TotalTimeChart() {
           label: `Previous ${periodLabel}`,
           minutes: previousSeconds / 60,
           display: formatDuration(previousSeconds),
-          color: "hsl(242, 70%, 50%)", // Added color property
         },
         {
           label: `Current ${periodLabel}`,
           minutes: currentSeconds / 60,
           display: formatDuration(currentSeconds),
-          color: "hsl(192, 72%, 43%)", // Added color property
         },
       ],
       currentTotal: formatDuration(currentSeconds),
@@ -212,7 +209,7 @@ export default function TotalTimeChart() {
                 />
                 <Bar
                   dataKey="minutes"
-                  fill="hsl(192 72% 43%)"
+                  fill="hsl(192 90% 41%)"
                   radius={[8, 8, 0, 0]}
                   barSize={100}
                 />

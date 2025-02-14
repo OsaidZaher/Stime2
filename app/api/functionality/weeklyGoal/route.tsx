@@ -1,4 +1,3 @@
-import { AuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -16,7 +15,6 @@ export async function POST(request: Request) {
     const { target, completion } = await request.json();
     const userId = session?.user.id;
 
-    // Check if a weekly goal already exists
     const existingGoal = await prisma.weeklyGoal.findUnique({
       where: {
         userId: userId,
@@ -25,7 +23,6 @@ export async function POST(request: Request) {
 
     let weeklyGoal;
     if (existingGoal) {
-      // Update existing goal
       weeklyGoal = await prisma.weeklyGoal.update({
         where: {
           userId: userId,
@@ -36,7 +33,6 @@ export async function POST(request: Request) {
         },
       });
     } else {
-      // Create new goal
       weeklyGoal = await prisma.weeklyGoal.create({
         data: {
           target,

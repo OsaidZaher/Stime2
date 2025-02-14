@@ -1,79 +1,125 @@
-/*"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Pen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Goals } from "@prisma/client";
-
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { WeeklyGoal } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { PrismaClient } from "@prisma/client";
+import useSWR, { mutate } from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function LogInCard() {
-  const [streak, setStreak] = useState();
-  const [target, setTarget] = useState();
-  const [progress, setProgress] = useState(0);
+  const {
+    data: weeklyGoal,
+    error,
+    isLoading,
+  } = useSWR<WeeklyGoal>("/api/functionality/weeklyGoal", fetcher);
+
   const [open, setOpen] = useState(false);
+  const [target, setTarget] = useState<number>(7);
+  const [completion, setCompletion] = useState<number>(0);
 
+  const loginCount = weeklyGoal?.completion ?? 0;
+  const progress = (loginCount / target) * 100;
+  const daysLeft = target - loginCount;
 
-  const handleSubmit = async (e:React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     try {
-      const response = await fetch("/api/functionality/grades",{
+      const response = await fetch("/api/functionality/weeklyGoal", {
         method: "POST",
-        headers:{'Content-type': "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          target: Number(target)
-        })
-      })
-      if(!response.ok){
-        const data = await response.json();
-        throw new Error(data.error || "Failed to add target");
+          target: Number(target),
+          completion: Number(loginCount),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update goal");
       }
 
+      await mutate("/api/functionality/weeklyGoal");
       setOpen(false);
-      
     } catch (error) {
-      console.log(error)
-      
+      console.error("Error saving goal:", error);
     }
-    
-  }
-
-
-
-  const daysLeft = Math.max(0, target - streak);
+  };
 
   useEffect(() => {
-    setProgress((streak / target) * 100);
-  }, [streak, target]);
+    if (weeklyGoal?.target) {
+      setTarget(weeklyGoal.target);
+    }
+    checkLoginToday();
+  }, [weeklyGoal]);
+
+  const checkLoginToday = () => {
+    const lastLoginDate = localStorage.getItem("lastLoginDate");
+    const today = new Date().toLocaleDateString();
+
+    if (lastLoginDate !== today) {
+      const newCompletion = loginCount + 1;
+      setCompletion(newCompletion);
+
+      localStorage.setItem("lastLoginDate", today);
+
+      updateCompletion(newCompletion);
+    }
+  };
+
+  const updateCompletion = async (newCompletion: number) => {
+    try {
+      const response = await fetch("/api/functionality/weeklyGoal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          target,
+          completion: newCompletion,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update completion");
+      }
+
+      await mutate("/api/functionality/weeklyGoal");
+    } catch (error) {
+      console.error("Error saving completion:", error);
+    }
+  };
 
   const getMotivationalMessage = () => {
-    if (streak === target) return "Goal achieved! 🎉";
-    if (streak / target >= 0.8) return "Almost there! Keep it up! 💪";
-    if (streak / target >= 0.5) return "Halfway there! You're doing great! 👍";
-    if (streak > 0) return "Great start! Keep going! 🚀";
-    return "Start your streak today! 🌟";
+    if (loginCount === target) return "Weekly goal achieved! 🎉";
+    if (loginCount / target >= 0.8) return "Almost there! Keep it up! 💪";
+    if (loginCount / target >= 0.5)
+      return "Halfway through the week! You're doing great! 👍";
+    if (loginCount > 0) return "Great start to the week! Keep going! 🚀";
+    return "Start your week today! 🌟";
   };
 
   const getColorClass = () => {
-    if (progress >= 80) return "text-green-500";
-    if (progress < 50) return "text-yellow-500";
+    if (progress >= 80) return "text-green-600";
+    if (progress >= 50) return "text-green-400";
+    return "text-yellow-500";
   };
 
-
-  
-  
+  // Show loading state
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <Card className="w-full max-w-sm bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-lg">
@@ -94,18 +140,17 @@ export function LogInCard() {
             <DialogHeader>
               <DialogTitle>What is your weekly login goal?</DialogTitle>
             </DialogHeader>
-            <div className="space-x-4 py-2 flex ">
+            <form onSubmit={handleSubmit} className="space-x-4 py-2 flex">
               <Input
                 type="number"
-                onChange={(e) => setTarget(e.target.value)}
+                value={target}
+                onChange={(e) => setTarget(Number(e.target.value))}
                 min="1"
                 max="7"
                 className="w-20 border-2 border-gray-500 outline-none focus:border-4 focus:border-blue-500 rounded-md p-2 text-center"
               />
-              <Button type="submit" onClick={handleSubmit}>
-                Save changes
-              </Button>
-            </div>
+              <Button type="submit">Save changes</Button>
+            </form>
           </DialogContent>
         </Dialog>
       </CardHeader>
@@ -125,7 +170,7 @@ export function LogInCard() {
               className={`${getColorClass()} transition-all duration-500 ease-in-out`}
               strokeWidth="8"
               strokeDasharray={289}
-              strokeDashoffset={289 - (289 * progress) / 100}
+              strokeDashoffset={289 - (289 * Math.min(progress, 100)) / 100}
               strokeLinecap="round"
               stroke="currentColor"
               fill="transparent"
@@ -135,7 +180,7 @@ export function LogInCard() {
             />
           </svg>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-            <div className="text-5xl font-bold">{streak}</div>
+            <div className="text-5xl font-bold">{loginCount}</div>
             <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
               days
             </div>
@@ -156,4 +201,3 @@ export function LogInCard() {
 }
 
 export default LogInCard;
-*/

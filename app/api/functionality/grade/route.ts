@@ -12,14 +12,7 @@ export async function POST(request: Request) {
 
     const { subject, grade } = await request.json();
 
-    const userId = session.user.id.toString();
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    const userId = session.user.id;
 
     const existingSubject = await prisma.subject.findFirst({
       where: {
@@ -81,7 +74,6 @@ export async function GET() {
     });
     return NextResponse.json({ subjects }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching subjects:", error);
     return NextResponse.json(
       { error: "Failed to fetch subjects" },
       { status: 500 }

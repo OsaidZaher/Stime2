@@ -13,14 +13,12 @@ export async function POST(req: NextRequest) {
 
     const { subjectId, topic, startTime, endTime } = await req.json();
 
-    // Ensure subjectId is a number
     const parsedSubjectId = Number(subjectId);
 
     if (!subjectId || isNaN(parsedSubjectId)) {
       return NextResponse.json({ error: "Invalid subjectId" }, { status: 400 });
     }
 
-    // Use the user ID as a string
     const userId = session.user.id;
 
     const startDate = new Date(startTime);
@@ -33,12 +31,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Calculate duration in seconds
     const duration = Math.floor(
       (endDate.getTime() - startDate.getTime()) / 1000
     );
 
-    // Verify that the subject belongs to the current user
     const subject = await prisma.subject.findFirst({
       where: {
         id: parsedSubjectId,

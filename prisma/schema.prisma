@@ -18,7 +18,8 @@ model User {
   userGrades    UserGrade[]   
   studySessions StudySession[]
   subjects      Subject[]
-  goals         Goals[]
+  weeklyGoal WeeklyGoal?
+  
 }
 
 model Subject {
@@ -30,7 +31,6 @@ model Subject {
 
   @@unique([name, userId])
   userGrades    UserGrade[]   
-  goals         Goals[]
 }
 
 model StudySession {
@@ -67,17 +67,13 @@ model UserGrade {
  
 
 
-model Goals {
+model WeeklyGoal {
   id          String   @id @default(cuid())
   target      Int    
-  completion  Int      @default(0) 
-  userId      String
-  subjectId   Int
+  completion  Int     
+  userId      String @unique
   user        User     @relation(fields: [userId], references: [id])
-  subject     Subject  @relation(fields: [subjectId], references: [id])
-  createdAt   DateTime @default(now())
-  isCompleted Boolean  @default(false)
   
   @@index([userId])
-  @@index([subjectId])
+
 }

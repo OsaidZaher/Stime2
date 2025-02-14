@@ -1,2 +1,6 @@
 "use client";
-export default function Page() {}
+import LogInCard from "@/components/ui/logInCard";
+
+export default function Page() {
+  return <LogInCard />;
+}

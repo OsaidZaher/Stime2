@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 import { authOptions } from "@/app/auth.config";
-
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,6 +13,9 @@ export async function POST(request: Request) {
 
     const { target, completion } = await request.json();
     const userId = session?.user.id;
+
+    const today = new Date();
+    const isMonday = today.getDay() === 1;
 
     const existingGoal = await prisma.weeklyGoal.findUnique({
       where: {
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
         },
         data: {
           target,
-          completion,
+          completion: isMonday ? 1 : completion,
         },
       });
     } else {
@@ -37,7 +39,7 @@ export async function POST(request: Request) {
         data: {
           target,
           userId,
-          completion,
+          completion: 1,
         },
       });
     }
@@ -47,7 +49,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "failed to add goal" }, { status: 500 });
   }
 }
-
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);

@@ -23,11 +23,12 @@ export function LogInCard() {
     data: weeklyGoal,
     error,
     isLoading,
-  } = useSWR<WeeklyGoal>("/api/functionality/weeklyGoal", fetcher);
+  } = useSWR<WeeklyGoal>("/api/functionality/weeklyGoal", fetcher, {
+    refreshInterval: 0, // Disable auto-refresh
+  });
 
   const [open, setOpen] = useState(false);
   const [target, setTarget] = useState<number>(7);
-  const [completion, setCompletion] = useState<number>(0);
 
   const loginCount = weeklyGoal?.completion ?? 0;
   const progress = (loginCount / target) * 100;
@@ -44,7 +45,7 @@ export function LogInCard() {
         },
         body: JSON.stringify({
           target: Number(target),
-          completion: Number(loginCount),
+          completion: loginCount,
         }),
       });
 
@@ -68,14 +69,22 @@ export function LogInCard() {
 
   const checkLoginToday = () => {
     const lastLoginDate = localStorage.getItem("lastLoginDate");
-    const today = new Date().toLocaleDateString();
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
 
-    if (lastLoginDate !== today) {
-      const newCompletion = loginCount + 1;
-      setCompletion(newCompletion);
+    if (today.getDay() === 1) {
+      const lastMondayCheck = localStorage.getItem("lastMondayCheck");
+      if (lastMondayCheck !== todayStr) {
+        updateCompletion(0);
+        localStorage.setItem("lastMondayCheck", todayStr);
+        localStorage.removeItem("lastLoginDate");
+        return;
+      }
+    }
 
-      localStorage.setItem("lastLoginDate", today);
-
+    if (lastLoginDate !== todayStr) {
+      const newCompletion = Math.min(loginCount + 1, target);
+      localStorage.setItem("lastLoginDate", todayStr);
       updateCompletion(newCompletion);
     }
   };
@@ -83,7 +92,7 @@ export function LogInCard() {
   const updateCompletion = async (newCompletion: number) => {
     try {
       const response = await fetch("/api/functionality/weeklyGoal", {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },

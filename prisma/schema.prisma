@@ -18,8 +18,8 @@ model User {
   userGrades    UserGrade[]   
   studySessions StudySession[]
   subjects      Subject[]
-  weeklyGoal WeeklyGoal?
-  
+  weeklyGoal    WeeklyGoal?
+  subjectGoals  SubjectGoal[]
 }
 
 model Subject {
@@ -28,9 +28,10 @@ model Subject {
   userId        String
   studySessions StudySession[]
   user          User           @relation(fields: [userId], references: [id])
+  userGrades    UserGrade[]  
+  subjectGoal   SubjectGoal?
 
   @@unique([name, userId])
-  userGrades    UserGrade[]   
 }
 
 model StudySession {
@@ -59,21 +60,32 @@ model UserGrade {
   id        String   @id @default(cuid()) 
   grades    String[] 
   userId    String
-  subjectId Int      // Foreign key to Subject model
+  subjectId Int
   user      User     @relation(fields: [userId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
   createdAt DateTime @default(now())
-} 
- 
-
+}
 
 model WeeklyGoal {
   id          String   @id @default(cuid())
   target      Int    
   completion  Int     
-  userId      String @unique
+  userId      String   @unique
   user        User     @relation(fields: [userId], references: [id])
   
   @@index([userId])
+}
 
+model SubjectGoal {
+  id         String   @id @default(cuid())
+  target     Int
+  completion Int      @default(0)
+  isCompleted Boolean @default(false)
+  userId     String
+  subjectId  Int      @unique
+  user       User     @relation(fields: [userId], references: [id])
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+
+  @@index([userId])
+  @@index([subjectId])
 }

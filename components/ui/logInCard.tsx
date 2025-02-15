@@ -1,11 +1,12 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { Pen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { WeeklyGoal } from "@prisma/client";
+import type { WeeklyGoal } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -23,9 +24,7 @@ export function LogInCard() {
     data: weeklyGoal,
     error,
     isLoading,
-  } = useSWR<WeeklyGoal>("/api/functionality/weeklyGoal", fetcher, {
-    refreshInterval: 0, // Disable auto-refresh
-  });
+  } = useSWR<WeeklyGoal>("/api/functionality/weeklyGoal", fetcher, {});
 
   const [open, setOpen] = useState(false);
   const [target, setTarget] = useState<number>(7);
@@ -44,7 +43,7 @@ export function LogInCard() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          target: Number(target),
+          target: target,
           completion: loginCount,
         }),
       });
@@ -118,13 +117,16 @@ export function LogInCard() {
     if (loginCount / target >= 0.5)
       return "Halfway through the week! You're doing great! 👍";
     if (loginCount > 0) return "Great start to the week! Keep going! 🚀";
-    return "Start your week today! 🌟";
+    return "Start your weekly goals!🌟";
   };
 
   const getColorClass = () => {
-    if (progress >= 80) return "text-green-600";
-    if (progress >= 50) return "text-green-400";
-    return "text-yellow-500";
+    if (progress <= 20) return "text-yellow-400";
+    if (progress <= 40) return "text-yellow-500";
+    if (progress <= 60) return "text-yellow-600";
+    if (progress <= 80) return "text-green-400";
+    if (progress < 100) return "text-green-500";
+    return "text-green-600";
   };
 
   // Show loading state

@@ -1,10 +1,10 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { UserGrade } from "@prisma/client";
-import { X, ArrowLeft, ArrowRight, ArrowDown, ArrowUp } from "lucide-react";
+import { X, ArrowLeft, ArrowRight } from "lucide-react";
+import useSWR from "swr";
 
 import {
   Dialog,
@@ -27,48 +27,52 @@ type Grade = {
   gradeIds: number[];
 };
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function GradeCard() {
-  const [grades, setGrades] = useState<Grade[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
 
-  const fetchGrades = async () => {
-    try {
-      const response = await fetch("/api/functionality/grade");
-      if (!response.ok) {
-        throw new Error("Failed to fetch grades");
-      }
-      const data = await response.json();
+  const { data, error, isLoading, mutate } = useSWR(
+    "/api/functionality/grade",
+    fetcher
+  );
 
-      const gradesBySubject: { [key: string]: Grade } = {};
+  const grades: Grade[] = useMemo(() => {
+    if (!data || !data.subjects) return [];
+    const gradesBySubject: { [key: string]: Grade } = {};
 
-      data.subjects.forEach((subject: any) => {
-        subject.userGrades.forEach((gradeEntry: any) => {
-          const subjectName = subject.name.toLowerCase();
-          if (!gradesBySubject[subjectName]) {
-            gradesBySubject[subjectName] = {
-              subjectId: subject.id,
-              subject: subject.name,
-              grades: [],
-              gradeIds: [],
-            };
-          }
-          gradesBySubject[subjectName].grades.push(gradeEntry.grades[0]);
-          gradesBySubject[subjectName].gradeIds.push(gradeEntry.id);
-        });
+    data.subjects.forEach((subject: any) => {
+      subject.userGrades.forEach((gradeEntry: any) => {
+        const subjectName = subject.name.toLowerCase();
+        if (!gradesBySubject[subjectName]) {
+          gradesBySubject[subjectName] = {
+            subjectId: subject.id,
+            subject: subject.name,
+            grades: [],
+            gradeIds: [],
+          };
+        }
+        gradesBySubject[subjectName].grades.push(gradeEntry.grades[0]);
+        gradesBySubject[subjectName].gradeIds.push(gradeEntry.id);
       });
+    });
 
-      setGrades(Object.values(gradesBySubject));
-    } catch (error) {
-      toast.error((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return Object.values(gradesBySubject);
+  }, [data]);
 
+  const totalPages = Math.ceil(grades.length / SUBJECTS_PER_CARD);
+
+  // Adjust the current page if it becomes out of bounds after deletion.
   useEffect(() => {
-    fetchGrades();
-  }, []);
+    if (currentPage >= totalPages && totalPages > 0) {
+      setCurrentPage(totalPages - 1);
+    }
+  }, [currentPage, totalPages]);
+
+  const currentGrades = grades.slice(
+    currentPage * SUBJECTS_PER_CARD,
+    (currentPage + 1) * SUBJECTS_PER_CARD
+  );
 
   const handleDeleteGrade = async (subjectId: number, gradeIndex: number) => {
     try {
@@ -90,26 +94,8 @@ export default function GradeCard() {
         throw new Error(errorData.message || "Failed to delete grade");
       }
 
-      setGrades((prevGrades) =>
-        prevGrades
-          .map((grade) => {
-            if (grade.subjectId === subjectId) {
-              const newGrades = [...grade.grades];
-              const newGradeIds = [...grade.gradeIds];
-              newGrades.splice(gradeIndex, 1);
-              newGradeIds.splice(gradeIndex, 1);
-
-              return {
-                ...grade,
-                grades: newGrades,
-                gradeIds: newGradeIds,
-              };
-            }
-            return grade;
-          })
-          .filter((grade): grade is Grade => grade !== null)
-      );
-
+      // Revalidate the SWR data.
+      mutate();
       toast.success("Grade deleted successfully!");
     } catch (error) {
       console.error("Delete error:", error);
@@ -118,13 +104,6 @@ export default function GradeCard() {
       );
     }
   };
-
-  const totalPages = Math.ceil(grades.length / SUBJECTS_PER_CARD);
-
-  const currentGrades = grades.slice(
-    currentPage * SUBJECTS_PER_CARD,
-    (currentPage + 1) * SUBJECTS_PER_CARD
-  );
 
   const handleNavigation = (direction: "left" | "right") => {
     if (direction === "left" && currentPage > 0) {
@@ -141,8 +120,9 @@ export default function GradeCard() {
           <CardTitle className="text-2xl font-semibold text-primary">
             Grades
           </CardTitle>
+          {/* Pass the mutate function as a callback to revalidate after adding a grade */}
           <GradeDialog
-            onGradeAdded={fetchGrades}
+            onGradeAdded={mutate}
             existingSubjects={grades.map((g) => g.subject)}
           />
         </div>
@@ -151,15 +131,15 @@ export default function GradeCard() {
         className="pt-6 overflow-y-auto"
         style={{ maxHeight: "calc(100% - 130px)" }}
       >
-        {loading ? (
+        {isLoading ? (
           <p>Loading...</p>
-        ) : currentGrades.length === 0 ? (
+        ) : !grades.length ? (
           <p>No grades have been added.</p>
         ) : (
           <ul className="space-y-4">
             {currentGrades.map((grade, index) => (
               <li key={index} className="flex justify-between items-center">
-                <span className="text-md font-medium text-gray-700 dark:text-slate-100  ">
+                <span className="text-md font-medium text-gray-700 dark:text-slate-100">
                   {grade.subject.charAt(0).toUpperCase() +
                     grade.subject.slice(1)}
                 </span>
@@ -180,7 +160,7 @@ export default function GradeCard() {
                             handleDeleteGrade(grade.subjectId, idx)
                           }
                         >
-                          <X className="h-3 w-3 font text-red-600" />
+                          <X className="h-3 w-3 text-red-600" />
                         </Button>
                       </Badge>
                     ))}
@@ -190,6 +170,7 @@ export default function GradeCard() {
             ))}
           </ul>
         )}
+        {error && <p className="text-red-500">Error loading grades.</p>}
       </CardContent>
       {grades.length > SUBJECTS_PER_CARD && (
         <div className="absolute bottom-1 left-0 right-0 flex justify-between px-4">
@@ -251,6 +232,7 @@ function GradeDialog({ onGradeAdded, existingSubjects }: GradeDialogProps) {
       setSubject("");
       setGrade("");
       setOpen(false);
+      // Revalidate the SWR data after adding a grade.
       onGradeAdded();
       toast.success("Grade added successfully!");
     } catch (error) {

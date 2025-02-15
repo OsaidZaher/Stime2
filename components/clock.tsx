@@ -24,7 +24,7 @@ export function Timer({
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [initialMinutes] = useState(1);
+  const [initialMinutes] = useState(25);
   const [initialSeconds] = useState(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);

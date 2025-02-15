@@ -59,9 +59,8 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    console.log("Session in GET:", session);
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user.id) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id.toString();

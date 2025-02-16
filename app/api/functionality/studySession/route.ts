@@ -15,10 +15,6 @@ export async function POST(req: NextRequest) {
 
     const parsedSubjectId = Number(subjectId);
 
-    if (!subjectId || isNaN(parsedSubjectId)) {
-      return NextResponse.json({ error: "Invalid subjectId" }, { status: 400 });
-    }
-
     const userId = session.user.id;
 
     const startDate = new Date(startTime);
@@ -30,15 +26,17 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
     const duration = Math.floor(
-      (endDate.getTime() - startDate.getTime()) / 1000
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60)
     );
 
     const subject = await prisma.subject.findFirst({
       where: {
         id: parsedSubjectId,
         userId: userId,
+      },
+      include: {
+        subjectGoal: true,
       },
     });
 
@@ -49,6 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Create the study session
     const studySession = await prisma.studySession.create({
       data: {
         subjectId: parsedSubjectId,
@@ -60,6 +59,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (subject.subjectGoal) {
+      const newCompletion = subject.subjectGoal.completion + duration;
+      const isCompleted = newCompletion >= subject.subjectGoal.target * 60;
+
+      await prisma.subjectGoal.update({
+        where: {
+          id: subject.subjectGoal.id,
+        },
+        data: {
+          completion: newCompletion,
+          isCompleted: isCompleted,
+        },
+      });
+    }
+
     return NextResponse.json(studySession, { status: 201 });
   } catch (error) {
     console.error("Error creating study session:", error);
@@ -69,7 +83,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

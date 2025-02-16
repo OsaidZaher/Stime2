@@ -61,6 +61,55 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user.id) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const { subject, target } = await request.json();
+
+    // Find the subject goal with its associated subject
+    const existingGoal = await prisma.subjectGoal.findFirst({
+      where: {
+        userId,
+        subject: {
+          name: {
+            equals: subject,
+            mode: "insensitive",
+          },
+        },
+      },
+    });
+
+    if (!existingGoal) {
+      return NextResponse.json(
+        { error: "Subject goal not found" },
+        { status: 404 }
+      );
+    }
+
+    const updatedGoal = await prisma.subjectGoal.update({
+      where: {
+        id: existingGoal.id,
+      },
+      data: {
+        target,
+      },
+    });
+
+    return NextResponse.json(updatedGoal, { status: 200 });
+  } catch (error) {
+    console.error("Update error:", error);
+    return NextResponse.json(
+      { error: "Failed to update subject goal" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function GET(res: Response) {
   try {
     const session = await getServerSession(authOptions);

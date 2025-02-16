@@ -139,12 +139,11 @@ export function LogInCard() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+              variant="outline"
+              size="sm"
+              className="rounded-full hover:bg-primary/10"
             >
               <Pen className="h-4 w-4" />
-              <span className="sr-only">Edit goal</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[350px]">

@@ -49,6 +49,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "failed to add goal" }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user.id) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
+    const { target, completion } = await request.json();
+    const userId = session?.user.id;
+
+    const weeklyGoal = await prisma.weeklyGoal.update({
+      where: {
+        userId: userId,
+      },
+      data: {
+        target,
+        completion,
+      },
+    });
+
+    return NextResponse.json(weeklyGoal, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "failed to update completion" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);

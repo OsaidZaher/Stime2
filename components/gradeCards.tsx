@@ -37,10 +37,9 @@ export default function GradeCard() {
     fetcher
   );
 
-  const grades: Grade[] = useMemo(() => {
-    if (!data || !data.subjects) return [];
+  let grades: Grade[] = [];
+  if (data && data.subjects) {
     const gradesBySubject: { [key: string]: Grade } = {};
-
     data.subjects.forEach((subject: any) => {
       subject.userGrades.forEach((gradeEntry: any) => {
         const subjectName = subject.name.toLowerCase();
@@ -56,13 +55,11 @@ export default function GradeCard() {
         gradesBySubject[subjectName].gradeIds.push(gradeEntry.id);
       });
     });
-
-    return Object.values(gradesBySubject);
-  }, [data]);
+    grades = Object.values(gradesBySubject);
+  }
 
   const totalPages = Math.ceil(grades.length / SUBJECTS_PER_CARD);
 
-  // Adjust the current page if it becomes out of bounds after deletion.
   useEffect(() => {
     if (currentPage >= totalPages && totalPages > 0) {
       setCurrentPage(totalPages - 1);
@@ -120,7 +117,6 @@ export default function GradeCard() {
           <CardTitle className="text-2xl font-semibold text-primary">
             Grades
           </CardTitle>
-          {/* Pass the mutate function as a callback to revalidate after adding a grade */}
           <GradeDialog
             onGradeAdded={mutate}
             existingSubjects={grades.map((g) => g.subject)}

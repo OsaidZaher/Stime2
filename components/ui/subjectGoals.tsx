@@ -3,6 +3,7 @@
 import { DialogTrigger } from "@/components/ui/dialog";
 
 import type React from "react";
+import { X } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,7 +17,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
-import { Pencil, Plus, BookOpen } from "lucide-react";
+import {
+  Pencil,
+  Plus,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Minus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import useSWR from "swr";
@@ -27,6 +35,8 @@ import { motion } from "framer-motion";
 interface SubjectGoalWithSubject extends SubjectGoal {
   subject: Subject;
 }
+
+const SubjectGoalsCard_MAX = 5;
 
 interface ApiResponse {
   subjectGoals: SubjectGoalWithSubject[];
@@ -43,6 +53,7 @@ export default function SubjectGoalsCard() {
   const [addOpen, setAddOpen] = useState(false);
   const [addSubject, setAddSubject] = useState("");
   const [addTarget, setAddTarget] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editSubject, setEditSubject] = useState("");
@@ -123,12 +134,48 @@ export default function SubjectGoalsCard() {
   };
 
   const subjectGoals = data?.subjectGoals ?? [];
+  const totalPages = Math.ceil(subjectGoals.length / SubjectGoalsCard_MAX);
+
+  const currentPageGoals = subjectGoals.slice(
+    currentPage * SubjectGoalsCard_MAX,
+    (currentPage + 1) * SubjectGoalsCard_MAX
+  );
+
+  const handleNavigation = (direction: "left" | "right") => {
+    if (direction === "left" && currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    } else if (direction === "right" && currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleDelete = async (subjectGoalId: SubjectGoal["id"]) => {
+    try {
+      const response = await fetch("/api/functionality/subjectGoals", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ subjectGoalId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete subject goal");
+      }
+
+      console.log("subject goal deleted successfully");
+      mutate(); // Revalidate or refresh the data as needed
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
-    <Card className="w-full max-w-md shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="w-full max-w-md h-[600px] shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-primary" />
+          <BookOpen className="w-6 h-6 text-blue-600" />
           Subjects Progress
         </CardTitle>
         <div className="flex gap-2">
@@ -242,7 +289,7 @@ export default function SubjectGoalsCard() {
         </div>
       </CardHeader>
 
-      <CardContent className="grid gap-6 pt-6">
+      <CardContent className="space-y-6 pt-6 flex-grow overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center items-center h-40">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -256,38 +303,82 @@ export default function SubjectGoalsCard() {
             No subject goals added yet.
           </p>
         ) : (
-          subjectGoals.map((goal, index) => (
-            <motion.div
-              key={goal.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-blue-500" />
-                  <span className="font-medium">
-                    {goal.subject.name.charAt(0).toUpperCase() +
-                      goal.subject.name.slice(1)}
-                  </span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {((goal.completion / (goal.target * 60)) * 100).toFixed(1)}%
-                </span>
-              </div>
-              <Progress
-                value={(goal.completion / (goal.target * 60)) * 100}
-                className="h-2 [&>div]:bg-blue-400"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{Math.floor(goal.completion / 60)} hrs</span>
-                <span>{goal.target} hrs</span>
-              </div>
-            </motion.div>
-          ))
+          <>
+            <div className="space-y-6">
+              {currentPageGoals.map((goal, index) => (
+                <motion.div
+                  key={goal.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-blue-500" />
+                      <span className="font-medium">
+                        {goal.subject.name.charAt(0).toUpperCase() +
+                          goal.subject.name.slice(1)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-muted-foreground">
+                        {((goal.completion / (goal.target * 60)) * 100).toFixed(
+                          1
+                        )}
+                        %
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => handleDelete(goal.id)}
+                      >
+                        <X className="h-4 w-4 text-slate-800 font-extrabold mt-[-10px]" />
+                      </Button>
+                    </div>
+                  </div>
+                  <Progress
+                    value={(goal.completion / (goal.target * 60)) * 100}
+                    className="h-2 bg-blue-100 [&>div]:bg-blue-400"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{Math.floor(goal.completion / 60)} hrs</span>
+                    <span>
+                      {goal.target} {goal.target === 1 ? "hr" : "hrs"}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
         )}
       </CardContent>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 p-4 border-t">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleNavigation("left")}
+            disabled={currentPage === 0}
+            className="w-8 h-8 p-0"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage + 1} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleNavigation("right")}
+            disabled={currentPage === totalPages - 1}
+            className="w-8 h-8 p-0"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }

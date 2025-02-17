@@ -21,11 +21,6 @@ import {
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface ExamTableProps {
-  onExamDeleted?: () => void;
-  className?: string;
-}
-
 const EXAM_PER_CARD = 4;
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

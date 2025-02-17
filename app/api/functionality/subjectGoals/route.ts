@@ -1,5 +1,6 @@
 import { authOptions } from "@/app/auth.config";
 import { prisma } from "@/lib/prisma";
+import { error } from "console";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -71,7 +72,6 @@ export async function PATCH(request: Request) {
     const userId = session.user.id;
     const { subject, target } = await request.json();
 
-    // Find the subject goal with its associated subject
     const existingGoal = await prisma.subjectGoal.findFirst({
       where: {
         userId,
@@ -127,6 +127,37 @@ export async function GET(res: Response) {
   } catch (error) {
     return NextResponse.json(
       { error: "failed to fetch weekly goals" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user.id)
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+    const userId = session.user.id;
+
+    const body = await request.json();
+    const { subjectGoalId } = body;
+
+    if (!subjectGoalId)
+      return NextResponse.json(
+        { error: "subject goal does not exist" },
+        { status: 500 }
+      );
+
+    await prisma.subjectGoal.delete({
+      where: {
+        id: subjectGoalId,
+      },
+    });
+    return NextResponse.json({ message: "goal deleted successfully" });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "failed to deleted goal" },
       { status: 500 }
     );
   }

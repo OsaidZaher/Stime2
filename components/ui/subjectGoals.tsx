@@ -334,7 +334,7 @@ export default function SubjectGoalsCard() {
                         className="h-6 w-6 p-0"
                         onClick={() => handleDelete(goal.id)}
                       >
-                        <X className="h-4 w-4 text-slate-800 font-extrabold mt-[-10px]" />
+                        <X className="h-4 w-4 text-slate-900 dark:*:text-slate-100 font-extrabold mt-[-10px]" />
                       </Button>
                     </div>
                   </div>
@@ -363,7 +363,7 @@ export default function SubjectGoalsCard() {
             disabled={currentPage === 0}
             className="w-8 h-8 p-0"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3 w-3 text-blue-600" />
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {currentPage + 1} of {totalPages}
@@ -375,7 +375,7 @@ export default function SubjectGoalsCard() {
             disabled={currentPage === totalPages - 1}
             className="w-8 h-8 p-0"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3 text-blue-600" />
           </Button>
         </div>
       )}

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         },
         data: {
           target,
-          completion: isMonday ? 1 : completion,
+          completion: isMonday ? completion : 1,
         },
       });
     } else {

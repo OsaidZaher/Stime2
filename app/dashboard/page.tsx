@@ -1,12 +1,16 @@
 "use client";
 import LogInCard from "@/components/ui/logInCard";
 import SubjectGoalsCard from "@/components/ui/subjectGoals";
+import DashTimeCard from "@/components/ui/dashTimeCard";
 
 export default function Page() {
   return (
     <>
       <div className="flex space-x-10">
-        <LogInCard />
+        <div className="space-y-10">
+          <LogInCard />
+          <DashTimeCard />
+        </div>
         {<SubjectGoalsCard />}
       </div>
     </>

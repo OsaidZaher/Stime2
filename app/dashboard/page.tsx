@@ -2,6 +2,7 @@
 import LogInCard from "@/components/ui/logInCard";
 import SubjectGoalsCard from "@/components/ui/subjectGoals";
 import DashTimeCard from "@/components/ui/dashTimeCard";
+import TodoListCard from "@/components/ui/toDo";
 
 export default function Page() {
   return (

@@ -20,6 +20,7 @@ model User {
   subjects      Subject[]
   weeklyGoal    WeeklyGoal?
   subjectGoals  SubjectGoal[]
+  toDoList toDo[]
 }
 
 model Subject {
@@ -88,4 +89,15 @@ model SubjectGoal {
 
   @@index([userId])
   @@index([subjectId])
+}
+
+
+model toDo {
+  id          String   @id @default(cuid())
+  task String
+  isCompleted Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
 }

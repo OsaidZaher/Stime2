@@ -13,6 +13,7 @@ export default function Page() {
           <DashTimeCard />
         </div>
         {<SubjectGoalsCard />}
+        <TodoListCard />
       </div>
     </>
   );

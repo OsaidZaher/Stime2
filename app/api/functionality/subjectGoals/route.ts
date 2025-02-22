@@ -110,7 +110,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-export async function GET(res: Response) {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user.id) {

@@ -148,7 +148,7 @@ export function LogInCard() {
               size="sm"
               className="rounded-full hover:bg-primary/10"
             >
-              <Pen className="h-4 w-4" />
+              <Pen className="h-4 w-4 text-blue-600 font-extrabold" />
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[350px]">

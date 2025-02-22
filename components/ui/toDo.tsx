@@ -195,8 +195,8 @@ export default function TodoListCard() {
   if (error) return <div>Failed to load tasks</div>;
 
   return (
-    <Card className="w-full max-w-lg bg-white shadow-lg rounded-xl overflow-hidden border border-blue-100">
-      <CardHeader className="p-6 bg-gradient-to-r from-blue-400 to-blue-600 text-white">
+    <Card className="w-full max-w-lg  shadow-lg rounded-xl overflow-hidden border border-blue-100  dark:border-[hsl(232,39%,11%)]">
+      <CardHeader className="p-6 gradient-bg text-white">
         <CardTitle className="text-2xl font-bold">My Tasks</CardTitle>
         <p className="text-sm mt-2 text-blue-100">
           {completedTasksCount} of {tasks.length} tasks completed
@@ -213,9 +213,9 @@ export default function TodoListCard() {
             />
             <Button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-slate-100"
+              className=" theme-background theme-hover text-slate-100"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-2 theme-hover" />
               Add
             </Button>
           </form>
@@ -225,7 +225,7 @@ export default function TodoListCard() {
           ) : (
             <AnimatePresence>
               {tasks.length === 0 ? (
-                <p className="text-center text-blue-500 py-4">
+                <p className="text-center theme-text py-4">
                   No tasks yet. Add one to get started!
                 </p>
               ) : (
@@ -236,7 +236,7 @@ export default function TodoListCard() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
+                    className="flex items-center space-x-3 p-3 rounded-lg light-bg transition-colors"
                   >
                     <Checkbox
                       id={task.id}
@@ -244,7 +244,7 @@ export default function TodoListCard() {
                       onCheckedChange={() =>
                         handleToggleTask(task.id, task.isCompleted)
                       }
-                      className="h-5 w-5 rounded-md border-blue-300 text-blue-600"
+                      className="h-5 w-5 rounded-md light-bg text-theme"
                     />
                     {editingTaskId === task.id ? (
                       <Input
@@ -254,7 +254,7 @@ export default function TodoListCard() {
                         onKeyUp={(e) =>
                           e.key === "Enter" && handleEditTask(task.id)
                         }
-                        className="flex-grow border-blue-200 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-grow "
                         autoFocus
                       />
                     ) : (
@@ -262,7 +262,7 @@ export default function TodoListCard() {
                         htmlFor={task.id}
                         className={`text-sm flex-grow ${
                           task.isCompleted
-                            ? "text-blue-400 line-through"
+                            ? "theme-text line-through"
                             : "text-black"
                         }`}
                       >
@@ -273,7 +273,7 @@ export default function TodoListCard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleStartEdit(task)}
-                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-200"
+                      className="theme-text theme-hover hover:bg-blue-200"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -281,7 +281,7 @@ export default function TodoListCard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteTask(task.id)}
-                      className="text-blue-600 hover:text-red-600 hover:bg-blue-200"
+                      className="theme-text  theme-hover"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

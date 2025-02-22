@@ -5,6 +5,7 @@ import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/themeprovider";
 import { Toaster } from "sonner";
 import ClientSessionProvider from "@/components/client-session-provider";
+import { ColorThemeProvider } from "@/components/ui/colorPicker";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,11 +40,13 @@ export default function RootLayout({
             disableTransitionOnChange
             storageKey="theme-preference"
           >
-            <main className="flex-grow">{children}</main>
-            <footer className="mt-auto">
-              <Footer />
-            </footer>
-            <Toaster />
+            <ColorThemeProvider>
+              <main className="flex-grow">{children}</main>
+              <footer className="mt-auto">
+                <Footer />
+              </footer>
+              <Toaster />
+            </ColorThemeProvider>
           </ThemeProvider>
         </ClientSessionProvider>
       </body>

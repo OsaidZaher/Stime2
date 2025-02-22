@@ -186,7 +186,7 @@ export default function SubjectGoalsCard() {
                 size="sm"
                 className="rounded-full hover:bg-primary/10"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-4 w-4 text-blue-500 font-extrabold" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -240,7 +240,7 @@ export default function SubjectGoalsCard() {
                 size="sm"
                 className="rounded-full hover:bg-primary/10"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 text-blue-500 font-extrabold" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

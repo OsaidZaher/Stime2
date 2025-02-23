@@ -175,7 +175,7 @@ export default function SubjectGoalsCard() {
     <Card className="w-full max-w-md h-[600px] shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-blue-600" />
+          <BookOpen className="w-6 h-6 theme-dark" />
           Subjects Progress
         </CardTitle>
         <div className="flex gap-2">
@@ -186,7 +186,7 @@ export default function SubjectGoalsCard() {
                 size="sm"
                 className="rounded-full hover:bg-primary/10"
               >
-                <Pencil className="h-4 w-4 text-blue-500 font-extrabold" />
+                <Pencil className="h-4 w-4 theme-light font-extrabold" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -240,7 +240,7 @@ export default function SubjectGoalsCard() {
                 size="sm"
                 className="rounded-full hover:bg-primary/10"
               >
-                <Plus className="h-4 w-4 text-blue-500 font-extrabold" />
+                <Plus className="h-4 w-4 theme-light font-extrabold" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -315,7 +315,7 @@ export default function SubjectGoalsCard() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-blue-500" />
+                      <div className="h-2 w-2 rounded-full bg-color-700 " />
                       <span className="font-medium">
                         {goal.subject.name.charAt(0).toUpperCase() +
                           goal.subject.name.slice(1)}
@@ -340,7 +340,7 @@ export default function SubjectGoalsCard() {
                   </div>
                   <Progress
                     value={(goal.completion / (goal.target * 60)) * 100}
-                    className="h-2 bg-blue-100 [&>div]:bg-blue-400"
+                    className="h-2   bg-color-100 [&>div]:bg-color-400"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{Math.floor(goal.completion / 60)} hrs</span>
@@ -363,7 +363,7 @@ export default function SubjectGoalsCard() {
             disabled={currentPage === 0}
             className="w-8 h-8 p-0"
           >
-            <ChevronLeft className="h-3 w-3 text-blue-600" />
+            <ChevronLeft className="h-3 w-3 theme-dark" />
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {currentPage + 1} of {totalPages}
@@ -375,7 +375,7 @@ export default function SubjectGoalsCard() {
             disabled={currentPage === totalPages - 1}
             className="w-8 h-8 p-0"
           >
-            <ChevronRight className="h-3 w-3 text-blue-600" />
+            <ChevronRight className="h-3 w-3 theme-dark" />
           </Button>
         </div>
       )}

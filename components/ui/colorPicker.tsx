@@ -21,23 +21,60 @@ export function ColorThemeProvider({ children }) {
   useEffect(() => {
     const root = document.documentElement;
 
-    // Set all theme-related CSS variables
+    // Base theme variables
     root.style.setProperty("--theme-primary", `var(--${colorTheme}-primary)`);
+    root.style.setProperty(
+      "--theme-primary-lighter",
+      `var(--${colorTheme}-primary-lighter)`
+    );
     root.style.setProperty(
       "--theme-primary-darker",
       `var(--${colorTheme}-primary-darker)`
     );
+
+    // Gradients
     root.style.setProperty("--theme-gradient", `var(--${colorTheme}-gradient)`);
     root.style.setProperty(
       "--theme-dark-gradient",
       `var(--${colorTheme}-dark-gradient)`
     );
-    // Add the new light background variable
+
+    // Gradient2 variables
+    root.style.setProperty(
+      "--theme-gradient2",
+      `var(--${colorTheme}-gradient2)`
+    );
+    root.style.setProperty(
+      "--theme-gradient2-dark",
+      `var(--${colorTheme}-gradient2-dark)`
+    );
+
+    // Color variants (50-950)
+    root.style.setProperty("--theme-50", `var(--${colorTheme}-primary-50)`);
+    root.style.setProperty("--theme-100", `var(--${colorTheme}-primary-100)`);
+    root.style.setProperty("--theme-400", `var(--${colorTheme}-primary-400)`);
+    root.style.setProperty("--theme-700", `var(--${colorTheme}-700)`);
+    root.style.setProperty("--theme-950", `var(--${colorTheme}-primary-950)`);
+    root.style.setProperty("--theme-800", `var(--${colorTheme}-primary-800)`);
+    root.style.setProperty("--theme-600", `var(--${colorTheme}-primary-600)`);
+
+    // Special background colors
     root.style.setProperty(
       "--theme-light-bg",
       `var(--${colorTheme}-primary-50)`
     );
 
+    // OKLCH gradients (if using them)
+    root.style.setProperty(
+      "--theme-oklch-gradient",
+      `var(--${colorTheme}-gradient2)`
+    );
+    root.style.setProperty(
+      "--theme-oklch-gradient-dark",
+      `var(--${colorTheme}-gradient2-dark)`
+    );
+
+    // Clean up existing color classes and add new theme
     document.body.className = document.body.className
       .split(" ")
       .filter((cls) => !cls.match(/^(red|orange|yellow|blue|purple|pink)$/))
@@ -64,12 +101,30 @@ export function ThemeSwitcher() {
   const { colorTheme, setColorTheme } = useColorTheme();
 
   const colorThemes = [
-    { name: "Red", value: "red" },
-    { name: "Orange", value: "orange" },
-    { name: "Yellow", value: "yellow" },
-    { name: "Blue", value: "blue" },
-    { name: "Purple", value: "purple" },
-    { name: "Pink", value: "pink" },
+    {
+      name: "Red",
+      value: "red",
+    },
+    {
+      name: "Orange",
+      value: "orange",
+    },
+    {
+      name: "Yellow",
+      value: "yellow",
+    },
+    {
+      name: "Blue",
+      value: "blue",
+    },
+    {
+      name: "Purple",
+      value: "purple",
+    },
+    {
+      name: "Pink",
+      value: "pink",
+    },
   ];
 
   return (
@@ -80,7 +135,12 @@ export function ThemeSwitcher() {
             variant="outline"
             className="capitalize theme-background theme-hover text-slate-100"
           >
-            Color: {colorTheme}
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-4 h-4 rounded-full bg-${colorTheme}-primary-400`}
+              />
+              Color: {colorTheme}
+            </div>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
@@ -89,7 +149,7 @@ export function ThemeSwitcher() {
             <DropdownMenuItem
               key={t.value}
               onClick={() => setColorTheme(t.value)}
-              className="cursor-pointer"
+              className="cursor-pointer flex items-center gap-2"
             >
               <span className="capitalize">{t.name}</span>
             </DropdownMenuItem>

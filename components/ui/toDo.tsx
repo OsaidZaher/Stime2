@@ -232,11 +232,8 @@ export default function TodoListCard() {
                 tasks.map((task) => (
                   <motion.div
                     key={task.id}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center space-x-3 p-3 rounded-lg light-bg transition-colors"
+                    className="flex items-center space-x-3 p-3 rounded-lg light-bg  
+                    transition-colors dark:text-white"
                   >
                     <Checkbox
                       id={task.id}
@@ -244,7 +241,7 @@ export default function TodoListCard() {
                       onCheckedChange={() =>
                         handleToggleTask(task.id, task.isCompleted)
                       }
-                      className="h-5 w-5 rounded-md light-bg text-theme"
+                      className="h-5 w-5 rounded-md light-bg text-theme "
                     />
                     {editingTaskId === task.id ? (
                       <Input
@@ -254,7 +251,7 @@ export default function TodoListCard() {
                         onKeyUp={(e) =>
                           e.key === "Enter" && handleEditTask(task.id)
                         }
-                        className="flex-grow "
+                        className="flex-grow dark:text-white"
                         autoFocus
                       />
                     ) : (
@@ -263,7 +260,7 @@ export default function TodoListCard() {
                         className={`text-sm flex-grow ${
                           task.isCompleted
                             ? "theme-text line-through"
-                            : "text-black"
+                            : "text-black dark:text-white"
                         }`}
                       >
                         {task.task}
@@ -273,7 +270,7 @@ export default function TodoListCard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleStartEdit(task)}
-                      className="theme-text theme-hover hover:bg-blue-200"
+                      className="theme-text theme-hover "
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -283,7 +280,7 @@ export default function TodoListCard() {
                       onClick={() => handleDeleteTask(task.id)}
                       className="theme-text  theme-hover"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 " />
                     </Button>
                   </motion.div>
                 ))

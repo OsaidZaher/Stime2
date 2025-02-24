@@ -10,18 +10,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const DEFAULT_THEME = "blue";
+
 const ColorThemeContext = createContext({
-  colorTheme: "blue",
-  setColorTheme: (theme) => {},
+  colorTheme: DEFAULT_THEME,
+  setColorTheme: (theme: string) => {},
+  isThemeLoaded: false,
 });
 
-export function ColorThemeProvider({ children }) {
-  const [colorTheme, setColorTheme] = useState("blue");
+export function ColorThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Always start with default theme for SSR
+  const [colorTheme, setColorTheme] = useState<string>(DEFAULT_THEME);
+  const [isThemeLoaded, setIsThemeLoaded] = useState<boolean>(false);
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem("colorTheme");
+    if (savedTheme) {
+      setColorTheme(savedTheme);
+    }
+    setIsThemeLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isThemeLoaded) return;
+
+    localStorage.setItem("colorTheme", colorTheme);
+
     const root = document.documentElement;
 
-    // Base theme variables
     root.style.setProperty("--theme-primary", `var(--${colorTheme}-primary)`);
     root.style.setProperty(
       "--theme-primary-lighter",
@@ -60,13 +80,11 @@ export function ColorThemeProvider({ children }) {
     root.style.setProperty("--theme-800", `var(--${colorTheme}-primary-800)`);
     root.style.setProperty("--theme-600", `var(--${colorTheme}-primary-600)`);
 
-    // Special background colors
     root.style.setProperty(
       "--theme-light-bg",
       `var(--${colorTheme}-primary-50)`
     );
 
-    // OKLCH gradients (if using them)
     root.style.setProperty(
       "--theme-oklch-gradient",
       `var(--${colorTheme}-gradient2)`
@@ -76,16 +94,17 @@ export function ColorThemeProvider({ children }) {
       `var(--${colorTheme}-gradient2-dark)`
     );
 
-    // Clean up existing color classes and add new theme
     document.body.className = document.body.className
       .split(" ")
       .filter((cls) => !cls.match(/^(red|orange|yellow|blue|purple|pink)$/))
       .concat(colorTheme)
       .join(" ");
-  }, [colorTheme]);
+  }, [colorTheme, isThemeLoaded]);
 
   return (
-    <ColorThemeContext.Provider value={{ colorTheme, setColorTheme }}>
+    <ColorThemeContext.Provider
+      value={{ colorTheme, setColorTheme, isThemeLoaded }}
+    >
       {children}
     </ColorThemeContext.Provider>
   );

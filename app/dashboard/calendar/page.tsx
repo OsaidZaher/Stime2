@@ -90,7 +90,7 @@ export default function CardWithForm() {
       <div className=" space-y-8">
         <ExamTable />
 
-        <Card className="w-[550px] h-[350px]">
+        <Card className="w-[550px] h-[350px] shadow-md rounded-xl overflow-hidden border border-color-100">
           <CardHeader>
             <CardTitle>Upcoming exam?</CardTitle>
             <CardDescription>Add it right here!</CardDescription>
@@ -141,7 +141,9 @@ export default function CardWithForm() {
             </form>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button onClick={handleSubmit}>Add Exam</Button>
+            <Button onClick={handleSubmit} className="bg-color-500">
+              Add Exam
+            </Button>
           </CardFooter>
         </Card>
       </div>

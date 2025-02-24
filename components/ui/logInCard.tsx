@@ -138,7 +138,7 @@ export function LogInCard() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <Card className="w-full h-[400px] max-w-sm  shadow-lg">
+    <Card className="w-full h-[400px] max-w-sm  shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold">Weekly Streak</CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>

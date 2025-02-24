@@ -242,12 +242,12 @@ const StudyStatistics5 = () => {
   };
 
   return (
-    <Card className=" w-[550px] flex flex-col h-[400px]">
+    <Card className=" w-[550px] flex flex-col h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
       {renderContent()}
       <CardFooter className="mt-auto">
         <Button
           onClick={() => setShowVisualization(!showVisualization)}
-          className="w-full"
+          className="w-full bg-color-500"
         >
           {showVisualization ? "Show Leaderboard" : "Show Visualization"}
         </Button>

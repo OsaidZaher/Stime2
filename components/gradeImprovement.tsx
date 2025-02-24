@@ -80,7 +80,7 @@ const GradeChanges = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <Card className="w-[550px] h-[400px]">
+    <Card className="w-[550px] h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader>
         <CardTitle className="text-xl font-bold">
           Recent Grade Changes

@@ -118,7 +118,7 @@ export function ExamTable() {
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-2xl shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader>
         <CardTitle>Exams</CardTitle>
       </CardHeader>

@@ -417,13 +417,24 @@
 .border-color-500 {
   border-color: var(--theme-primary);
 }
-
+.border-color-50 {
+  border-color: var(--theme-light-bg);
+}
+.dark .border-color-50 {
+  border-color: var(--theme-950);
+}
 .border-color-100 {
   border-color: var(--theme-100);
+}
+.dark .border-color-100 {
+  border-color: var(--theme-950);
 }
 
 .border-color-200 {
   border-color: var(--theme-200);
+}
+.dark .border-color-200 {
+  border-color: var(--theme-950);
 }
 
 .border-color-300 {

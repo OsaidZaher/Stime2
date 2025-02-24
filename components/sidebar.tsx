@@ -1,13 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+
 import {
   SidebarInset,
   SidebarProvider,
@@ -17,10 +9,10 @@ import {
 export default function SideBar() {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar className="border-color-100" />
       <SidebarInset>
         <header className="flex h-1 shrink-0 items-center  px-4">
-          <SidebarTrigger className="-mr-4" />
+          <SidebarTrigger className="-mr-4 text-500" />
         </header>
       </SidebarInset>
     </SidebarProvider>

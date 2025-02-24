@@ -261,7 +261,7 @@ function SheetDemo({
                   <div className="flex flex-col space-y-4">
                     <AlarmPicker onAlarmSelect={setSelectedAlarm} />
                     <Button
-                      className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
+                      className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200  font-semibold text-sm shadow-md rounded-lg"
                       variant="outline"
                       onClick={(e) => {
                         e.stopPropagation();

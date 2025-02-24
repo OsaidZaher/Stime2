@@ -417,7 +417,7 @@ export function AlarmPicker({
       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
         <Button
           variant="outline"
-          className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
+          className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200 font-semibold text-sm shadow-md rounded-lg"
         >
           <span className="truncate">
             {alarms.find((a) => a.id === selectedAlarm)?.name || "Pick Alarm"}

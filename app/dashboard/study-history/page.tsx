@@ -168,7 +168,7 @@ function FindBy({
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
       />
-      <Search className="absolute left-48 top-1/2 transform -translate-y-1/2 text-gray-400" />
+      <Search className="absolute left-48 top-1/2 transform -translate-y-1/2 text-500s" />
     </div>
   );
 }

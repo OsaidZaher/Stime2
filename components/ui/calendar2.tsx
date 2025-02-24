@@ -31,7 +31,7 @@ export function Calendar2({
   const examDays = exams ? exams.map((exam) => new Date(exam.date)) : [];
 
   return (
-    <Card className="w-full max-w-2xl h-[372.5px] flex items-center justify-center ">
+    <Card className="w-full max-w-2xl h-[372.5px] flex items-center justify-center shadow-md rounded-xl overflow-hidden border border-color-100 ">
       <DayPicker
         showOutsideDays={showOutsideDays}
         className={cn("w-full h-full p-6", className)}

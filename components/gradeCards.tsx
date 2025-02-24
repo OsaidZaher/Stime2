@@ -111,7 +111,7 @@ export default function GradeCard() {
   };
 
   return (
-    <Card className="w-[550px] h-[350px] relative">
+    <Card className="w-[550px] h-[350px] relative shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader className="border-b">
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-semibold text-primary">
@@ -239,7 +239,7 @@ function GradeDialog({ onGradeAdded, existingSubjects }: GradeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Grade</Button>
+        <Button className="bg-color-500">Add Grade</Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit}>

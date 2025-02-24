@@ -50,7 +50,7 @@ export function StudySessionsStats() {
 
   if (loading) {
     return (
-      <Card className="w-full max-w-lg h-[250px] mx-auto">
+      <Card className="w-full max-w-lg h-[250px] mx-auto shadow-md rounded-xl overflow-hidden border border-color-100">
         <CardContent className="flex items-center justify-center h-full">
           <p>Loading statistics...</p>
         </CardContent>
@@ -69,7 +69,7 @@ export function StudySessionsStats() {
   }
 
   return (
-    <Card className="w-full max-w-lg h-[250px] mx-auto">
+    <Card className="w-full max-w-lg h-[250px] mx-auto shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <div className="space-y-2">
           <CardTitle>
@@ -83,8 +83,8 @@ export function StudySessionsStats() {
               : "See how many sessions you had"}
           </CardDescription>
         </div>
-        <Button size="icon" onClick={toggleView}>
-          <RotateCcw className="h-4 w-4" />
+        <Button size="icon" onClick={toggleView} className="bg-color-500">
+          <RotateCcw className="h-4 w-4 " />
           <span className="sr-only">Toggle view</span>
         </Button>
       </CardHeader>

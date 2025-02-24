@@ -115,7 +115,7 @@ export default function StudySessionsPage() {
       {isLoading ? (
         <p>Loading study sessions...</p>
       ) : (
-        <div className="text-blue-500 dark:text-blue-800 space-y-4">
+        <div className="text-600 space-y-4">
           <div className="grid grid-cols-2 gap-[975px]">
             <FindBy searchTerm={searchTerm} onSearchChange={setSearchTerm} />
             <TimeSelect

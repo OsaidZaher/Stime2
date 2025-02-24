@@ -238,7 +238,7 @@ function SheetDemo({
                 )}
                 <div className="flex ml-20 mt-4 space-x-20 items-start">
                   <Button
-                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
+                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white  border-color-200 outline-color-500 font-semibold text-2xl shadow-md rounded-lg"
                     variant="outline"
                   >
                     Start Study
@@ -247,7 +247,7 @@ function SheetDemo({
                   {/* Save Session Button */}
                   <div className="flex flex-col">
                     <Button
-                      className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-2xl shadow-md rounded-lg"
+                      className="bg-white border-color-200 h-24 w-64 dark:bg-black text-black dark:text-white  font-semibold text-2xl shadow-md rounded-lg"
                       variant="outline"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -261,7 +261,7 @@ function SheetDemo({
                   <div className="flex flex-col space-y-4">
                     <AlarmPicker onAlarmSelect={setSelectedAlarm} />
                     <Button
-                      className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
+                      className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
                       variant="outline"
                       onClick={(e) => {
                         e.stopPropagation();

@@ -23,8 +23,7 @@ const data = {
     {
       title: "Stime",
       url: "#",
-      className:
-        "text-blue-600 dark:text-blue-300 great-vibes-regular text-3xl mt-5 ml-4 gap-y-4",
+      className: "text-500 great-vibes-regular text-3xl mt-5 ml-4 gap-y-4",
       items: [
         {
           title: "   ",
@@ -91,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <Icon
                               size={18}
                               className={
-                                isActive ? "text-blue-600" : "text-gray-500"
+                                isActive ? "text-500" : "text-gray-500"
                               }
                             />
                           )}

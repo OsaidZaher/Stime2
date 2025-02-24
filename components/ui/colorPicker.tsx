@@ -52,6 +52,8 @@ export function ColorThemeProvider({ children }) {
     // Color variants (50-950)
     root.style.setProperty("--theme-50", `var(--${colorTheme}-primary-50)`);
     root.style.setProperty("--theme-100", `var(--${colorTheme}-primary-100)`);
+    root.style.setProperty("--theme-200", `var(--${colorTheme}-primary-200)`);
+    root.style.setProperty("--theme-300", `var(--${colorTheme}-primary-300)`);
     root.style.setProperty("--theme-400", `var(--${colorTheme}-primary-400)`);
     root.style.setProperty("--theme-700", `var(--${colorTheme}-700)`);
     root.style.setProperty("--theme-950", `var(--${colorTheme}-primary-950)`);
@@ -133,7 +135,7 @@ export function ThemeSwitcher() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="capitalize theme-background theme-hover text-slate-100"
+            className="capitalize theme-background theme-hover text-slate-100 border-color-500 outline-color-400"
           >
             <div className="flex items-center gap-2">
               <div
@@ -143,14 +145,17 @@ export function ThemeSwitcher() {
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
+        <DropdownMenuContent className="w-56 border-color-500">
           <DropdownMenuLabel>Choose color theme</DropdownMenuLabel>
           {colorThemes.map((t) => (
             <DropdownMenuItem
               key={t.value}
               onClick={() => setColorTheme(t.value)}
-              className="cursor-pointer flex items-center gap-2"
+              className="cursor-pointer flex items-center gap-2 focus:outline-color-400 hover:bg-color-100"
             >
+              <div
+                className={`w-4 h-4 rounded-full bg-${t.value}-primary-400`}
+              />
               <span className="capitalize">{t.name}</span>
             </DropdownMenuItem>
           ))}

@@ -186,7 +186,7 @@ export function Timer({
           }}
           className={cn(
             "p-8 rounded-full transition-all duration-200 ease-in-out",
-            "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
+            "bg-color-500 theme-hover ",
             "text-white shadow-lg hover:shadow-xl",
             "transform hover:scale-105 active:scale-95"
           )}
@@ -201,7 +201,7 @@ export function Timer({
           }}
           className={cn(
             "p-8 rounded-full transition-all duration-200 ease-in-out",
-            "bg-neutral-200 hover:bg-neutral-300 dark:bg-slate-800 dark:hover:bg-slate-700",
+            "bg-neutral-200 hover:bg-neutral-300 dark:bg-slate-800 dark:hover:bg-slate-700 outline-color-500 border-color-500 ",
             "text-neutral-700 dark:text-neutral-200 shadow-lg hover:shadow-xl",
             "transform hover:scale-105 active:scale-95"
           )}
@@ -417,7 +417,7 @@ export function AlarmPicker({
       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
         <Button
           variant="outline"
-          className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
+          className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200 dark:border-slate-800 font-semibold text-sm shadow-md rounded-lg"
         >
           <span className="truncate">
             {alarms.find((a) => a.id === selectedAlarm)?.name || "Pick Alarm"}

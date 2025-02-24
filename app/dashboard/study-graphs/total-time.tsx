@@ -161,7 +161,7 @@ export default function TotalTimeChart() {
 
   return (
     <div className="">
-      <Card className="w-full max-w-lg ">
+      <Card className="w-full max-w-lg border-color-100  ">
         <Select value={timeFrame} onValueChange={setTimeFrame}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a Time frame" />
@@ -209,7 +209,7 @@ export default function TotalTimeChart() {
                 />
                 <Bar
                   dataKey="minutes"
-                  fill="hsl(192 90% 41%)"
+                  fill="var(--theme-primary)"
                   radius={[8, 8, 0, 0]}
                   barSize={100}
                 />

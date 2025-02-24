@@ -176,7 +176,7 @@ export default function GradeCard() {
             onClick={() => handleNavigation("left")}
             disabled={currentPage === 0}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 text-500" />
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {currentPage + 1} of {totalPages}
@@ -187,7 +187,7 @@ export default function GradeCard() {
             onClick={() => handleNavigation("right")}
             disabled={currentPage >= totalPages - 1}
           >
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4 text-500" />
           </Button>
         </div>
       )}

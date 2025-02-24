@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <>
       <div className="flex space-x-10">
-        <div className="space-y-10">
+        <div className="space-y-16">
           <LogInCard />
           <DashTimeCard />
         </div>

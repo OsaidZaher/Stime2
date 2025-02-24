@@ -209,7 +209,7 @@ export default function TodoListCard() {
               placeholder="Add a new task"
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
-              className="flex-grow border-blue-200 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-grow border-color-100 focus:ring-blue-500 focus:border-blue-500"
             />
             <Button
               type="submit"

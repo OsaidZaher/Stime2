@@ -1,7 +1,6 @@
 import { ModeToggle } from "@/components/ui/themetoggle";
 import SideBar from "@/components/sidebar";
 import { UserDrop, NotificationBell } from "@/components/navbar";
-import { ThemeSwitcher } from "@/components/ui/colorPicker";
 
 export default function DashboardLayout({
   children,
@@ -16,7 +15,6 @@ export default function DashboardLayout({
           <ModeToggle />
           <NotificationBell />
           <UserDrop />
-          <ThemeSwitcher />
         </div>
       </header>
 

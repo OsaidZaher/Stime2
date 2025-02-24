@@ -239,7 +239,7 @@ function GradeDialog({ onGradeAdded, existingSubjects }: GradeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-color-00">Add Grade</Button>
+        <Button className="bg-color-500">Add Grade</Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit}>

@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
 import { ChevronUp, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
-
+import { useTimeContext } from "@/app/contexts/TimerContext";
+import { X } from "lucide-react";
 interface TimeComponentProps {
   startTime: boolean;
   onReset: () => void;
@@ -20,83 +20,60 @@ export function TimeComponent({
   onTimeEnd,
   mode,
 }: TimeComponentProps) {
-  // Default values based on mode
-  const defaultMinutes = mode === "timer" ? 25 : 0;
-  const defaultSeconds = 0;
+  // Get timer state from context
+  const {
+    minutes,
+    seconds,
+    isRunning,
+    isPaused,
+    mode: contextMode,
+    startTimer,
+    pauseTimer,
+    resumeTimer,
+    resetTimer,
+    setTimerMode,
+    setTimerDuration,
+  } = useTimeContext();
 
-  const [minutes, setMinutes] = useState(defaultMinutes);
-  const [seconds, setSeconds] = useState(defaultSeconds);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [startDateTime, setStartDateTime] = useState<Date | null>(null);
-  const [endDateTime, setEndDateTime] = useState<Date | null>(null);
+  // Local state for editing
   const [editingMinutes, setEditingMinutes] = useState(false);
   const [editingSeconds, setEditingSeconds] = useState(false);
   const [inputMinutes, setInputMinutes] = useState(
-    String(defaultMinutes).padStart(2, "0")
+    String(minutes).padStart(2, "0")
   );
   const [inputSeconds, setInputSeconds] = useState(
-    String(defaultSeconds).padStart(2, "0")
+    String(seconds).padStart(2, "0")
   );
 
   const minutesInputRef = useRef<HTMLInputElement>(null);
   const secondsInputRef = useRef<HTMLInputElement>(null);
 
-  // Reset to appropriate default values when mode changes
+  // Sync with context mode if prop changes
   useEffect(() => {
-    setMinutes(mode === "timer" ? 25 : 0);
-    setSeconds(0);
-    setInputMinutes(String(mode === "timer" ? 25 : 0).padStart(2, "0"));
-    setInputSeconds("00");
-  }, [mode]);
+    if (mode !== contextMode) {
+      setTimerMode(mode);
+    }
+  }, [mode, contextMode, setTimerMode]);
 
   // Start time when parent component triggers it
   useEffect(() => {
-    if (startTime) {
-      setIsRunning(true);
-      setIsPaused(false);
-      if (!startDateTime) {
-        setStartDateTime(new Date());
-      }
-    } else {
-      resetTimeComponent();
+    if (startTime && !isRunning) {
+      startTimer();
     }
-  }, [startTime]);
+  }, [startTime, isRunning, startTimer]);
 
-  // Timer/Stopwatch logic
+  // Check for timer completion (timer mode only)
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isRunning && !isPaused) {
-      interval = setInterval(() => {
-        if (mode === "timer") {
-          // Timer logic (countdown)
-          if (seconds > 0) {
-            setSeconds(seconds - 1);
-          } else if (minutes > 0) {
-            setMinutes(minutes - 1);
-            setSeconds(59);
-          } else {
-            setIsRunning(false);
-            setIsPaused(false);
-            setEndDateTime(new Date());
-            clearInterval(interval);
-            if (onTimeEnd) onTimeEnd();
-          }
-        } else {
-          // Stopwatch logic (count up)
-          if (seconds < 59) {
-            setSeconds(seconds + 1);
-          } else {
-            setSeconds(0);
-            setMinutes(minutes + 1);
-          }
-        }
-      }, 1000);
+    if (
+      contextMode === "timer" &&
+      minutes === 0 &&
+      seconds === 0 &&
+      isRunning &&
+      !isPaused
+    ) {
+      if (onTimeEnd) onTimeEnd();
     }
-
-    return () => clearInterval(interval);
-  }, [isRunning, isPaused, minutes, seconds, mode, onTimeEnd]);
+  }, [minutes, seconds, isRunning, isPaused, contextMode, onTimeEnd]);
 
   // Update display strings when the numeric values change
   useEffect(() => {
@@ -119,54 +96,51 @@ export function TimeComponent({
 
   const togglePause = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent event bubbling
-    setIsPaused(!isPaused);
+    if (isPaused) {
+      resumeTimer();
+    } else {
+      pauseTimer();
+    }
   };
 
   const incrementMinutes = () => {
-    if (mode === "timer" && (!isRunning || isPaused)) {
-      setMinutes((prev) => prev + 1);
+    if (contextMode === "timer" && (!isRunning || isPaused)) {
+      setTimerDuration(minutes + 1, seconds);
     }
   };
 
   const decrementMinutes = () => {
-    if (mode === "timer" && (!isRunning || isPaused) && minutes > 0) {
-      setMinutes((prev) => prev - 1);
+    if (contextMode === "timer" && (!isRunning || isPaused) && minutes > 0) {
+      setTimerDuration(minutes - 1, seconds);
     }
   };
 
   const incrementSeconds = () => {
-    if (mode === "timer" && (!isRunning || isPaused)) {
+    if (contextMode === "timer" && (!isRunning || isPaused)) {
       if (seconds === 59) {
-        setSeconds(0);
-        setMinutes((prev) => prev + 1);
+        setTimerDuration(minutes + 1, 0);
       } else {
-        setSeconds((prev) => prev + 1);
+        setTimerDuration(minutes, seconds + 1);
       }
     }
   };
 
   const decrementSeconds = () => {
     if (
-      mode === "timer" &&
+      contextMode === "timer" &&
       (!isRunning || isPaused) &&
       (minutes > 0 || seconds > 0)
     ) {
       if (seconds === 0) {
-        setSeconds(59);
-        setMinutes((prev) => prev - 1);
+        setTimerDuration(minutes - 1, 59);
       } else {
-        setSeconds((prev) => prev - 1);
+        setTimerDuration(minutes, seconds - 1);
       }
     }
   };
 
   const resetTimeComponent = () => {
-    setMinutes(mode === "timer" ? 25 : 0);
-    setSeconds(0);
-    setIsRunning(false);
-    setIsPaused(false);
-    setStartDateTime(null);
-    setEndDateTime(null);
+    resetTimer();
     onReset();
   };
 
@@ -191,7 +165,7 @@ export function TimeComponent({
     if (isNaN(newMinutes)) newMinutes = 0;
     // You might want to set an upper limit here, e.g., 99
     newMinutes = Math.min(99, Math.max(0, newMinutes));
-    setMinutes(newMinutes);
+    setTimerDuration(newMinutes, seconds);
     setInputMinutes(String(newMinutes).padStart(2, "0"));
     setEditingMinutes(false);
   };
@@ -200,7 +174,7 @@ export function TimeComponent({
     let newSeconds = parseInt(inputSeconds, 10);
     if (isNaN(newSeconds)) newSeconds = 0;
     newSeconds = Math.min(59, Math.max(0, newSeconds));
-    setSeconds(newSeconds);
+    setTimerDuration(minutes, newSeconds);
     setInputSeconds(String(newSeconds).padStart(2, "0"));
     setEditingSeconds(false);
   };
@@ -222,7 +196,7 @@ export function TimeComponent({
       <div className="flex items-center">
         {/* Minutes */}
         <div className="flex items-center group">
-          {mode === "timer" && (
+          {contextMode === "timer" && (
             <div className="flex flex-col">
               <button
                 onClick={(e) => {
@@ -248,7 +222,9 @@ export function TimeComponent({
               </button>
             </div>
           )}
-          {editingMinutes && mode === "timer" && (!isRunning || isPaused) ? (
+          {editingMinutes &&
+          contextMode === "timer" &&
+          (!isRunning || isPaused) ? (
             <input
               ref={minutesInputRef}
               type="text"
@@ -263,7 +239,7 @@ export function TimeComponent({
             <span
               className="text-[12rem] font-bold tabular-nums transition-colors cursor-pointer"
               onClick={() => {
-                if (mode === "timer" && (!isRunning || isPaused)) {
+                if (contextMode === "timer" && (!isRunning || isPaused)) {
                   setEditingMinutes(true);
                 }
               }}
@@ -277,7 +253,9 @@ export function TimeComponent({
 
         {/* Seconds */}
         <div className="flex items-center group">
-          {editingSeconds && mode === "timer" && (!isRunning || isPaused) ? (
+          {editingSeconds &&
+          contextMode === "timer" &&
+          (!isRunning || isPaused) ? (
             <input
               ref={secondsInputRef}
               type="text"
@@ -292,7 +270,7 @@ export function TimeComponent({
             <span
               className="text-[12rem] font-bold tabular-nums transition-colors cursor-pointer"
               onClick={() => {
-                if (mode === "timer" && (!isRunning || isPaused)) {
+                if (contextMode === "timer" && (!isRunning || isPaused)) {
                   setEditingSeconds(true);
                 }
               }}
@@ -300,7 +278,7 @@ export function TimeComponent({
               {String(seconds).padStart(2, "0")}
             </span>
           )}
-          {mode === "timer" && (
+          {contextMode === "timer" && (
             <div className="flex flex-col ml-2">
               <button
                 onClick={(e) => {

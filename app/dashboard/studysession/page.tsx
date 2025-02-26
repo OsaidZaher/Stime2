@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react"; // Combine imports for useState and useEffect
-
 import { useSession } from "next-auth/react";
+import { useTimeContext } from "@/app/contexts/TimerContext";
 import {
   TimeComponent,
   AlarmPicker,
@@ -129,13 +129,20 @@ function SheetDemo({
   showTimer,
   toggleView,
 }: SheetDemoProps) {
-  const [startTimer, setStartTimer] = useState(false);
-  const [startStopwatch, setStartStopwatch] = useState(false);
+  // Get context values
+  const {
+    isRunning,
+    startTimer,
+    mode,
+    selectedAlarm,
+    setSelectedAlarm,
+    resetTimer,
+  } = useTimeContext();
+
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
   const [topic, setTopic] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-  const [selectedAlarm, setSelectedAlarm] = useState("iphone_alarm.mp3");
   const [showAlarmPopup, setShowAlarmPopup] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -147,13 +154,8 @@ function SheetDemo({
       return;
     }
 
-    // Start the appropriate timer based on current view
-    if (showTimer) {
-      setStartTimer(true);
-    } else {
-      setStartStopwatch(true);
-    }
-
+    // Use context to start the timer
+    startTimer();
     setStartTime(new Date());
     setIsSheetOpen(false); // Close the sheet after starting
   };
@@ -178,7 +180,7 @@ function SheetDemo({
           topic,
           startTime,
           endTime,
-          timerType: showTimer ? "timer" : "stopwatch",
+          timerType: mode,
         }),
       });
 
@@ -199,8 +201,7 @@ function SheetDemo({
     setTopic("");
     setStartTime(null);
     setEndTime(null);
-    setStartTimer(false);
-    setStartStopwatch(false);
+    resetTimer();
   };
 
   const { playAlarm, stopAlarm, isLoaded } = useAlarm(selectedAlarm, () =>
@@ -230,21 +231,13 @@ function SheetDemo({
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             {/* Timer/Stopwatch components are now OUTSIDE the SheetTrigger */}
             <div className="mt-[-175px] space-y-0 ml-10">
-              {showTimer ? (
-                <TimeComponent
-                  mode="timer"
-                  startTime={startTimer}
-                  onReset={resetSession}
-                  onTimeEnd={handleTimerEnd}
-                  selectedAlarm={selectedAlarm || ""}
-                />
-              ) : (
-                <TimeComponent
-                  mode="stopwatch"
-                  startTime={startStopwatch}
-                  onReset={resetSession}
-                />
-              )}
+              <TimeComponent
+                mode={showTimer ? "timer" : "stopwatch"}
+                startTime={isRunning}
+                onReset={resetSession}
+                onTimeEnd={handleTimerEnd}
+                selectedAlarm={selectedAlarm}
+              />
               <div className="flex ml-20 mt-4 space-x-20 items-start">
                 {/* This button is now the SheetTrigger */}
                 <SheetTrigger asChild>

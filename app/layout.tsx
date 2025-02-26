@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/themeprovider";
 import { Toaster } from "sonner";
 import ClientSessionProvider from "@/components/client-session-provider";
 import { ColorThemeProvider } from "@/components/ui/colorPicker";
+import { TimeProvider } from "./contexts/TimerContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -77,11 +78,13 @@ export default function RootLayout({
             storageKey="theme-preference"
           >
             <ColorThemeProvider>
-              <main className="flex-grow">{children}</main>
-              <footer className="mt-auto">
-                <Footer />
-              </footer>
-              <Toaster />
+              <TimeProvider>
+                <main className="flex-grow">{children}</main>
+                <footer className="mt-auto">
+                  <Footer />
+                </footer>
+                <Toaster />
+              </TimeProvider>
             </ColorThemeProvider>
           </ThemeProvider>
         </ClientSessionProvider>

@@ -19,8 +19,10 @@ interface TimeContextType {
   startDateTime: Date | null;
   selectedAlarm: string;
   elapsedSeconds: number;
+  selectedSubject: number | null;
+  topic: string;
+  startTime: Date | null;
 
-  // Methods to control the timer
   startTimer: () => void;
   pauseTimer: () => void;
   resumeTimer: () => void;
@@ -28,6 +30,9 @@ interface TimeContextType {
   setTimerMode: (mode: "timer" | "stopwatch") => void;
   setTimerDuration: (minutes: number, seconds: number) => void;
   setSelectedAlarm: (alarm: string) => void;
+  setSelectedSubject: (subject: number | null) => void;
+  setTopic: (topic: string) => void;
+  setStartTime: (time: Date | null) => void;
 }
 
 // Type for the persistent state in localStorage
@@ -42,6 +47,10 @@ interface PersistentTimerState {
   initialMinutes: number; // Store initial values for timer reset
   initialSeconds: number;
   lastUpdated: number; // Timestamp to track time between navigations
+  // Add form fields to persistent state
+  selectedSubject: number | null;
+  topic: string;
+  startTime: string | null; // Store as ISO string
 }
 
 // Create the context with a default undefined value
@@ -108,6 +117,9 @@ export function TimeProvider({ children }: TimeProviderProps) {
   const [initialSeconds, setInitialSeconds] = useState(0); // For reset
   const [elapsedSeconds, setElapsedSeconds] = useState(0); // For time tracking
   const [isInitialized, setIsInitialized] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
+  const [topic, setTopic] = useState("");
+  const [startTime, setStartTime] = useState<Date | null>(null);
 
   // Load saved state from localStorage on component mount
   useEffect(() => {
@@ -127,6 +139,13 @@ export function TimeProvider({ children }: TimeProviderProps) {
       );
       setIsRunning(savedState.isRunning);
       setIsPaused(savedState.isPaused);
+
+      // Load form data from localStorage
+      setSelectedSubject(savedState.selectedSubject);
+      setTopic(savedState.topic || "");
+      setStartTime(
+        savedState.startTime ? new Date(savedState.startTime) : null
+      );
 
       // Update timer based on elapsed time if it was running
       if (savedState.isRunning && !savedState.isPaused && timePassed > 0) {
@@ -177,6 +196,10 @@ export function TimeProvider({ children }: TimeProviderProps) {
       initialMinutes,
       initialSeconds,
       lastUpdated: Date.now(),
+      // Save form data to localStorage
+      selectedSubject,
+      topic,
+      startTime: startTime ? startTime.toISOString() : null,
     };
 
     saveStateToStorage(state);
@@ -191,6 +214,10 @@ export function TimeProvider({ children }: TimeProviderProps) {
     initialMinutes,
     initialSeconds,
     isInitialized,
+    // Add dependencies for form fields
+    selectedSubject,
+    topic,
+    startTime,
   ]);
 
   // Timer/Stopwatch logic
@@ -302,6 +329,12 @@ export function TimeProvider({ children }: TimeProviderProps) {
     setTimerMode,
     setTimerDuration,
     setSelectedAlarm,
+    selectedSubject,
+    topic,
+    startTime,
+    setSelectedSubject,
+    setTopic,
+    setStartTime,
   };
 
   return <TimeContext.Provider value={value}>{children}</TimeContext.Provider>;

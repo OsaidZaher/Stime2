@@ -129,7 +129,6 @@ function SheetDemo({
   showTimer,
   toggleView,
 }: SheetDemoProps) {
-  // Get context values
   const {
     isRunning,
     startTimer,
@@ -137,11 +136,14 @@ function SheetDemo({
     selectedAlarm,
     setSelectedAlarm,
     resetTimer,
+    selectedSubject,
+    setSelectedSubject,
+    topic,
+    setTopic,
+    startTime,
+    setStartTime,
   } = useTimeContext();
 
-  const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
-  const [topic, setTopic] = useState("");
-  const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [showAlarmPopup, setShowAlarmPopup] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);

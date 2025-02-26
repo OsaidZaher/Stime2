@@ -61,13 +61,29 @@ export async function PATCH(request: Request) {
     const { target, completion } = await request.json();
     const userId = session?.user.id;
 
+    const today = new Date();
+    const isMonday = today.getDay() === 1;
+
+    const existingGoal = await prisma.weeklyGoal.findUnique({
+      where: { userId: userId },
+    });
+
+    if (completion === 0 && isMonday) {
+      const weeklyGoal = await prisma.weeklyGoal.update({
+        where: { userId: userId },
+        data: {
+          target,
+          completion: 0,
+        },
+      });
+      return NextResponse.json(weeklyGoal, { status: 200 });
+    }
+
     const weeklyGoal = await prisma.weeklyGoal.update({
-      where: {
-        userId: userId,
-      },
+      where: { userId: userId },
       data: {
         target,
-        completion,
+        completion: Math.min(completion, target),
       },
     });
 

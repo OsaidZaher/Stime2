@@ -95,11 +95,12 @@ export function ColorThemeProvider({
       `var(--${colorTheme}-gradient2-dark)`
     );
 
-    document.body.className = document.body.className
-      .split(" ")
-      .filter((cls) => !cls.match(/^(red|orange|yellow|blue|purple|pink)$/))
-      .concat(colorTheme)
-      .join(" ");
+    // Remove all theme classes and add the current one
+    const themeClasses = ["red", "orange", "yellow", "blue", "purple", "pink"];
+    themeClasses.forEach((cls) => {
+      document.body.classList.remove(cls);
+    });
+    document.body.classList.add(colorTheme);
   }, [colorTheme, isThemeLoaded]);
 
   return (
@@ -119,34 +120,53 @@ export function useColorTheme() {
   return context;
 }
 
+// Fixed version for use in the dropdown menu
+export function ThemeSwitcherButton() {
+  const { colorTheme, setColorTheme } = useColorTheme();
+
+  const colorThemes = [
+    { name: "Red", value: "red" },
+    { name: "Orange", value: "orange" },
+    { name: "Yellow", value: "yellow" },
+    { name: "Blue", value: "blue" },
+    { name: "Purple", value: "purple" },
+    { name: "Pink", value: "pink" },
+  ];
+
+  return (
+    <>
+      <DropdownMenuLabel>Choose your Theme</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      {colorThemes.map((theme) => (
+        <DropdownMenuItem
+          key={theme.value}
+          onClick={() => setColorTheme(theme.value)}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center gap-2 w-full">
+            <div
+              className="w-4 h-4 rounded-full"
+              style={{ backgroundColor: `var(--${theme.value}-primary)` }}
+            />
+            <span>{theme.name}</span>
+          </div>
+        </DropdownMenuItem>
+      ))}
+    </>
+  );
+}
+
+// Standalone version for direct use
 export function ThemeSwitcher() {
   const { colorTheme, setColorTheme } = useColorTheme();
 
   const colorThemes = [
-    {
-      name: "Red",
-      value: "red",
-    },
-    {
-      name: "Orange",
-      value: "orange",
-    },
-    {
-      name: "Yellow",
-      value: "yellow",
-    },
-    {
-      name: "Blue",
-      value: "blue",
-    },
-    {
-      name: "Purple",
-      value: "purple",
-    },
-    {
-      name: "Pink",
-      value: "pink",
-    },
+    { name: "Red", value: "red" },
+    { name: "Orange", value: "orange" },
+    { name: "Yellow", value: "yellow" },
+    { name: "Blue", value: "blue" },
+    { name: "Purple", value: "purple" },
+    { name: "Pink", value: "pink" },
   ];
 
   return (
@@ -162,23 +182,17 @@ export function ThemeSwitcher() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>Choose your Theme</DropdownMenuLabel>
-          {colorThemes.map((t) => (
+          {colorThemes.map((theme) => (
             <DropdownMenuItem
-              key={t.value}
-              onClick={() => setColorTheme(t.value)}
-              className="cursor-pointer flex items-center gap-2 transition-colors duration-200"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = `var(--${t.value}-primary-200)`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "";
-              }}
+              key={theme.value}
+              onClick={() => setColorTheme(theme.value)}
+              className="cursor-pointer flex items-center gap-2"
             >
               <div
                 className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: `var(--${t.value}-primary)` }}
+                style={{ backgroundColor: `var(--${theme.value}-primary)` }}
               />
-              <span className="w-full h-4 font-medium">{t.name}</span>
+              <span>{theme.name}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

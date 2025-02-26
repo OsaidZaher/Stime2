@@ -1,6 +1,6 @@
 "use client";
 import { signOut, useSession } from "next-auth/react";
-import { ThemeSwitcher } from "./ui/colorPicker";
+import { ThemeSwitcher, ThemeSwitcherButton } from "./ui/colorPicker";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -32,7 +32,6 @@ export function UserDrop() {
               src={session.user.image}
               alt="User profile"
               onError={(e) => {
-                // If image fails to load, clear the src to show fallback
                 e.currentTarget.src = "";
               }}
             />
@@ -46,9 +45,7 @@ export function UserDrop() {
           <span>Log out</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <ThemeSwitcher />
-        </DropdownMenuItem>
+        <ThemeSwitcherButton />
       </DropdownMenuContent>
     </DropdownMenu>
   );

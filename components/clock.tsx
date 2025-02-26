@@ -1,68 +1,121 @@
 "use client";
 
 import * as React from "react";
-
 import { useState, useEffect, useRef } from "react";
-import { ChevronUp, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
 import { X } from "lucide-react";
+import { ChevronUp, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface TimerProps {
-  startTimer: boolean;
+interface TimeComponentProps {
+  startTime: boolean;
   onReset: () => void;
-  onTimerEnd: () => void;
-  selectedAlarm: string;
+  onTimeEnd?: () => void;
+  selectedAlarm?: string;
+  mode: "timer" | "stopwatch";
 }
 
-export function Timer({
-  startTimer,
+export function TimeComponent({
+  startTime,
   onReset,
-  onTimerEnd,
-  selectedAlarm,
-}: TimerProps) {
-  const [minutes, setMinutes] = useState(25);
-  const [seconds, setSeconds] = useState(0);
+  onTimeEnd,
+  mode,
+}: TimeComponentProps) {
+  // Default values based on mode
+  const defaultMinutes = mode === "timer" ? 25 : 0;
+  const defaultSeconds = 0;
+
+  const [minutes, setMinutes] = useState(defaultMinutes);
+  const [seconds, setSeconds] = useState(defaultSeconds);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [initialMinutes] = useState(25);
-  const [initialSeconds] = useState(0);
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [endTime, setEndTime] = useState<Date | null>(null);
+  const [startDateTime, setStartDateTime] = useState<Date | null>(null);
+  const [endDateTime, setEndDateTime] = useState<Date | null>(null);
+  const [editingMinutes, setEditingMinutes] = useState(false);
+  const [editingSeconds, setEditingSeconds] = useState(false);
+  const [inputMinutes, setInputMinutes] = useState(
+    String(defaultMinutes).padStart(2, "0")
+  );
+  const [inputSeconds, setInputSeconds] = useState(
+    String(defaultSeconds).padStart(2, "0")
+  );
 
+  const minutesInputRef = useRef<HTMLInputElement>(null);
+  const secondsInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset to appropriate default values when mode changes
   useEffect(() => {
-    if (startTimer) {
+    setMinutes(mode === "timer" ? 25 : 0);
+    setSeconds(0);
+    setInputMinutes(String(mode === "timer" ? 25 : 0).padStart(2, "0"));
+    setInputSeconds("00");
+  }, [mode]);
+
+  // Start time when parent component triggers it
+  useEffect(() => {
+    if (startTime) {
       setIsRunning(true);
       setIsPaused(false);
-      if (!startTime) {
-        setStartTime(new Date());
+      if (!startDateTime) {
+        setStartDateTime(new Date());
       }
     } else {
-      resetTimer();
+      resetTimeComponent();
     }
-  }, [startTimer]);
+  }, [startTime]);
 
+  // Timer/Stopwatch logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
     if (isRunning && !isPaused) {
       interval = setInterval(() => {
-        if (seconds > 0) {
-          setSeconds(seconds - 1);
-        } else if (minutes > 0) {
-          setMinutes(minutes - 1);
-          setSeconds(59);
+        if (mode === "timer") {
+          // Timer logic (countdown)
+          if (seconds > 0) {
+            setSeconds(seconds - 1);
+          } else if (minutes > 0) {
+            setMinutes(minutes - 1);
+            setSeconds(59);
+          } else {
+            setIsRunning(false);
+            setIsPaused(false);
+            setEndDateTime(new Date());
+            clearInterval(interval);
+            if (onTimeEnd) onTimeEnd();
+          }
         } else {
-          setIsRunning(false);
-          setIsPaused(false);
-          setEndTime(new Date());
-          clearInterval(interval);
-          onTimerEnd();
+          // Stopwatch logic (count up)
+          if (seconds < 59) {
+            setSeconds(seconds + 1);
+          } else {
+            setSeconds(0);
+            setMinutes(minutes + 1);
+          }
         }
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, isPaused, minutes, seconds]);
+  }, [isRunning, isPaused, minutes, seconds, mode, onTimeEnd]);
+
+  // Update display strings when the numeric values change
+  useEffect(() => {
+    setInputMinutes(String(minutes).padStart(2, "0"));
+    setInputSeconds(String(seconds).padStart(2, "0"));
+  }, [minutes, seconds]);
+
+  // Auto-focus input when editing starts
+  useEffect(() => {
+    if (editingMinutes && minutesInputRef.current) {
+      minutesInputRef.current.focus();
+    }
+  }, [editingMinutes]);
+
+  useEffect(() => {
+    if (editingSeconds && secondsInputRef.current) {
+      secondsInputRef.current.focus();
+    }
+  }, [editingSeconds]);
 
   const togglePause = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent event bubbling
@@ -70,19 +123,19 @@ export function Timer({
   };
 
   const incrementMinutes = () => {
-    if (!isRunning || isPaused) {
+    if (mode === "timer" && (!isRunning || isPaused)) {
       setMinutes((prev) => prev + 1);
     }
   };
 
   const decrementMinutes = () => {
-    if ((!isRunning || isPaused) && minutes > 0) {
+    if (mode === "timer" && (!isRunning || isPaused) && minutes > 0) {
       setMinutes((prev) => prev - 1);
     }
   };
 
   const incrementSeconds = () => {
-    if (!isRunning || isPaused) {
+    if (mode === "timer" && (!isRunning || isPaused)) {
       if (seconds === 59) {
         setSeconds(0);
         setMinutes((prev) => prev + 1);
@@ -93,7 +146,11 @@ export function Timer({
   };
 
   const decrementSeconds = () => {
-    if ((!isRunning || isPaused) && (minutes > 0 || seconds > 0)) {
+    if (
+      mode === "timer" &&
+      (!isRunning || isPaused) &&
+      (minutes > 0 || seconds > 0)
+    ) {
       if (seconds === 0) {
         setSeconds(59);
         setMinutes((prev) => prev - 1);
@@ -103,14 +160,61 @@ export function Timer({
     }
   };
 
-  const resetTimer = () => {
-    setMinutes(initialMinutes);
-    setSeconds(initialSeconds);
+  const resetTimeComponent = () => {
+    setMinutes(mode === "timer" ? 25 : 0);
+    setSeconds(0);
     setIsRunning(false);
     setIsPaused(false);
-    setStartTime(null);
-    setEndTime(null);
+    setStartDateTime(null);
+    setEndDateTime(null);
     onReset();
+  };
+
+  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow numeric input
+    if (/^\d*$/.test(value)) {
+      setInputMinutes(value);
+    }
+  };
+
+  const handleSecondsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow numeric input
+    if (/^\d*$/.test(value)) {
+      setInputSeconds(value);
+    }
+  };
+
+  const handleMinutesBlur = () => {
+    let newMinutes = parseInt(inputMinutes, 10);
+    if (isNaN(newMinutes)) newMinutes = 0;
+    // You might want to set an upper limit here, e.g., 99
+    newMinutes = Math.min(99, Math.max(0, newMinutes));
+    setMinutes(newMinutes);
+    setInputMinutes(String(newMinutes).padStart(2, "0"));
+    setEditingMinutes(false);
+  };
+
+  const handleSecondsBlur = () => {
+    let newSeconds = parseInt(inputSeconds, 10);
+    if (isNaN(newSeconds)) newSeconds = 0;
+    newSeconds = Math.min(59, Math.max(0, newSeconds));
+    setSeconds(newSeconds);
+    setInputSeconds(String(newSeconds).padStart(2, "0"));
+    setEditingSeconds(false);
+  };
+
+  const handleMinutesKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleMinutesBlur();
+    }
+  };
+
+  const handleSecondsKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSecondsBlur();
+    }
   };
 
   return (
@@ -118,173 +222,115 @@ export function Timer({
       <div className="flex items-center">
         {/* Minutes */}
         <div className="flex items-center group">
-          <div className="flex flex-col ">
-            <button
-              onClick={(e) => {
-                e.stopPropagation;
-                incrementMinutes();
-                e.preventDefault();
+          {mode === "timer" && (
+            <div className="flex flex-col">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  incrementMinutes();
+                  e.preventDefault();
+                }}
+                className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+                disabled={isRunning && !isPaused}
+              >
+                <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  decrementMinutes();
+                  e.preventDefault();
+                }}
+                className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+                disabled={isRunning && !isPaused}
+              >
+                <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+              </button>
+            </div>
+          )}
+          {editingMinutes && mode === "timer" && (!isRunning || isPaused) ? (
+            <input
+              ref={minutesInputRef}
+              type="text"
+              value={inputMinutes}
+              onChange={handleMinutesChange}
+              onBlur={handleMinutesBlur}
+              onKeyDown={handleMinutesKeyDown}
+              className="text-[12rem] font-bold tabular-nums transition-colors w-[16rem] bg-transparent text-center focus:outline-none focus:border-blue-500"
+              maxLength={2}
+            />
+          ) : (
+            <span
+              className="text-[12rem] font-bold tabular-nums transition-colors cursor-pointer"
+              onClick={() => {
+                if (mode === "timer" && (!isRunning || isPaused)) {
+                  setEditingMinutes(true);
+                }
               }}
-              className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
             >
-              <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation;
-                decrementMinutes();
-                e.preventDefault();
-              }}
-              className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
-            >
-              <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
-            </button>
-          </div>
-          <span className="text-[12rem] font-bold tabular-nums transition-colors">
-            {String(minutes).padStart(2, "0")}
-          </span>
+              {String(minutes).padStart(2, "0")}
+            </span>
+          )}
         </div>
 
         <span className="text-[12rem] font-bold mx-4">:</span>
 
         {/* Seconds */}
         <div className="flex items-center group">
-          <span className="text-[12rem] font-bold tabular-nums transition-colors">
-            {String(seconds).padStart(2, "0")}
-          </span>
-          <div className="flex flex-col ml-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation;
-                incrementSeconds();
-                e.preventDefault();
+          {editingSeconds && mode === "timer" && (!isRunning || isPaused) ? (
+            <input
+              ref={secondsInputRef}
+              type="text"
+              value={inputSeconds}
+              onChange={handleSecondsChange}
+              onBlur={handleSecondsBlur}
+              onKeyDown={handleSecondsKeyDown}
+              className="text-[12rem] font-bold tabular-nums transition-colors w-[16rem] bg-transparent text-center focus:outline-none focus:border-blue-500"
+              maxLength={2}
+            />
+          ) : (
+            <span
+              className="text-[12rem] font-bold tabular-nums transition-colors cursor-pointer"
+              onClick={() => {
+                if (mode === "timer" && (!isRunning || isPaused)) {
+                  setEditingSeconds(true);
+                }
               }}
-              className="p-2 rounded-lg  transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
             >
-              <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation;
-                decrementSeconds();
-                e.preventDefault();
-              }}
-              className="p-2 rounded-lg  transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
-            >
-              <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
-            </button>
-          </div>
+              {String(seconds).padStart(2, "0")}
+            </span>
+          )}
+          {mode === "timer" && (
+            <div className="flex flex-col ml-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  incrementSeconds();
+                  e.preventDefault();
+                }}
+                className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+                disabled={isRunning && !isPaused}
+              >
+                <ChevronUp className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  decrementSeconds();
+                  e.preventDefault();
+                }}
+                className="p-2 rounded-lg transition-opacity hover:bg-neutral-100 dark:hover:bg-slate-800"
+                disabled={isRunning && !isPaused}
+              >
+                <ChevronDown className="w-8 h-8 text-neutral-600 dark:text-neutral-400" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Controls */}
       <div className="flex flex-col space-y-6 ml-12 mt-20">
-        <button
-          onClick={(e) => {
-            e.stopPropagation;
-            togglePause(e);
-          }}
-          className={cn(
-            "p-8 rounded-full transition-all duration-200 ease-in-out",
-            "bg-color-500 theme-hover ",
-            "text-white shadow-lg hover:shadow-xl",
-            "transform hover:scale-105 active:scale-95"
-          )}
-        >
-          {isPaused ? <Play size={40} /> : <Pause size={40} />}
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            resetTimer();
-            e.preventDefault();
-          }}
-          className={cn(
-            "p-8 rounded-full transition-all duration-200 ease-in-out",
-            "bg-neutral-200 hover:bg-neutral-300 dark:bg-slate-800 dark:hover:bg-slate-700 outline-color-500 border-color-500 ",
-            "text-neutral-700 dark:text-neutral-200 shadow-lg hover:shadow-xl",
-            "transform hover:scale-105 active:scale-95"
-          )}
-        >
-          <RotateCcw size={40} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-interface StopwatchProps {
-  startStopwatch: boolean;
-  onReset: () => void;
-}
-
-export function Stopwatch({ startStopwatch, onReset }: StopwatchProps) {
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-
-  useEffect(() => {
-    if (startStopwatch) {
-      setIsRunning(true);
-      setIsPaused(false);
-    } else {
-      resetStopwatch();
-    }
-  }, [startStopwatch]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isRunning && !isPaused) {
-      interval = setInterval(() => {
-        if (seconds < 59) {
-          setSeconds(seconds + 1);
-        } else {
-          setSeconds(0);
-          setMinutes(minutes + 1);
-        }
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [isRunning, isPaused, minutes, seconds]);
-
-  const togglePause = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    setIsPaused(!isPaused);
-  };
-
-  const resetStopwatch = () => {
-    setMinutes(0);
-    setSeconds(0);
-    setIsRunning(false);
-    setIsPaused(false);
-    onReset();
-  };
-
-  return (
-    <div className="flex items-center justify-between w-full max-w-6xl mx-auto p-8 ml-12 ">
-      <div className="flex items-center">
-        {/* Minutes */}
-        <div className="flex items-center group">
-          <span className="text-[12rem] font-bold tabular-nums transition-colors">
-            {String(minutes).padStart(2, "0")}
-          </span>
-        </div>
-
-        <span className="text-[12rem] font-bold mx-4">:</span>
-
-        {/* Seconds */}
-        <div className="flex items-center group">
-          <span className="text-[12rem] font-bold tabular-nums transition-colors">
-            {String(seconds).padStart(2, "0")}
-          </span>
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="flex flex-col space-y-6  mt-20 mr-12">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -302,7 +348,7 @@ export function Stopwatch({ startStopwatch, onReset }: StopwatchProps) {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            resetStopwatch();
+            resetTimeComponent();
             e.preventDefault();
           }}
           className={cn(
@@ -318,7 +364,6 @@ export function Stopwatch({ startStopwatch, onReset }: StopwatchProps) {
     </div>
   );
 }
-
 import { Bell, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

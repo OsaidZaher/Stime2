@@ -66,30 +66,31 @@ export function LogInCard() {
     checkLoginToday();
   }, [weeklyGoal]);
 
-  const checkLoginToday = () => {
-    const lastLoginDate = localStorage.getItem("lastLoginDate");
+  const checkLoginToday = async () => {
     const today = new Date();
     const todayStr = today.toISOString().split("T")[0];
+    const lastLoginDate = localStorage.getItem("lastLoginDate");
+    const isMonday = today.getDay() === 1;
 
-    if (today.getDay() === 1) {
+    if (isMonday) {
       const lastMondayCheck = localStorage.getItem("lastMondayCheck");
+
       if (lastMondayCheck !== todayStr) {
-        updateCompletion(0);
+        await updateCompletion(0);
         localStorage.setItem("lastMondayCheck", todayStr);
-        localStorage.removeItem("lastLoginDate");
 
         if (lastLoginDate !== todayStr) {
           localStorage.setItem("lastLoginDate", todayStr);
-          updateCompletion(1);
+          await updateCompletion(1);
         }
         return;
       }
     }
 
     if (lastLoginDate !== todayStr) {
-      const newCompletion = Math.min(loginCount + 1, target);
       localStorage.setItem("lastLoginDate", todayStr);
-      updateCompletion(newCompletion);
+      const newCompletion = Math.min((weeklyGoal?.completion || 0) + 1, target);
+      await updateCompletion(newCompletion);
     }
   };
 

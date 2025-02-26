@@ -8,6 +8,7 @@ import useSWR from "swr";
 
 export default function DashTimeCard() {
   const [todayStudy, setTodayStudy] = useState<number>(0);
+  const [displayText, setDisplayText] = useState<string>("0 mins");
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -26,16 +27,32 @@ export default function DashTimeCard() {
       return sessionCreation >= today;
     });
 
-    const totalTime = +(
+    const totalMinutes = Math.floor(
       todaySessions.reduce((total, session) => total + session.duration, 0) / 60
-    ).toFixed(1);
-    setTodayStudy(totalTime);
+    );
+
+    setTodayStudy(totalMinutes);
+
+    if (totalMinutes >= 60) {
+      const hours = Math.floor(totalMinutes / 60);
+      const remainingMins = totalMinutes % 60;
+
+      if (remainingMins === 0) {
+        setDisplayText(`${hours} ${hours === 1 ? "hr" : "hrs"}`);
+      } else {
+        setDisplayText(
+          `${hours} ${hours === 1 ? "hr" : "hrs"} ${remainingMins} mins`
+        );
+      }
+    } else {
+      setDisplayText(`${totalMinutes} mins`);
+    }
   }, [data]);
 
   return (
-    <Card className="overflow-hidden gradient-bg2 shadow-md rounded-xl  border border-color-100 ">
+    <Card className="overflow-hidden gradient-bg2 shadow-md rounded-xl border border-color-100">
       <div className="flex flex-col items-center justify-center p-6 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-color-300  ">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-color-300">
           <ClockIcon className="h-10 w-10 text-white" strokeWidth={2} />
         </div>
         <div className="flex flex-col items-center sm:items-start">
@@ -43,7 +60,7 @@ export default function DashTimeCard() {
             Hours Studied Today
           </span>
           <span className="text-4xl font-bold text-600 dark:text-white">
-            {isLoading ? "..." : `${todayStudy}hrs`}
+            {isLoading ? "..." : displayText}
           </span>
         </div>
       </div>

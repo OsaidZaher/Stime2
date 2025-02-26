@@ -323,9 +323,10 @@ export default function SubjectGoalsCard() {
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-muted-foreground">
-                        {((goal.completion / (goal.target * 60)) * 100).toFixed(
-                          1
-                        )}
+                        {(
+                          (goal.completion / (goal.target * 3600)) *
+                          100
+                        ).toFixed(1)}
                         %
                       </span>
                       <Button
@@ -339,11 +340,11 @@ export default function SubjectGoalsCard() {
                     </div>
                   </div>
                   <Progress
-                    value={(goal.completion / (goal.target * 60)) * 100}
-                    className="h-2   bg-color-100 [&>div]:bg-color-400"
+                    value={(goal.completion / (goal.target * 3600)) * 100}
+                    className="h-2 bg-color-100 [&>div]:bg-color-400"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{Math.floor(goal.completion / 60)} hrs</span>
+                    <span>{Math.floor(goal.completion / 3600)} hrs</span>
                     <span>
                       {goal.target} {goal.target === 1 ? "hr" : "hrs"}
                     </span>

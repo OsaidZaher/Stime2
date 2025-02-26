@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react"; // Combine imports for useS
 
 import { useSession } from "next-auth/react";
 import {
-  Timer,
-  Stopwatch,
+  TimeComponent,
   AlarmPicker,
   AlarmPopup,
   useAlarm,
@@ -138,6 +137,7 @@ function SheetDemo({
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [selectedAlarm, setSelectedAlarm] = useState("iphone_alarm.mp3");
   const [showAlarmPopup, setShowAlarmPopup] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleStartSession = () => {
     if (!selectedSubject || !topic) {
@@ -155,6 +155,7 @@ function SheetDemo({
     }
 
     setStartTime(new Date());
+    setIsSheetOpen(false); // Close the sheet after starting
   };
 
   const handleSaveSession = async () => {
@@ -216,64 +217,75 @@ function SheetDemo({
     stopAlarm();
     setShowAlarmPopup(false);
   };
+
+  const handleOpenSheet = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSheetOpen(true);
+  };
+
   return (
     <>
       <div className="relative inset-0 flex items-center justify-center z-50">
         <div className="pointer-events-auto">
-          <Sheet>
-            <SheetTrigger asChild>
-              <div className="mt-[-175px] space-y-0 ml-10">
-                {showTimer ? (
-                  <Timer
-                    startTimer={startTimer}
-                    onReset={resetSession}
-                    onTimerEnd={handleTimerEnd}
-                    selectedAlarm={selectedAlarm || ""}
-                  />
-                ) : (
-                  <Stopwatch
-                    startStopwatch={startStopwatch}
-                    onReset={resetSession}
-                  />
-                )}
-                <div className="flex ml-20 mt-4 space-x-20 items-start">
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            {/* Timer/Stopwatch components are now OUTSIDE the SheetTrigger */}
+            <div className="mt-[-175px] space-y-0 ml-10">
+              {showTimer ? (
+                <TimeComponent
+                  mode="timer"
+                  startTime={startTimer}
+                  onReset={resetSession}
+                  onTimeEnd={handleTimerEnd}
+                  selectedAlarm={selectedAlarm || ""}
+                />
+              ) : (
+                <TimeComponent
+                  mode="stopwatch"
+                  startTime={startStopwatch}
+                  onReset={resetSession}
+                />
+              )}
+              <div className="flex ml-20 mt-4 space-x-20 items-start">
+                {/* This button is now the SheetTrigger */}
+                <SheetTrigger asChild>
                   <Button
-                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white  border-color-200 outline-color-500 font-semibold text-2xl shadow-md rounded-lg"
+                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-color-200 outline-color-500 font-semibold text-2xl shadow-md rounded-lg"
                     variant="outline"
+                    onClick={handleOpenSheet}
                   >
                     Start Study
                   </Button>
+                </SheetTrigger>
 
-                  {/* Save Session Button */}
-                  <div className="flex flex-col">
-                    <Button
-                      className="bg-white border-color-200 h-24 w-64 dark:bg-black text-black dark:text-white  font-semibold text-2xl shadow-md rounded-lg"
-                      variant="outline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSaveSession();
-                      }}
-                    >
-                      Save Session
-                    </Button>
-                  </div>
+                {/* Save Session Button */}
+                <div className="flex flex-col">
+                  <Button
+                    className="bg-white border-color-200 h-24 w-64 dark:bg-black text-black dark:text-white font-semibold text-2xl shadow-md rounded-lg"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSaveSession();
+                    }}
+                  >
+                    Save Session
+                  </Button>
+                </div>
 
-                  <div className="flex flex-col space-y-4">
-                    <AlarmPicker onAlarmSelect={setSelectedAlarm} />
-                    <Button
-                      className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200  font-semibold text-sm shadow-md rounded-lg"
-                      variant="outline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleView();
-                      }}
-                    >
-                      {showTimer ? "Study Stopwatch" : "Study Timer"}
-                    </Button>
-                  </div>
+                <div className="flex flex-col space-y-4">
+                  <AlarmPicker onAlarmSelect={setSelectedAlarm} />
+                  <Button
+                    className="w-40 h-10 bg-white dark:bg-black text-black dark:text-white border-color-200 font-semibold text-sm shadow-md rounded-lg"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleView();
+                    }}
+                  >
+                    {showTimer ? "Study Stopwatch" : "Study Timer"}
+                  </Button>
                 </div>
               </div>
-            </SheetTrigger>
+            </div>
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>Study Session Details</SheetTitle>
@@ -316,7 +328,6 @@ function SheetDemo({
     </>
   );
 }
-
 interface DialogDemoProps {
   addSubject: (newSubject: string) => void;
 }

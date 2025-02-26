@@ -26,8 +26,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Calculate duration in seconds instead of minutes
     const duration = Math.floor(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60)
+      (endDate.getTime() - startDate.getTime()) / 1000
     );
 
     const subject = await prisma.subject.findFirst({
@@ -47,7 +49,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create the study session
     const studySession = await prisma.studySession.create({
       data: {
         subjectId: parsedSubjectId,
@@ -60,8 +61,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (subject.subjectGoal) {
+      const targetInSeconds = subject.subjectGoal.target * 3600;
+
       const newCompletion = subject.subjectGoal.completion + duration;
-      const isCompleted = newCompletion >= subject.subjectGoal.target * 60;
+
+      const isCompleted = newCompletion >= targetInSeconds;
 
       await prisma.subjectGoal.update({
         where: {

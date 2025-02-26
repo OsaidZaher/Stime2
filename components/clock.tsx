@@ -48,40 +48,57 @@ export function TimeComponent({
   const minutesInputRef = useRef<HTMLInputElement>(null);
   const secondsInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync with context mode if prop changes
   useEffect(() => {
     if (mode !== contextMode) {
       setTimerMode(mode);
     }
   }, [mode, contextMode, setTimerMode]);
 
-  // Start time when parent component triggers it
   useEffect(() => {
     if (startTime && !isRunning) {
       startTimer();
     }
   }, [startTime, isRunning, startTimer]);
 
-  // Check for timer completion (timer mode only)
+  const timerEndTriggered = useRef(false);
+
   useEffect(() => {
     if (
       contextMode === "timer" &&
       minutes === 0 &&
       seconds === 0 &&
       isRunning &&
-      !isPaused
+      !isPaused &&
+      !timerEndTriggered.current
     ) {
+      // Set the ref to true to prevent multiple triggers
+      timerEndTriggered.current = true;
+
+      // Stop the timer immediately
+      pauseTimer();
+
+      // Then call the onTimeEnd callback
       if (onTimeEnd) onTimeEnd();
     }
-  }, [minutes, seconds, isRunning, isPaused, contextMode, onTimeEnd]);
 
-  // Update display strings when the numeric values change
+    // Reset the trigger ref when the timer is reset or started again
+    if ((minutes > 0 || seconds > 0) && timerEndTriggered.current) {
+      timerEndTriggered.current = false;
+    }
+  }, [
+    minutes,
+    seconds,
+    isRunning,
+    isPaused,
+    contextMode,
+    onTimeEnd,
+    pauseTimer,
+  ]);
   useEffect(() => {
     setInputMinutes(String(minutes).padStart(2, "0"));
     setInputSeconds(String(seconds).padStart(2, "0"));
   }, [minutes, seconds]);
 
-  // Auto-focus input when editing starts
   useEffect(() => {
     if (editingMinutes && minutesInputRef.current) {
       minutesInputRef.current.focus();
@@ -316,7 +333,7 @@ export function TimeComponent({
           }}
           className={cn(
             "p-8 rounded-full transition-all duration-200 ease-in-out",
-            "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
+            "bg-color-600 theme-hover",
             "text-white shadow-lg hover:shadow-xl",
             "transform hover:scale-105 active:scale-95"
           )}

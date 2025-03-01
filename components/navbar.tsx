@@ -51,28 +51,6 @@ export function UserDrop() {
   );
 }
 
-import { Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-export function NotificationBell() {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="end"></PopoverContent>
-    </Popover>
-  );
-}
-
 const handleLogOut = async () => {
   try {
     await signOut({ callbackUrl: "/" });

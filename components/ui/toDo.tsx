@@ -195,7 +195,7 @@ export default function TodoListCard() {
   if (error) return <div>Failed to load tasks</div>;
 
   return (
-    <Card className="w-full max-w-lg  shadow-md rounded-xl overflow-hidden border border-color-100  ">
+    <Card className="w-full max-w-xl   shadow-md rounded-xl overflow-hidden border border-color-100  ">
       <CardHeader className="p-6 gradient-bg text-white">
         <CardTitle className="text-2xl font-bold">My Tasks</CardTitle>
         <p className="text-sm mt-2 text-blue-100">

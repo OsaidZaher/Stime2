@@ -172,7 +172,7 @@ export default function SubjectGoalsCard() {
   };
 
   return (
-    <Card className="w-full max-w-md h-[600px] shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col">
+    <Card className="w-full max-w-lg h-[600px] shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col ">
       <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <BookOpen className="w-6 h-6 theme-dark" />

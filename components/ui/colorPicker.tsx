@@ -24,7 +24,6 @@ export function ColorThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // Always start with default theme for SSR
   const [colorTheme, setColorTheme] = useState<string>(DEFAULT_THEME);
   const [isThemeLoaded, setIsThemeLoaded] = useState<boolean>(false);
 
@@ -95,7 +94,6 @@ export function ColorThemeProvider({
       `var(--${colorTheme}-gradient2-dark)`
     );
 
-    // Remove all theme classes and add the current one
     const themeClasses = ["red", "orange", "yellow", "blue", "purple", "pink"];
     themeClasses.forEach((cls) => {
       document.body.classList.remove(cls);

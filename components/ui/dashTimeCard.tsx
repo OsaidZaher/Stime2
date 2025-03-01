@@ -50,7 +50,7 @@ export default function DashTimeCard() {
   }, [data]);
 
   return (
-    <Card className="overflow-hidden gradient-bg2 shadow-md rounded-xl border border-color-100">
+    <Card className="overflow-hidden gradient-bg2 shadow-md rounded-xl border border-color-100 ">
       <div className="flex flex-col items-center justify-center p-6 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-color-300">
           <ClockIcon className="h-10 w-10 text-white" strokeWidth={2} />

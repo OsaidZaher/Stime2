@@ -111,7 +111,7 @@ export default function GradeCard() {
   };
 
   return (
-    <Card className="w-[550px] h-[350px] relative shadow-md rounded-xl overflow-hidden border border-color-100">
+    <Card className="max-w-xl h-[350px] relative shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader className="border-b">
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-semibold text-primary">

@@ -118,11 +118,14 @@ export function LogInCard() {
   };
 
   const getMotivationalMessage = () => {
-    if (loginCount === target) return "Weekly goal achieved! 🎉";
-    if (loginCount / target >= 0.8) return "Almost there! Keep it up! 💪";
+    if (loginCount === target)
+      return "You have achieved your weekly goal, well done!🎉";
+    if (loginCount / target >= 0.8)
+      return "You are almost there, keep it up! 💪";
     if (loginCount / target >= 0.5)
       return "Halfway through the week! You're doing great! 👍";
-    if (loginCount > 0) return "Great start to the week! Keep going! 🚀";
+    if (loginCount > 0)
+      return "Great you have started! Now let's reach your goal 🚀";
     return "Start your weekly goals!🌟";
   };
 

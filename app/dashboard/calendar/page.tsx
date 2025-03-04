@@ -89,7 +89,6 @@ export default function CardWithForm() {
       )}
     >
       <div className={cn("flex flex-col md:flex-row gap-6 w-full")}>
-        {/* Calendar Section */}
         <div className="w-full md:w-1/2 lg:w-2/5 space-y-6">
           <Calendar2 />
           <GradeCard />

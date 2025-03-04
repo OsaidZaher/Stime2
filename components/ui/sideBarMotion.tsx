@@ -13,7 +13,7 @@ export function SideBarMotion({ children }: { children: React.ReactNode }) {
       <div
         className={`${
           state === "collapsed" ? "ml-32" : "mr-24"
-        } w-full transition-all duration-300`}
+        } w-full transition-all duration-500`}
       >
         {children}
       </div>

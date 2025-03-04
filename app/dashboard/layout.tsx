@@ -6,7 +6,6 @@ import {
   SidebarProvider,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import SideBar from "@/components/sidebar";
 
 export default function DashboardLayout({
   children,
@@ -18,7 +17,7 @@ export default function DashboardLayout({
       <AppSidebar />
       <SidebarInset>
         <header className="flex items-center justify-between p-4">
-          <SidebarTrigger />
+          <SidebarTrigger className="border border-500" />
           <div className="flex items-center space-x-4">
             <ModeToggle />
             <UserDrop />

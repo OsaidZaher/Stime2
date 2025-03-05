@@ -45,7 +45,6 @@ const GradeChanges = () => {
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-
     const newGrade = sortedGrades[0].grades[0];
     const oldGrade = sortedGrades[1].grades[0];
 
@@ -74,7 +73,7 @@ const GradeChanges = () => {
               isIncrease ? "text-green-500" : "text-red-500"
             }`}
           >
-            {isIncrease ? "+" : ""}
+            {isIncrease ? "+" : "-"}
             {percentageChange.toFixed(1)}%
           </span>
         </div>
@@ -84,7 +83,7 @@ const GradeChanges = () => {
     return (
       <div className="flex items-center space-x-2">
         <span className="text-lg font-semibold">{oldGrade}</span>
-        <ArrowRight className="h-5 w-5 text-blue-500" />
+        <ArrowRight className="h-5 w-5 " />
         <span className="text-lg font-semibold">{newGrade}</span>
       </div>
     );
@@ -112,7 +111,7 @@ const GradeChanges = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <Card className="w-[550px] h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
+    <Card className="max-w-xl h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader>
         <CardTitle className="text-xl font-bold flex justify-between items-center">
           Recent Grade Changes

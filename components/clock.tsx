@@ -171,14 +171,13 @@ export function TimeComponent({
 
   const handleSecondsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Only allow numeric input
     if (/^\d*$/.test(value)) {
       setInputSeconds(value);
     }
   };
 
   const handleMinutesBlur = () => {
-    let newMinutes = parseInt(inputMinutes, 10);
+    let newMinutes = Number.parseInt(inputMinutes, 10);
     if (isNaN(newMinutes)) newMinutes = 0;
     // You might want to set an upper limit here, e.g., 99
     newMinutes = Math.min(99, Math.max(0, newMinutes));
@@ -188,7 +187,7 @@ export function TimeComponent({
   };
 
   const handleSecondsBlur = () => {
-    let newSeconds = parseInt(inputSeconds, 10);
+    let newSeconds = Number.parseInt(inputSeconds, 10);
     if (isNaN(newSeconds)) newSeconds = 0;
     newSeconds = Math.min(59, Math.max(0, newSeconds));
     setTimerDuration(minutes, newSeconds);
@@ -210,7 +209,11 @@ export function TimeComponent({
 
   return (
     <div className="flex items-center justify-between w-full max-w-6xl mx-auto p-8">
-      <div className="flex items-center">
+      <div
+        className={`flex items-center ${
+          contextMode === "stopwatch" ? "mx-auto" : ""
+        }`}
+      >
         {/* Minutes */}
         <div className="flex items-center group">
           {contextMode === "timer" && (
@@ -325,7 +328,11 @@ export function TimeComponent({
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col space-y-6 ml-12 mt-20">
+      <div
+        className={`flex flex-col space-y-4  mt-20 ${
+          contextMode === "stopwatch" ? "" : ""
+        }`}
+      >
         <button
           onClick={(e) => {
             e.stopPropagation();

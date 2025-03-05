@@ -39,12 +39,27 @@ interface ChartConfigItem {
 const colors = [
   "hsl(var(--chart-1))",
   "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
+  "hsl(--chart-3))",
   "hsl(var(--chart-4))",
   "hsl(var(--chart-5))",
 ];
 
 const RADIAN = Math.PI / 180;
+
+// New function to format duration
+const formatDuration = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  const parts = [];
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (remainingSeconds > 0 || parts.length === 0)
+    parts.push(`${remainingSeconds}s`);
+
+  return parts.join(" ");
+};
 
 const StudyStatistics5 = () => {
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
@@ -105,34 +120,6 @@ const StudyStatistics5 = () => {
     setChartData(processedData);
   };
 
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    subject,
-  }: any) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="bold"
-      >
-        {capitalizeWord(`${subject}`)}
-      </text>
-    );
-  };
-
   const renderActiveShape = (props: any) => {
     const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
       props;
@@ -167,8 +154,9 @@ const StudyStatistics5 = () => {
       return (
         <>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl font-semibold text-center">
-              Study Pie
+            <CardTitle className="text-xl font-semibold text-center flex flex-col">
+              Your Most Studied Subjects
+              <span className="text-slate-400 text-sm">Past 7 Days</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-4">
@@ -181,7 +169,17 @@ const StudyStatistics5 = () => {
                   <PieChart>
                     <ChartTooltip
                       cursor={false}
-                      content={<ChartTooltipContent />}
+                      content={
+                        <ChartTooltipContent
+                          formatter={(value, name) =>
+                            `${
+                              typeof name === "string"
+                                ? capitalizeWord(name)
+                                : name
+                            }: ${formatDuration(Number(value))}`
+                          }
+                        />
+                      }
                     />
                     <Pie
                       data={chartData}
@@ -191,7 +189,6 @@ const StudyStatistics5 = () => {
                       cy="50%"
                       outerRadius={100}
                       labelLine={false}
-                      label={renderCustomizedLabel}
                       activeShape={renderActiveShape}
                       activeIndex={0}
                     >

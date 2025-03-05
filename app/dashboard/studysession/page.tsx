@@ -244,7 +244,7 @@ function SheetDemo({
                 {/* This button is now the SheetTrigger */}
                 <SheetTrigger asChild>
                   <Button
-                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-color-200 outline-color-500 font-semibold text-2xl shadow-md rounded-lg"
+                    className="bg-white h-24 w-64 dark:bg-black text-black dark:text-white border-color-200 outline-color-500 font-semibold text-2xl shadow-md rounded-lg ml-6"
                     variant="outline"
                     onClick={handleOpenSheet}
                   >
@@ -255,7 +255,7 @@ function SheetDemo({
                 {/* Save Session Button */}
                 <div className="flex flex-col">
                   <Button
-                    className="bg-white border-color-200 h-24 w-64 dark:bg-black text-black dark:text-white font-semibold text-2xl shadow-md rounded-lg"
+                    className="bg-white border-color-200 h-24 w-64 dark:bg-black text-black dark:text-white font-semibold text-2xl shadow-md rounded-lg "
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();

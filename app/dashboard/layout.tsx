@@ -14,10 +14,10 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider className="w-full">
-      <AppSidebar />
+      <AppSidebar className="  border border-color-100" />
       <SidebarInset>
         <header className="flex items-center justify-between p-4">
-          <SidebarTrigger className="border border-500" />
+          <SidebarTrigger className="text-500" />
           <div className="flex items-center space-x-4">
             <ModeToggle />
             <UserDrop />

@@ -49,6 +49,7 @@
     "@radix-ui/react-tooltip": "^1.1.7",
     "@tabler/icons-react": "^3.26.0",
     "@tanstack/react-table": "^8.20.5",
+    "@vercel/analytics": "^1.5.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",

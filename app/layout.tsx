@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import ClientSessionProvider from "@/components/client-session-provider";
 import { ColorThemeProvider } from "@/components/ui/colorPicker";
 import { TimeProvider } from "./contexts/TimerContext";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"] });
 

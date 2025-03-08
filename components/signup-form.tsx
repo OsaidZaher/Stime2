@@ -6,7 +6,6 @@ import React, { FormEvent, useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
-import { IconBrandGoogle, IconBrandFacebook } from "@tabler/icons-react";
 import { signIn } from "next-auth/react";
 
 export default function SignupPopup({

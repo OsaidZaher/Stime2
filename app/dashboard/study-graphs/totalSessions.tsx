@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CalendarDays, Clock, Calendar, RotateCcw } from "lucide-react";
 import {
   Card,
@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import useSWR from "swr";
 
 interface StudySessionsStatsProps {
   weekSessions: number;
@@ -19,46 +20,33 @@ interface StudySessionsStatsProps {
   monthAverage: string;
   yearAverage: string;
 }
+import { Skeleton } from "@/components/ui/skeleton";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function StudySessionsStats() {
   const [showAverage, setShowAverage] = useState(false);
-  const [stats, setStats] = useState<StudySessionsStatsProps | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch("/api/functionality/stats");
-        if (!response.ok) {
-          throw new Error("Failed to fetch stats");
-        }
-        const data = await response.json();
-        setStats(data);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  // Use SWR hook for fetching data
+  const {
+    data: stats,
+    error,
+    isLoading,
+  } = useSWR<StudySessionsStatsProps>("/api/functionality/stats", fetcher);
 
   const toggleView = () => {
     setShowAverage(!showAverage);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Card className="w-full max-w-lg h-[250px] mx-auto shadow-md rounded-xl overflow-hidden border border-color-100">
-        <CardContent className="flex items-center justify-center h-full">
-          <p>Loading statistics...</p>
-        </CardContent>
-      </Card>
+      <>
+        <StudySessionsSkeleton />
+      </>
     );
   }
 
-  if (!stats) {
+  if (error || !stats) {
     return (
       <Card className="w-full max-w-lg h-[250px] mx-auto">
         <CardContent className="flex items-center justify-center h-full">
@@ -123,6 +111,32 @@ export function StudySessionsStats() {
               </p>
             </div>
           </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+function StudySessionsSkeleton() {
+  return (
+    <Card className="w-full max-w-lg mx-auto shadow-md rounded-xl overflow-hidden border">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-[200px]" />
+          <Skeleton className="h-4 w-[250px]" />
+        </div>
+        <Skeleton className="h-9 w-[100px]" />
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center space-x-4 p-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-8 w-16" />
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

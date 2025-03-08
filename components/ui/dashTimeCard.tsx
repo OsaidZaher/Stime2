@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ClockIcon } from "lucide-react";
 import type { StudySession } from "@prisma/client";
 import { useEffect, useState } from "react";
@@ -52,17 +53,29 @@ export default function DashTimeCard() {
   return (
     <Card className="overflow-hidden gradient-bg2 shadow-md rounded-xl border border-color-100 ">
       <div className="flex flex-col items-center justify-center p-6 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-color-300">
-          <ClockIcon className="h-10 w-10 text-white" strokeWidth={2} />
-        </div>
-        <div className="flex flex-col items-center sm:items-start">
-          <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            Hours Studied Today
-          </span>
-          <span className="text-4xl font-bold text-600 dark:text-white">
-            {isLoading ? "..." : displayText}
-          </span>
-        </div>
+        {isLoading ? (
+          <>
+            <Skeleton className="h-20 w-20 rounded-full" />
+            <div className="flex flex-col items-center sm:items-start space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-color-300">
+              <ClockIcon className="h-10 w-10 text-white" strokeWidth={2} />
+            </div>
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                Hours Studied Today
+              </span>
+              <span className="text-4xl font-bold text-600 dark:text-white">
+                {displayText}
+              </span>
+            </div>
+          </>
+        )}
       </div>
     </Card>
   );

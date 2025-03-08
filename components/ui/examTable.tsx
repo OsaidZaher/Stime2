@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const EXAM_PER_CARD = 4;
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -98,12 +99,13 @@ export function ExamTable() {
   };
 
   if (error) return <div>Error loading exams.</div>;
-  if (!exams) return null;
 
-  const totalPages = Math.ceil(exams.length / EXAM_PER_CARD);
-  const sortedExams = [...exams].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const totalPages = exams ? Math.ceil(exams.length / EXAM_PER_CARD) : 1;
+  const sortedExams = exams
+    ? [...exams].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      )
+    : [];
   const currentExams = sortedExams.slice(
     currentPage * EXAM_PER_CARD,
     (currentPage + 1) * EXAM_PER_CARD
@@ -133,30 +135,60 @@ export function ExamTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentExams.map((exam) => (
-              <TableRow key={exam.id}>
-                <TableCell>{exam.name}</TableCell>
-                <TableCell>
-                  {new Date(exam.date).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{countdowns[exam.id]}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => handleDeleteExam(exam.id)}
-                  >
-                    <X size={12} className="text-red-600" />
-                  </Button>
+            {isLoading ? (
+              // Skeleton loading state with shadcn Skeleton component
+              [...Array(EXAM_PER_CARD)].map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24 rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20 rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32 rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : exams && exams.length > 0 ? (
+              <>
+                {currentExams.map((exam) => (
+                  <TableRow key={exam.id}>
+                    <TableCell>{exam.name}</TableCell>
+                    <TableCell>
+                      {new Date(exam.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{countdowns[exam.id]}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleDeleteExam(exam.id)}
+                      >
+                        <X size={12} className="text-red-600" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {[...Array(EXAM_PER_CARD - currentExams.length)].map(
+                  (_, index) => (
+                    <TableRow key={`empty-${index}`} className="h-12">
+                      <TableCell colSpan={4}>&nbsp;</TableCell>
+                    </TableRow>
+                  )
+                )}
+              </>
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-4">
+                  No exams found
                 </TableCell>
               </TableRow>
-            ))}
-            {[...Array(EXAM_PER_CARD - currentExams.length)].map((_, index) => (
-              <TableRow key={`empty-${index}`} className="h-12">
-                <TableCell colSpan={4}>&nbsp;</TableCell>
-              </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>
@@ -164,7 +196,7 @@ export function ExamTable() {
         <Button
           variant="outline"
           size="icon"
-          disabled={currentPage === 0}
+          disabled={!exams || currentPage === 0}
           onClick={() => handleNavigation("left")}
         >
           <ChevronLeft size={16} className="text-blue-700 font-extrabold" />
@@ -175,7 +207,7 @@ export function ExamTable() {
         <Button
           variant="outline"
           size="icon"
-          disabled={currentPage >= totalPages - 1}
+          disabled={!exams || currentPage >= totalPages - 1}
           onClick={() => handleNavigation("right")}
         >
           <ChevronRight size={16} className="text-blue-700 font-extrabold" />

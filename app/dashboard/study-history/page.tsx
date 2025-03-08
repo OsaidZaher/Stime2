@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+import { useState, useMemo } from "react";
 import { StudySession, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import useSWR from "swr";
 
 import {
   Select,
@@ -14,24 +17,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-async function getStudySessions(): Promise<StudySession[]> {
-  const response = await fetch("/api/functionality/studySession");
-  if (!response.ok) {
-    throw new Error("Failed to fetch study sessions");
-  }
-
-  const data = await response.json();
-
-  const formattedData = data.map((session: any) => ({
-    id: session.id,
-    subjectName: session.subject.name,
-    topic: session.topic,
-    duration: calculateDuration(session.duration),
-    startTime: session.startTime,
-  }));
-
-  return formattedData;
-}
+const fetcher = (url: string) =>
+  fetch(url)
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch study sessions");
+      return res.json();
+    })
+    .then((data) =>
+      data.map((session: any) => ({
+        id: session.id,
+        subjectName: session.subject.name,
+        topic: session.topic,
+        duration: calculateDuration(session.duration),
+        startTime: session.startTime,
+      }))
+    );
 
 function calculateDuration(durationInSeconds: number): string {
   const hours = Math.floor(durationInSeconds / 3600);
@@ -52,30 +52,19 @@ function calculateDuration(durationInSeconds: number): string {
 }
 
 export default function StudySessionsPage() {
-  const [data, setData] = useState<StudySession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [timeFilter, setTimeFilter] = useState<string>("all");
 
-  async function refreshData() {
-    setIsLoading(true);
-    try {
-      const freshData = await getStudySessions();
-      setData(freshData);
-    } catch (error) {
-      console.error("Error fetching study sessions:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    refreshData();
-  }, []);
+  // Use SWR for data fetching
+  const { data, error, isLoading, mutate } = useSWR<StudySession[]>(
+    "/api/functionality/studySession",
+    fetcher
+  );
 
   // Memoized filtered data
-
   const filteredData = useMemo(() => {
+    if (!data) return [];
+
     return data.filter((session) => {
       // Search filter
       const matchesSearch =
@@ -110,22 +99,51 @@ export default function StudySessionsPage() {
     });
   }, [data, searchTerm, timeFilter]);
 
+  // Function to manually refresh data if needed
+  const refreshData = () => {
+    mutate();
+  };
+
   return (
     <div className="container mx-auto py-10 font-semibold">
-      {isLoading ? (
-        <p>Loading study sessions...</p>
-      ) : (
-        <div className="text-600 space-y-4">
-          <div className="grid grid-cols-2 gap-[975px]">
-            <FindBy searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-            <TimeSelect
-              timeFilter={timeFilter}
-              onTimeFilterChange={setTimeFilter}
-            />
-          </div>
-          <DataTable columns={columns} data={filteredData} />
+      <div className="text-600 space-y-4">
+        <div className="grid grid-cols-2 gap-[975px]">
+          <FindBy searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+          <TimeSelect
+            timeFilter={timeFilter}
+            onTimeFilterChange={setTimeFilter}
+          />
         </div>
-      )}
+
+        {isLoading ? (
+          <div className="space-y-3">
+            <div className="flex items-center space-x-4 p-4">
+              <Skeleton className="h-6 w-36" />
+              <Skeleton className="h-6 w-36" />
+              <Skeleton className="h-6 w-36" />
+              <Skeleton className="h-6 w-36" />
+            </div>
+
+            {Array(5)
+              .fill(0)
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center space-x-4 p-4 border-t"
+                >
+                  <Skeleton className="h-5 w-36" />
+                  <Skeleton className="h-5 w-36" />
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-5 w-36" />
+                </div>
+              ))}
+          </div>
+        ) : error ? (
+          <p>Error loading study sessions. Please try again.</p>
+        ) : (
+          <DataTable columns={columns} data={filteredData} />
+        )}
+      </div>
     </div>
   );
 }

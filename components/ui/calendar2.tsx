@@ -9,6 +9,7 @@ import type { Exam } from "@prisma/client";
 import useSWR from "swr";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -19,10 +20,11 @@ export function Calendar2({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  const { data: exams, error } = useSWR<Exam[]>(
-    "/api/functionality/calendar",
-    fetcher
-  );
+  const {
+    data: exams,
+    error,
+    isLoading,
+  } = useSWR<Exam[]>("/api/functionality/calendar", fetcher);
 
   if (error) {
     console.error("Error fetching exams:", error);
@@ -30,8 +32,45 @@ export function Calendar2({
 
   const examDays = exams ? exams.map((exam) => new Date(exam.date)) : [];
 
+  if (isLoading) {
+    return (
+      <Card className="max-w-xl h-[372.5px] shadow-md rounded-xl overflow-hidden border border-color-100">
+        <div className="w-full h-full p-6">
+          {/* Calendar header skeleton */}
+          <div className="flex justify-center pt-1 relative items-center h-10 mb-4">
+            <Skeleton className="h-7 w-7 absolute left-1 rounded-md" />
+            <Skeleton className="h-8 w-32 rounded-md" /> {/* Month name */}
+            <Skeleton className="h-7 w-7 absolute right-1 rounded-md" />
+          </div>
+
+          {/* Weekday headers skeleton */}
+          <div className="flex justify-between mb-4">
+            {[...Array(7)].map((_, i) => (
+              <Skeleton key={`weekday-${i}`} className="h-6 w-6 rounded-md" />
+            ))}
+          </div>
+
+          {/* Calendar days skeleton - 6 rows for maximum month size */}
+          {[...Array(6)].map((_, rowIndex) => (
+            <div
+              key={`row-${rowIndex}`}
+              className="flex justify-between w-full my-2"
+            >
+              {[...Array(7)].map((_, colIndex) => (
+                <Skeleton
+                  key={`day-${rowIndex}-${colIndex}`}
+                  className="h-8 w-8 rounded-full"
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
   return (
-    <Card className=" max-w-xl h-[372.5px] shadow-md rounded-xl overflow-hidden border border-color-100 ">
+    <Card className="max-w-xl h-[372.5px] shadow-md rounded-xl overflow-hidden border border-color-100">
       <DayPicker
         showOutsideDays={showOutsideDays}
         className={cn("w-full h-full p-6", className)}

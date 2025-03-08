@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react"; // Combine imports for useState and useEffect
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTimeContext } from "@/app/contexts/TimerContext";
 import {
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SidebarInset } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
 import {
   Sheet,
   SheetClose,
@@ -93,7 +94,7 @@ export default function StudySession() {
   };
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <StudySessionSkeleton />;
   }
 
   if (status === "unauthenticated") {
@@ -105,14 +106,51 @@ export default function StudySession() {
       <div className="absolute top-4 right-4 z-50"></div>
       <div className=" ml-[750px] top-0 "></div>
       <main className="flex items-center justify-center min-h-screen bg-background">
-        <SheetDemo
-          subjects={subjects}
-          addSubject={addSubject}
-          showTimer={showTimer}
-          toggleView={toggleView}
-        />
+        {loading ? (
+          <StudySessionSkeleton />
+        ) : (
+          <SheetDemo
+            subjects={subjects}
+            addSubject={addSubject}
+            showTimer={showTimer}
+            toggleView={toggleView}
+          />
+        )}
       </main>
     </SidebarInset>
+  );
+}
+
+// Skeleton component for the loading state
+function StudySessionSkeleton() {
+  return (
+    <div className="relative inset-0 flex items-center justify-center z-50">
+      <div className="pointer-events-auto">
+        <div className="mt-[-175px] space-y-0 ml-10">
+          {/* Timer skeleton */}
+          <div className="flex flex-col items-center justify-center">
+            <Skeleton className="h-40 w-40 rounded-full mb-4" />
+            <Skeleton className="h-8 w-32 mb-2" />
+          </div>
+
+          <div className="flex ml-20 mt-4 space-x-20 items-start">
+            {/* Start Study button skeleton */}
+            <Skeleton className="h-24 w-64 rounded-lg ml-6" />
+
+            {/* Save Session button skeleton */}
+            <div className="flex flex-col">
+              <Skeleton className="h-24 w-64 rounded-lg" />
+            </div>
+
+            {/* Alarm and toggle button skeletons */}
+            <div className="flex flex-col space-y-4">
+              <Skeleton className="h-10 w-40 rounded-lg" />
+              <Skeleton className="h-10 w-40 rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -206,7 +244,7 @@ function SheetDemo({
     resetTimer();
   };
 
-  const { playAlarm, stopAlarm, isLoaded } = useAlarm(selectedAlarm, () =>
+  const { playAlarm, stopAlarm } = useAlarm(selectedAlarm, () =>
     setShowAlarmPopup(false)
   );
 
@@ -323,6 +361,7 @@ function SheetDemo({
     </>
   );
 }
+
 interface DialogDemoProps {
   addSubject: (newSubject: string) => void;
 }
@@ -406,6 +445,7 @@ function DialogDemo({ addSubject }: DialogDemoProps) {
     </Dialog>
   );
 }
+
 interface SelectDemoProps {
   subjects: Subject[];
   onSubjectSelect: (subjectId: number) => void;

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import {
   Pencil,
@@ -291,8 +292,26 @@ export default function SubjectGoalsCard() {
 
       <CardContent className="space-y-6 pt-6 flex-grow overflow-y-auto">
         {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="space-y-6">
+            {[...Array(5)].map((_, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-2 w-2 rounded-full" />
+                    <Skeleton className="h-5 w-32" />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                  </div>
+                </div>
+                <Skeleton className="h-2 w-full" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-4 w-10" />
+                  <Skeleton className="h-4 w-10" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : error ? (
           <p className="text-center text-red-500">

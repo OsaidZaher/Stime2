@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="h-24 text-center text-blue-600 dark:text-blue-300"
+                className="h-24 text-center text-color-600 "
               >
                 No results.
               </TableCell>

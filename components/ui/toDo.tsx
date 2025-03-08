@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ToDo {
   id: string;
@@ -195,12 +196,16 @@ export default function TodoListCard() {
   if (error) return <div>Failed to load tasks</div>;
 
   return (
-    <Card className="w-full max-w-xl   shadow-md rounded-xl overflow-hidden border border-color-100  ">
+    <Card className="w-full max-w-xl shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader className="p-6 gradient-bg text-white">
         <CardTitle className="text-2xl font-bold">My Tasks</CardTitle>
-        <p className="text-sm mt-2 text-blue-100">
-          {completedTasksCount} of {tasks.length} tasks completed
-        </p>
+        {isLoading ? (
+          <Skeleton className="h-5 w-32 bg-blue-100/20" />
+        ) : (
+          <p className="text-sm mt-2 text-blue-100">
+            {completedTasksCount} of {tasks.length} tasks completed
+          </p>
+        )}
       </CardHeader>
       <CardContent className="p-6">
         <div className="space-y-4">
@@ -210,10 +215,12 @@ export default function TodoListCard() {
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
               className="flex-grow border-color-100 focus:ring-blue-500 focus:border-blue-500"
+              disabled={isLoading}
             />
             <Button
               type="submit"
-              className=" theme-background theme-hover text-slate-100"
+              className="theme-background theme-hover text-slate-100"
+              disabled={isLoading}
             >
               <Plus className="h-4 w-4 mr-2 theme-hover" />
               Add
@@ -221,7 +228,21 @@ export default function TodoListCard() {
           </form>
 
           {isLoading ? (
-            <div className="text-center py-4">Loading tasks...</div>
+            // Skeleton loading state
+            <div className="space-y-3 py-2">
+              {/* Display 5 skeleton task items */}
+              {[...Array(5)].map((_, index) => (
+                <div
+                  key={`skeleton-task-${index}`}
+                  className="flex items-center space-x-3 p-3 rounded-lg light-bg"
+                >
+                  <Skeleton className="h-5 w-5 rounded-md" />
+                  <Skeleton className="h-5 w-full rounded-md" />
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                </div>
+              ))}
+            </div>
           ) : (
             <AnimatePresence>
               {tasks.length === 0 ? (
@@ -241,7 +262,7 @@ export default function TodoListCard() {
                       onCheckedChange={() =>
                         handleToggleTask(task.id, task.isCompleted)
                       }
-                      className="h-5 w-5 rounded-md light-bg text-theme "
+                      className="h-5 w-5 rounded-md light-bg text-theme"
                     />
                     {editingTaskId === task.id ? (
                       <Input
@@ -270,7 +291,7 @@ export default function TodoListCard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleStartEdit(task)}
-                      className="theme-text theme-hover "
+                      className="theme-text theme-hover"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -278,9 +299,9 @@ export default function TodoListCard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteTask(task.id)}
-                      className="theme-text  theme-hover"
+                      className="theme-text theme-hover"
                     >
-                      <Trash2 className="h-4 w-4 " />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </motion.div>
                 ))

@@ -1,10 +1,15 @@
+"use client";
+
+import type React from "react";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { X, ArrowLeft, ArrowRight } from "lucide-react";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   Dialog,
@@ -128,7 +133,19 @@ export default function GradeCard() {
         style={{ maxHeight: "calc(100% - 130px)" }}
       >
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="space-y-4">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <Skeleton className="h-5 w-24" />
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-7 w-12 rounded-full" />
+                    <Skeleton className="h-7 w-16 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : !grades.length ? (
           <p>No grades have been added.</p>
         ) : (

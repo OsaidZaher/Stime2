@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { Subject, UserGrade } from "@prisma/client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MAX_PER_CARD = 5;
 
@@ -73,7 +74,7 @@ const GradeChanges = () => {
               isIncrease ? "text-green-500" : "text-red-500"
             }`}
           >
-            {isIncrease ? "+" : "-"}
+            {isIncrease ? "+" : ""}
             {percentageChange.toFixed(1)}%
           </span>
         </div>
@@ -83,7 +84,7 @@ const GradeChanges = () => {
     return (
       <div className="flex items-center space-x-2">
         <span className="text-lg font-semibold">{oldGrade}</span>
-        <ArrowRight className="h-5 w-5 " />
+        <ArrowRight className="h-5 w-5 text-500" />
         <span className="text-lg font-semibold">{newGrade}</span>
       </div>
     );
@@ -107,7 +108,47 @@ const GradeChanges = () => {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  // Skeleton component for the grade changes
+  const GradeChangesSkeleton = () => (
+    <Card className="max-w-xl h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-40" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {Array(MAX_PER_CARD)
+            .fill(0)
+            .map((_, index) => (
+              <React.Fragment key={index}>
+                <div className="flex justify-between items-center py-2">
+                  <Skeleton className="h-5 w-24" />
+                  <div className="flex items-center space-x-2">
+                    <Skeleton className="h-6 w-16" />
+                    <Skeleton className="h-5 w-5 rounded-full" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                </div>
+                {index < MAX_PER_CARD - 1 && (
+                  <hr className="border-t border-gray-200" />
+                )}
+              </React.Fragment>
+            ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  if (isLoading) {
+    return <GradeChangesSkeleton />;
+  }
+
   if (error) return <div>Error: {error.message}</div>;
 
   return (
@@ -116,7 +157,7 @@ const GradeChanges = () => {
         <CardTitle className="text-xl font-bold flex justify-between items-center">
           Recent Grade Changes
           {validSubjects.length > MAX_PER_CARD && (
-            <div className="flex  text-500 items-center space-x-2">
+            <div className="flex text-500 items-center space-x-2">
               <Button
                 variant="ghost"
                 size="icon"

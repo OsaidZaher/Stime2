@@ -140,7 +140,7 @@ export function LogInCard() {
   };
 
   return (
-    <Card className="max-w-md min-w-max h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
+    <Card className="max-w-md  shadow-md rounded-xl overflow-hidden border border-color-100">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold">Weekly Streak</CardTitle>
         {!isLoading && (
@@ -154,7 +154,7 @@ export function LogInCard() {
                 <Pen className="h-4 w-4 theme-dark font-extrabold" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[350px]">
+            <DialogContent className="">
               <DialogHeader>
                 <DialogTitle>What is your weekly login goal?</DialogTitle>
               </DialogHeader>

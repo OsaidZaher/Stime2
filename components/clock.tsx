@@ -33,6 +33,7 @@ export function TimeComponent({
     resetTimer,
     setTimerMode,
     setTimerDuration,
+    hasTimerEnded,
   } = useTimeContext();
 
   // Local state for editing
@@ -63,37 +64,25 @@ export function TimeComponent({
   const timerEndTriggered = useRef(false);
 
   useEffect(() => {
+    // Check for timer end based on the hasTimerEnded flag from context
     if (
       contextMode === "timer" &&
-      minutes === 0 &&
-      seconds === 0 &&
-      isRunning &&
-      !isPaused &&
+      hasTimerEnded &&
       !timerEndTriggered.current
     ) {
       // Set the ref to true to prevent multiple triggers
       timerEndTriggered.current = true;
 
-      // Stop the timer immediately
-      pauseTimer();
-
       // Then call the onTimeEnd callback
       if (onTimeEnd) onTimeEnd();
     }
 
-    // Reset the trigger ref when the timer is reset or started again
-    if ((minutes > 0 || seconds > 0) && timerEndTriggered.current) {
+    // Reset the trigger ref when the timer is reset
+    if (!hasTimerEnded && timerEndTriggered.current) {
       timerEndTriggered.current = false;
     }
-  }, [
-    minutes,
-    seconds,
-    isRunning,
-    isPaused,
-    contextMode,
-    onTimeEnd,
-    pauseTimer,
-  ]);
+  }, [hasTimerEnded, contextMode, onTimeEnd]);
+
   useEffect(() => {
     setInputMinutes(String(minutes).padStart(2, "0"));
     setInputSeconds(String(seconds).padStart(2, "0"));

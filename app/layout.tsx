@@ -7,7 +7,15 @@ import { Toaster } from "sonner";
 import ClientSessionProvider from "@/components/client-session-provider";
 import { ColorThemeProvider } from "@/components/ui/colorPicker";
 import { TimeProvider } from "./contexts/TimerContext";
-import { Analytics } from "@vercel/analytics/react";
+import { ClerkMiddlewareAuthObject } from "@clerk/nextjs/server";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -70,25 +78,27 @@ export default function RootLayout({
         className={`${inter.className} min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        <ClientSessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            storageKey="theme-preference"
-          >
-            <ColorThemeProvider>
-              <TimeProvider>
-                <main className="flex-grow">{children}</main>
-                <footer className="mt-auto">
-                  <Footer />
-                </footer>
-                <Toaster />
-              </TimeProvider>
-            </ColorThemeProvider>
-          </ThemeProvider>
-        </ClientSessionProvider>
+        <ClerkProvider>
+          <ClientSessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              storageKey="theme-preference"
+            >
+              <ColorThemeProvider>
+                <TimeProvider>
+                  <main className="flex-grow">{children}</main>
+                  <footer className="mt-auto">
+                    <Footer />
+                  </footer>
+                  <Toaster />
+                </TimeProvider>
+              </ColorThemeProvider>
+            </ThemeProvider>
+          </ClientSessionProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

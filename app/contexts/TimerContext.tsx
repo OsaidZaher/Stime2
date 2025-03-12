@@ -6,11 +6,11 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useRef,
 } from "react";
 
 // Define the type for our context state
 interface TimeContextType {
-  // Timer/Stopwatch state
   minutes: number;
   seconds: number;
   isRunning: boolean;
@@ -18,10 +18,11 @@ interface TimeContextType {
   mode: "timer" | "stopwatch";
   startDateTime: Date | null;
   selectedAlarm: string;
-  elapsedSeconds: number;
+  elapsedSeconds: number; // accumulated elapsed seconds from previous runs
   selectedSubject: number | null;
   topic: string;
   startTime: Date | null;
+  hasTimerEnded: boolean; // Add this new state
 
   startTimer: () => void;
   pauseTimer: () => void;
@@ -33,33 +34,34 @@ interface TimeContextType {
   setSelectedSubject: (subject: number | null) => void;
   setTopic: (topic: string) => void;
   setStartTime: (time: Date | null) => void;
+  resetTimerEnded: () => void; // Add this new function
 }
 
-// Type for the persistent state in localStorage
+// Persistent state interface for localStorage
 interface PersistentTimerState {
   minutes: number;
   seconds: number;
   isRunning: boolean;
   isPaused: boolean;
   mode: "timer" | "stopwatch";
-  startDateTime: string | null; // Store as ISO string
+  startDateTime: string | null;
   selectedAlarm: string;
-  initialMinutes: number; // Store initial values for timer reset
+  initialMinutes: number;
   initialSeconds: number;
-  lastUpdated: number; // Timestamp to track time between navigations
-  // Add form fields to persistent state
+  lastUpdated: number;
   selectedSubject: number | null;
   topic: string;
-  startTime: string | null; // Store as ISO string
+  startTime: string | null;
+  elapsedSeconds: number;
+  hasTimerEnded: boolean; // Add this to persistent state
 }
 
-// Create the context with a default undefined value
+// Create the context
 const TimeContext = createContext<TimeContextType | undefined>(undefined);
 
 // Local storage key
 const TIMER_STATE_KEY = "stime_timer_state";
 
-// Custom hook to use the time context
 export function useTimeContext() {
   const context = useContext(TimeContext);
   if (context === undefined) {
@@ -68,10 +70,8 @@ export function useTimeContext() {
   return context;
 }
 
-// Helper to load state from localStorage
 const loadStateFromStorage = (): PersistentTimerState | null => {
   if (typeof window === "undefined") return null;
-
   try {
     const savedState = localStorage.getItem(TIMER_STATE_KEY);
     if (savedState) {
@@ -83,10 +83,8 @@ const loadStateFromStorage = (): PersistentTimerState | null => {
   return null;
 };
 
-// Helper to save state to localStorage
 const saveStateToStorage = (state: PersistentTimerState) => {
   if (typeof window === "undefined") return;
-
   try {
     localStorage.setItem(
       TIMER_STATE_KEY,
@@ -113,23 +111,22 @@ export function TimeProvider({ children }: TimeProviderProps) {
   const [mode, setMode] = useState<"timer" | "stopwatch">("timer");
   const [startDateTime, setStartDateTime] = useState<Date | null>(null);
   const [selectedAlarm, setSelectedAlarm] = useState("iphone_alarm.mp3");
-  const [initialMinutes, setInitialMinutes] = useState(25); // For reset
-  const [initialSeconds, setInitialSeconds] = useState(0); // For reset
-  const [elapsedSeconds, setElapsedSeconds] = useState(0); // For time tracking
+  const [initialMinutes, setInitialMinutes] = useState(25);
+  const [initialSeconds, setInitialSeconds] = useState(0);
+  // accumulated elapsed seconds from previous runs (for pause/resume)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
   const [topic, setTopic] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [hasTimerEnded, setHasTimerEnded] = useState(false); // Add this new state
 
-  // Load saved state from localStorage on component mount
+  // Load state from localStorage on mount
   useEffect(() => {
     const savedState = loadStateFromStorage();
-
     if (savedState) {
-      // Calculate time elapsed since last update if timer was running
       const timeNow = Date.now();
       const timePassed = Math.floor((timeNow - savedState.lastUpdated) / 1000);
-
       setMode(savedState.mode);
       setSelectedAlarm(savedState.selectedAlarm);
       setInitialMinutes(savedState.initialMinutes);
@@ -139,52 +136,44 @@ export function TimeProvider({ children }: TimeProviderProps) {
       );
       setIsRunning(savedState.isRunning);
       setIsPaused(savedState.isPaused);
-
-      // Load form data from localStorage
       setSelectedSubject(savedState.selectedSubject);
       setTopic(savedState.topic || "");
       setStartTime(
         savedState.startTime ? new Date(savedState.startTime) : null
       );
+      setElapsedSeconds(savedState.elapsedSeconds);
+      setHasTimerEnded(savedState.hasTimerEnded || false); // Load hasTimerEnded state
 
-      // Update timer based on elapsed time if it was running
+      // If the timer was running and not paused, adjust for elapsed time
       if (savedState.isRunning && !savedState.isPaused && timePassed > 0) {
         if (savedState.mode === "timer") {
-          // For timer mode, subtract elapsed time
           const totalSeconds = savedState.minutes * 60 + savedState.seconds;
           const remainingSeconds = Math.max(0, totalSeconds - timePassed);
-          const newMinutes = Math.floor(remainingSeconds / 60);
-          const newSeconds = remainingSeconds % 60;
-
-          setMinutes(newMinutes);
-          setSeconds(newSeconds);
-
-          // Check if timer would have completed during navigation
+          setMinutes(Math.floor(remainingSeconds / 60));
+          setSeconds(remainingSeconds % 60);
           if (remainingSeconds === 0) {
             setIsRunning(false);
-            // You might want to trigger the alarm here
+            setHasTimerEnded(true); // Set timer ended state
           }
         } else {
-          // For stopwatch mode, add elapsed time
+          // For stopwatch, add the passed time
           const totalSeconds =
             savedState.minutes * 60 + savedState.seconds + timePassed;
           setMinutes(Math.floor(totalSeconds / 60));
           setSeconds(totalSeconds % 60);
+          setElapsedSeconds(savedState.elapsedSeconds + timePassed);
         }
       } else {
-        // Just restore the saved state without adjustments
         setMinutes(savedState.minutes);
         setSeconds(savedState.seconds);
       }
     }
-
     setIsInitialized(true);
   }, []);
 
-  // Save state to localStorage whenever it changes
+  // Save state changes to localStorage
   useEffect(() => {
     if (!isInitialized) return;
-
     const state: PersistentTimerState = {
       minutes,
       seconds,
@@ -196,12 +185,12 @@ export function TimeProvider({ children }: TimeProviderProps) {
       initialMinutes,
       initialSeconds,
       lastUpdated: Date.now(),
-      // Save form data to localStorage
       selectedSubject,
       topic,
       startTime: startTime ? startTime.toISOString() : null,
+      elapsedSeconds,
+      hasTimerEnded,
     };
-
     saveStateToStorage(state);
   }, [
     minutes,
@@ -214,65 +203,97 @@ export function TimeProvider({ children }: TimeProviderProps) {
     initialMinutes,
     initialSeconds,
     isInitialized,
-    // Add dependencies for form fields
     selectedSubject,
     topic,
     startTime,
+    elapsedSeconds,
+    hasTimerEnded,
   ]);
 
-  // Timer/Stopwatch logic
+  // ---- Updated Timer/Stopwatch logic using requestAnimationFrame ----
+
+  // This effect uses requestAnimationFrame to update the displayed time.
+  // It calculates elapsed time as the sum of:
+  //   • any previously accumulated elapsed seconds (when paused)
+  //   • plus the time difference from the current run (if running)
+  // For timer mode, it subtracts from the initial duration.
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let animationFrameId: number;
+    const updateTime = () => {
+      // Use Date.now() as our reference clock
+      const now = Date.now();
+      // Calculate seconds elapsed in the current run
+      const currentRun = startDateTime
+        ? Math.floor((now - startDateTime.getTime()) / 1000)
+        : 0;
+      const totalElapsed = elapsedSeconds + currentRun;
+
+      if (mode === "timer") {
+        const totalInitialSeconds = initialMinutes * 60 + initialSeconds;
+        const remaining = totalInitialSeconds - totalElapsed;
+        if (remaining <= 0) {
+          setMinutes(0);
+          setSeconds(0);
+          setIsRunning(false);
+          setHasTimerEnded(true); // Set timer ended state
+          // Do not continue the loop
+          return;
+        }
+        setMinutes(Math.floor(remaining / 60));
+        setSeconds(remaining % 60);
+      } else {
+        // Stopwatch mode: simply count up
+        setMinutes(Math.floor(totalElapsed / 60));
+        setSeconds(totalElapsed % 60);
+      }
+      animationFrameId = requestAnimationFrame(updateTime);
+    };
 
     if (isRunning && !isPaused) {
-      interval = setInterval(() => {
-        if (mode === "timer") {
-          // Timer logic (countdown)
-          if (seconds > 0) {
-            setSeconds(seconds - 1);
-          } else if (minutes > 0) {
-            setMinutes(minutes - 1);
-            setSeconds(59);
-          } else {
-            setIsRunning(false);
-            setIsPaused(false);
-            // Timer completion is handled in the component with onTimeEnd
-          }
-        } else {
-          // Stopwatch logic (count up)
-          if (seconds < 59) {
-            setSeconds(seconds + 1);
-          } else {
-            setSeconds(0);
-            setMinutes(minutes + 1);
-          }
-        }
-
-        // Update elapsed seconds for tracking purposes
-        setElapsedSeconds((prev) => prev + 1);
-      }, 1000);
+      animationFrameId = requestAnimationFrame(updateTime);
     }
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [
+    isRunning,
+    isPaused,
+    mode,
+    startDateTime,
+    elapsedSeconds,
+    initialMinutes,
+    initialSeconds,
+  ]);
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRunning, isPaused, minutes, seconds, mode]);
+  // ---- Timer control functions adjustments ----
 
-  // Methods to control the timer
   const startTimer = () => {
     setIsRunning(true);
     setIsPaused(false);
+    setHasTimerEnded(false); // Reset timer ended state when starting
+    // When starting, record the current time as the run's start
     if (!startDateTime) {
       setStartDateTime(new Date());
+      // Reset accumulated elapsed time for a fresh start
+      setElapsedSeconds(0);
     }
   };
 
   const pauseTimer = () => {
+    if (startDateTime) {
+      // Calculate elapsed time from the current run and add it to the accumulated value
+      setElapsedSeconds(
+        (prev) =>
+          prev + Math.floor((Date.now() - startDateTime.getTime()) / 1000)
+      );
+    }
     setIsPaused(true);
+    // Clear startDateTime so that on resume we can re-anchor the current run
+    setStartDateTime(null);
   };
 
   const resumeTimer = () => {
     setIsPaused(false);
+    // Restart timing from now without resetting accumulated time
+    setStartDateTime(new Date());
   };
 
   const resetTimer = () => {
@@ -287,6 +308,11 @@ export function TimeProvider({ children }: TimeProviderProps) {
     setIsPaused(false);
     setStartDateTime(null);
     setElapsedSeconds(0);
+    setHasTimerEnded(false); // Reset timer ended state
+  };
+
+  const resetTimerEnded = () => {
+    setHasTimerEnded(false);
   };
 
   const setTimerMode = (newMode: "timer" | "stopwatch") => {
@@ -303,12 +329,12 @@ export function TimeProvider({ children }: TimeProviderProps) {
     setIsPaused(false);
     setStartDateTime(null);
     setElapsedSeconds(0);
+    setHasTimerEnded(false); // Reset timer ended state
   };
 
   const setTimerDuration = (newMinutes: number, newSeconds: number) => {
     setMinutes(newMinutes);
     setSeconds(newSeconds);
-    // Also update initial values for reset functionality
     setInitialMinutes(newMinutes);
     setInitialSeconds(newSeconds);
   };
@@ -322,10 +348,12 @@ export function TimeProvider({ children }: TimeProviderProps) {
     startDateTime,
     selectedAlarm,
     elapsedSeconds,
+    hasTimerEnded, // Expose the new state
     startTimer,
     pauseTimer,
     resumeTimer,
     resetTimer,
+    resetTimerEnded, // Expose the new function
     setTimerMode,
     setTimerDuration,
     setSelectedAlarm,

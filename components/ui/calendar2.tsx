@@ -32,6 +32,7 @@ export function Calendar2({
 
   const examDays = exams ? exams.map((exam) => new Date(exam.date)) : [];
 
+  // Use conditional rendering to handle different states
   if (isLoading) {
     return (
       <Card className="max-w-xl h-[372.5px] shadow-md rounded-xl overflow-hidden border border-color-100">
@@ -69,6 +70,7 @@ export function Calendar2({
     );
   }
 
+  // Only render this if not loading
   return (
     <Card className="max-w-xl h-[372.5px] shadow-md rounded-xl overflow-hidden border border-color-100">
       <DayPicker
@@ -131,7 +133,7 @@ export function Calendar2({
             "children"
           >) => (
             <ChevronLeftIcon
-              className={cn("h-6 w-6 text-blue-600 font-extrabold")}
+              className={cn("h-6 w-6 text-color-600 font-extrabold")}
               {...props}
             />
           ),
@@ -143,7 +145,7 @@ export function Calendar2({
             "children"
           >) => (
             <ChevronRightIcon
-              className={cn("h-6 w-6 text-blue-600 font-extrabold")}
+              className={cn("h-6 w-6 text-color-600 font-extrabold")}
               {...props}
             />
           ),

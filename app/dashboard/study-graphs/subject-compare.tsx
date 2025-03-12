@@ -194,7 +194,7 @@ const StudyStatistics5 = () => {
       // If it's dummy data, just show the section name
       if (dataPoint.isDummy) {
         return (
-          <div className="bg-white p-2 border border-gray-200 rounded shadow-sm">
+          <div className="bg-white p-1 sm:p-2 border border-gray-200 rounded shadow-sm text-xs sm:text-sm">
             {capitalizeWord(dataPoint.subject)}
           </div>
         );
@@ -202,7 +202,7 @@ const StudyStatistics5 = () => {
 
       // For real data, show name and time
       return (
-        <div className="bg-white p-2 border border-gray-200 rounded shadow-sm">
+        <div className="bg-white p-1 sm:p-2 border border-gray-200 rounded shadow-sm text-xs sm:text-sm">
           {capitalizeWord(dataPoint.subject)}: {formatDuration(dataPoint.time)}
         </div>
       );
@@ -213,7 +213,7 @@ const StudyStatistics5 = () => {
 
   // Shared title component for both views
   const titleComponent = (
-    <CardTitle className="text-xl font-semibold text-center flex flex-col">
+    <CardTitle className="text-base sm:text-xl font-semibold text-center flex flex-col">
       Your Most Studied Subjects
     </CardTitle>
   );
@@ -221,12 +221,12 @@ const StudyStatistics5 = () => {
   // Skeleton for visualization view
   const VisualizationSkeleton = () => (
     <>
-      <CardHeader className="pb-2">
-        <Skeleton className="h-8 w-64 mx-auto" />
+      <CardHeader className="pb-1 sm:pb-2">
+        <Skeleton className="h-6 sm:h-8 w-48 sm:w-64 mx-auto" />
       </CardHeader>
-      <CardContent className="pb-4">
-        <div className="mx-auto aspect-square h-[250px] flex items-center justify-center">
-          <div className="relative w-[200px] h-[200px] rounded-full overflow-hidden">
+      <CardContent className="pb-2 sm:pb-4">
+        <div className="mx-auto aspect-square h-[180px] sm:h-[250px] flex items-center justify-center">
+          <div className="relative w-[150px] sm:w-[200px] h-[150px] sm:h-[200px] rounded-full overflow-hidden">
             <Skeleton className="absolute inset-0 rounded-full" />
           </div>
         </div>
@@ -237,16 +237,19 @@ const StudyStatistics5 = () => {
   // Skeleton for leaderboard view
   const LeaderboardSkeleton = () => (
     <>
-      <CardHeader>
-        <Skeleton className="h-8 w-64 mx-auto mb-2" />
-        <Skeleton className="h-4 w-32 mx-auto" />
+      <CardHeader className="pb-1 sm:pb-2">
+        <Skeleton className="h-6 sm:h-8 w-48 sm:w-64 mx-auto mb-1 sm:mb-2" />
+        <Skeleton className="h-3 sm:h-4 w-24 sm:w-32 mx-auto" />
       </CardHeader>
       <CardContent>
-        <ul className="space-y-2">
+        <ul className="space-y-1 sm:space-y-2">
           {[1, 2, 3, 4, 5].map((index) => (
-            <li key={index} className="flex items-center space-x-2">
-              <Skeleton className="h-8 w-8" />
-              <Skeleton className="h-6 w-36" />
+            <li
+              key={index}
+              className="flex items-center space-x-1 sm:space-x-2"
+            >
+              <Skeleton className="h-6 sm:h-8 w-6 sm:w-8" />
+              <Skeleton className="h-4 sm:h-6 w-28 sm:w-36" />
             </li>
           ))}
         </ul>
@@ -266,10 +269,10 @@ const StudyStatistics5 = () => {
     if (showVisualization) {
       return (
         <>
-          <CardHeader className="pb-2">{titleComponent}</CardHeader>
-          <CardContent className="pb-4">
+          <CardHeader className="pb-1 sm:pb-2">{titleComponent}</CardHeader>
+          <CardContent className="pb-2 sm:pb-4">
             <ChartContainer
-              className="mx-auto aspect-square h-[250px]"
+              className="mx-auto aspect-square h-[180px] sm:h-[250px]"
               config={chartConfig}
             >
               <ResponsiveContainer>
@@ -295,18 +298,23 @@ const StudyStatistics5 = () => {
     } else {
       return (
         <>
-          <CardHeader>
+          <CardHeader className="pb-1 sm:pb-2">
             {titleComponent}
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-xs sm:text-sm">
               Past 7 days
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
+            <ul className="space-y-1 sm:space-y-2">
               {["🥇", "🥈", "🥉", "4.", "5."].map((rank, index) => (
-                <li key={rank} className="flex items-center space-x-2">
-                  <span className="text-2xl w-8 text-center">{rank}</span>
-                  <span className="text-lg">
+                <li
+                  key={rank}
+                  className="flex items-center space-x-1 sm:space-x-2"
+                >
+                  <span className="text-lg sm:text-2xl w-6 sm:w-8 text-center">
+                    {rank}
+                  </span>
+                  <span className="text-sm sm:text-lg">
                     {chartData[index] && !chartData[index].isDummy
                       ? capitalizeWord(chartData[index].subject)
                       : "No subject yet"}
@@ -321,15 +329,15 @@ const StudyStatistics5 = () => {
   };
 
   return (
-    <Card className="w-[550px] flex flex-col h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
+    <Card className="w-full sm:w-[550px] flex flex-col h-[350px] sm:h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
       {renderContent()}
-      <CardFooter className="mt-auto">
+      <CardFooter className="mt-auto p-2 sm:p-4">
         {isLoading ? (
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-8 sm:h-10 w-full" />
         ) : (
           <Button
             onClick={() => setShowVisualization(!showVisualization)}
-            className="w-full bg-color-500"
+            className="w-full bg-color-500 text-xs sm:text-sm py-2 sm:py-3"
           >
             {showVisualization ? "Show Leaderboard" : "Show Visualization"}
           </Button>

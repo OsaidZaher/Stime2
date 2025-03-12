@@ -140,9 +140,11 @@ export function LogInCard() {
   };
 
   return (
-    <Card className="max-w-md  shadow-md rounded-xl overflow-hidden border border-color-100">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-bold">Weekly Streak</CardTitle>
+    <Card className="w-full max-w-full sm:max-w-md shadow-md rounded-xl overflow-hidden border border-color-100">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+        <CardTitle className="text-xl sm:text-2xl font-bold">
+          Weekly Streak
+        </CardTitle>
         {!isLoading && (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -154,31 +156,36 @@ export function LogInCard() {
                 <Pen className="h-4 w-4 theme-dark font-extrabold" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="">
+            <DialogContent className="max-w-xs sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>What is your weekly login goal?</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-x-4 py-2 flex">
+              <form
+                onSubmit={handleSubmit}
+                className="space-x-2 sm:space-x-4 py-2 flex flex-col sm:flex-row items-center"
+              >
                 <Input
                   type="number"
                   value={target}
                   onChange={(e) => setTarget(Number(e.target.value))}
                   min="1"
                   max="7"
-                  className="w-20 border-2 border-gray-500 outline-none focus:border-4 focus:border-blue-500 rounded-md p-2 text-center"
+                  className="w-full sm:w-20 border-2 border-gray-500 outline-none focus:border-4 focus:border-blue-500 rounded-md p-2 text-center mb-2 sm:mb-0"
                 />
-                <Button type="submit">Save changes</Button>
+                <Button type="submit" className="w-full sm:w-auto">
+                  Save changes
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
         )}
         {isLoading && <Skeleton className="h-8 w-8 rounded-full" />}
       </CardHeader>
-      <CardContent className="flex flex-col items-center">
+      <CardContent className="flex flex-col items-center p-4 sm:p-6">
         {isLoading ? (
           <>
-            <div className="relative w-48 h-48 mb-4 flex items-center justify-center">
-              <Skeleton className="w-48 h-48 rounded-full" />
+            <div className="relative w-36 h-36 sm:w-48 sm:h-48 mb-4 flex items-center justify-center">
+              <Skeleton className="w-36 h-36 sm:w-48 sm:h-48 rounded-full" />
               <div className="absolute inset-0 flex items-center justify-center"></div>
             </div>
             <Skeleton className="h-5 w-32 mb-2" />
@@ -187,7 +194,7 @@ export function LogInCard() {
           </>
         ) : (
           <>
-            <div className="relative w-48 h-48 mb-4">
+            <div className="relative w-36 h-36 sm:w-48 sm:h-48 mb-4">
               <svg className="w-full h-full" viewBox="0 0 100 100">
                 <circle
                   className="text-gray-200 dark:text-gray-700"
@@ -212,19 +219,21 @@ export function LogInCard() {
                 />
               </svg>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                <div className="text-5xl font-bold">{loginCount}</div>
-                <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                <div className="text-4xl sm:text-5xl font-bold">
+                  {loginCount}
+                </div>
+                <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
                   days
                 </div>
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Target: {target} days
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
               {daysLeft} day{daysLeft !== 1 ? "s" : ""} left to reach your goal
             </p>
-            <p className="text-center text-sm font-medium text-gray-600 dark:text-gray-300">
+            <p className="text-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
               {getMotivationalMessage()}
             </p>
           </>

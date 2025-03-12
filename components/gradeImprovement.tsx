@@ -152,45 +152,49 @@ const GradeChanges = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <Card className="max-w-xl h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold flex justify-between items-center">
-          Recent Grade Changes
+    <Card className="w-full max-w-xl h-auto sm:h-[400px] shadow-md rounded-xl overflow-hidden border border-color-100">
+      <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+          <CardTitle className="text-lg sm:text-xl font-bold">
+            Recent Grade Changes
+          </CardTitle>
           {validSubjects.length > MAX_PER_CARD && (
-            <div className="flex text-500 items-center space-x-2">
+            <div className="flex text-500 items-center space-x-1 sm:space-x-2 self-end sm:self-auto">
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
+                className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 onClick={() => handleNavigation("left")}
                 disabled={currentPage === 0}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
-              <span className="text-sm text-gray-500">
-                Page {currentPage + 1} of {totalPages}
+              <span className="text-xs sm:text-sm text-gray-500">
+                {currentPage + 1}/{totalPages}
               </span>
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
+                className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 onClick={() => handleNavigation("right")}
                 disabled={currentPage >= totalPages - 1}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           )}
-        </CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
+      <CardContent className="px-3 sm:px-6 py-2 sm:py-4">
+        <div className="space-y-1 sm:space-y-2">
           {currentSubjects.length > 0 ? (
             currentSubjects.map((subject, index) => {
               const gradeChange = getLatestGrades(subject.userGrades);
 
               return (
                 <React.Fragment key={subject.id}>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-sm font-medium text-gray-600">
+                  <div className="flex justify-between items-center py-1 sm:py-2">
+                    <span className="text-xs sm:text-sm font-medium text-gray-600 truncate max-w-[60%]">
                       {capitalizeFirstLetter(subject.name)}
                     </span>
                     {renderGradeChange(
@@ -205,7 +209,7 @@ const GradeChanges = () => {
               );
             })
           ) : (
-            <div className="text-center text-gray-500">
+            <div className="text-center text-xs sm:text-sm text-gray-500 py-4">
               No grade changes found
             </div>
           )}

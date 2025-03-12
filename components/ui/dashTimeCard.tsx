@@ -51,26 +51,29 @@ export default function DashTimeCard() {
   }, [data]);
 
   return (
-    <Card className="overflow-hidden gradient-bg2 shadow-md rounded-xl border border-color-100 ">
-      <div className="flex flex-col items-center justify-center p-6 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
+    <Card className="w-full overflow-hidden gradient-bg2 shadow-md rounded-xl border border-color-100">
+      <div className="flex flex-col items-center justify-center p-4 space-y-4 sm:p-6 sm:flex-row sm:space-y-0 sm:space-x-6 md:p-8">
         {isLoading ? (
           <>
-            <Skeleton className="h-20 w-20 rounded-full" />
+            <Skeleton className="h-16 w-16 sm:h-20 sm:w-20 rounded-full" />
             <div className="flex flex-col items-center sm:items-start space-y-2">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-5 w-36 sm:h-6 sm:w-48" />
+              <Skeleton className="h-8 w-24 sm:h-10 sm:w-32" />
             </div>
           </>
         ) : (
           <>
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-color-300">
-              <ClockIcon className="h-10 w-10 text-white" strokeWidth={2} />
+            <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-color-300">
+              <ClockIcon
+                className="h-8 w-8 sm:h-10 sm:w-10 text-white"
+                strokeWidth={2}
+              />
             </div>
             <div className="flex flex-col items-center sm:items-start">
-              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              <span className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">
                 Hours Studied Today
               </span>
-              <span className="text-4xl font-bold text-600 dark:text-white">
+              <span className="text-3xl sm:text-4xl font-bold text-600 dark:text-white">
                 {displayText}
               </span>
             </div>

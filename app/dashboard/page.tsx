@@ -12,16 +12,18 @@ export default function Page() {
     <>
       <SidebarProvider>
         <SideBarMotion>
-          {/*<SidebarInset className=" p-10 ml-32 ">*/}
-          <div className="flex space-x-10 mt-10">
-            <div className="space-y-16">
-              <LogInCard />
-              <DashTimeCard />
+          <div className="p-4 sm:p-6 md:p-8 lg:p-10">
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-6">
+                <LogInCard />
+                <DashTimeCard />
+              </div>
+              <div className="flex flex-col md:flex-row gap-6 w-full">
+                <SubjectGoalsCard />
+                <TodoListCard />
+              </div>
             </div>
-            {<SubjectGoalsCard />}
-            <TodoListCard />
           </div>
-          {/*</SidebarInset>*/}
         </SideBarMotion>
       </SidebarProvider>
     </>

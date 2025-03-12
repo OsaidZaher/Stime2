@@ -173,13 +173,13 @@ export default function SubjectGoalsCard() {
   };
 
   return (
-    <Card className="w-full max-w-lg shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col ">
-      <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
-        <CardTitle className="text-2xl font-bold flex items-center gap-2">
-          <BookOpen className="w-6 h-6 theme-dark" />
+    <Card className="w-full max-w-full sm:max-w-lg shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col">
+      <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 pb-2 p-4 sm:p-6">
+        <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 theme-dark" />
           Subjects Progress
         </CardTitle>
-        <div className="flex gap-2">
+        <div className="flex gap-2 self-end sm:self-auto">
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogTrigger asChild>
               <Button
@@ -190,9 +190,9 @@ export default function SubjectGoalsCard() {
                 <Pencil className="h-4 w-4 icon-text font-extrabold" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="max-w-xs sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold">
+                <DialogTitle className="text-xl sm:text-2xl font-bold">
                   Edit Subject Goal
                 </DialogTitle>
                 <DialogDescription>
@@ -200,7 +200,7 @@ export default function SubjectGoalsCard() {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleEditSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="edit-subject">Subject</Label>
                     <Input
@@ -244,9 +244,9 @@ export default function SubjectGoalsCard() {
                 <Plus className="h-4 w-4 icon-text font-extrabold" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="max-w-xs sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold">
+                <DialogTitle className="text-xl sm:text-2xl font-bold">
                   Add New Subject Goal
                 </DialogTitle>
                 <DialogDescription>
@@ -254,7 +254,7 @@ export default function SubjectGoalsCard() {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="add-subject">Subject</Label>
                     <Input
@@ -290,25 +290,25 @@ export default function SubjectGoalsCard() {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 pt-6 flex-grow overflow-y-auto">
+      <CardContent className="space-y-6 pt-4 sm:pt-6 flex-grow overflow-y-auto p-4 sm:p-6">
         {isLoading ? (
           <div className="space-y-6">
-            {[...Array(5)].map((_, index) => (
+            {[...Array(4)].map((_, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-2 w-2 rounded-full" />
-                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-5 w-24 sm:w-32" />
                   </div>
                   <div className="flex items-center gap-1">
-                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-4 w-10 sm:w-12" />
                     <Skeleton className="h-6 w-6 rounded-full" />
                   </div>
                 </div>
                 <Skeleton className="h-2 w-full" />
                 <div className="flex justify-between">
-                  <Skeleton className="h-4 w-10" />
-                  <Skeleton className="h-4 w-10" />
+                  <Skeleton className="h-4 w-8 sm:w-10" />
+                  <Skeleton className="h-4 w-8 sm:w-10" />
                 </div>
               </div>
             ))}
@@ -335,13 +335,13 @@ export default function SubjectGoalsCard() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-color-700 " />
-                      <span className="font-medium">
+                      <span className="text-sm sm:text-base font-medium">
                         {goal.subject.name.charAt(0).toUpperCase() +
                           goal.subject.name.slice(1)}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-xs sm:text-sm text-muted-foreground">
                         {(
                           (goal.completion / (goal.target * 3600)) *
                           100
@@ -354,7 +354,7 @@ export default function SubjectGoalsCard() {
                         className="h-6 w-6 p-0"
                         onClick={() => handleDelete(goal.id)}
                       >
-                        <X className="h-4 w-4 text-slate-900 dark:*:text-slate-100 font-extrabold mt-[-10px]" />
+                        <X className="h-3 w-3 sm:h-4 sm:w-4 text-slate-900 dark:*:text-slate-100 font-extrabold mt-[-10px]" />
                       </Button>
                     </div>
                   </div>
@@ -375,17 +375,17 @@ export default function SubjectGoalsCard() {
         )}
       </CardContent>
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 p-4 border-t">
+        <div className="flex justify-center items-center gap-2 sm:gap-4 p-3 sm:p-4 border-t">
           <Button
             variant="outline"
             size="sm"
             onClick={() => handleNavigation("left")}
             disabled={currentPage === 0}
-            className="w-8 h-8 p-0"
+            className="w-7 h-7 sm:w-8 sm:h-8 p-0"
           >
             <ChevronLeft className="h-3 w-3 theme-dark" />
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-xs sm:text-sm text-muted-foreground">
             Page {currentPage + 1} of {totalPages}
           </span>
           <Button
@@ -393,7 +393,7 @@ export default function SubjectGoalsCard() {
             size="sm"
             onClick={() => handleNavigation("right")}
             disabled={currentPage === totalPages - 1}
-            className="w-8 h-8 p-0"
+            className="w-7 h-7 sm:w-8 sm:h-8 p-0"
           >
             <ChevronRight className="h-3 w-3 theme-dark" />
           </Button>

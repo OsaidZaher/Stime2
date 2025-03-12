@@ -84,103 +84,133 @@ export default function CardWithForm() {
   };
 
   return (
-    <div
-      className={cn(
-        "container w-full px-4 py-6 transition-all duration-500 ease-in-out mt-[-10]",
-        isCollapsed ? "ml-96" : "ml-52"
-      )}
-    >
-      <div className={cn("flex flex-col md:flex-row gap-6 w-full")}>
-        <div className="w-full md:w-1/2 lg:w-2/5 space-y-6">
-          <Calendar2 />
-          <GradeCard />
-        </div>
-
-        {/* Table and Card Section */}
-        <div className="w-full md:w-1/2 lg:w-3/5 space-y-6">
-          <ExamTable />
-          {isLoading ? (
-            <Card className="w-full max-w-xl h-[350px] shadow-md rounded-xl overflow-hidden border border-color-100">
-              <CardHeader>
-                <Skeleton className="h-7 w-40 mb-2" />
-                <Skeleton className="h-5 w-60" />
-              </CardHeader>
-              <CardContent>
-                <div className="grid w-full items-center gap-6">
-                  <div className="flex flex-col space-y-1.5">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                  </div>
-                  <div className="flex flex-col space-y-1.5">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Skeleton className="h-10 w-24" />
-              </CardFooter>
-            </Card>
-          ) : (
-            <Card className="w-full max-w-xl h-[350px] shadow-md rounded-xl overflow-hidden border border-color-100">
-              <CardHeader>
-                <CardTitle>Upcoming exam?</CardTitle>
-                <CardDescription>Add it right here!</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit}>
-                  <div className="grid w-full items-center gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="name">Exam Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="What exam is it?"
-                        value={examName}
-                        onChange={(e) => setExamName(e.target.value)}
-                      />
+    <>
+      <div
+        className={cn(
+          "container w-full px-2 py-4 transition-all duration-500 ease-in-out mt-[-10]",
+          isCollapsed ? "ml-96" : "ml-52"
+        )}
+      >
+        <div className={cn("flex flex-col lg:flex-row gap-4 w-full")}>
+          {" "}
+          <div className="w-full lg:w-1/2 xl:w-2/5 space-y-4">
+            {" "}
+            <Calendar2 />
+            <GradeCard />
+          </div>
+          <div className="w-full lg:w-1/2 xl:w-3/5 space-y-4 flex flex-col">
+            {" "}
+            <div className="flex-1">
+              <ExamTable />
+            </div>
+            <div className="flex-1">
+              {isLoading ? (
+                <Card className="w-full max-w-xl h-full shadow-md rounded-xl overflow-hidden border border-color-100">
+                  {" "}
+                  <CardHeader className="p-4">
+                    {" "}
+                    <Skeleton className="h-6 w-32 mb-1" />
+                    <Skeleton className="h-4 w-48" />
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    {" "}
+                    <div className="grid w-full items-center gap-4">
+                      {" "}
+                      {/* Reduced gap */}
+                      <div className="flex flex-col space-y-1">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
                     </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="date">Exam Date</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !date && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date ? (
-                              format(date, "PPP")
-                            ) : (
-                              <span>Pick exam date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            initialFocus
+                  </CardContent>
+                  <CardFooter className="flex justify-between p-4">
+                    {" "}
+                    {/* Added padding control */}
+                    <Skeleton className="h-8 w-20" />
+                  </CardFooter>
+                </Card>
+              ) : (
+                <Card className="w-full max-w-xl h-full shadow-md rounded-xl overflow-hidden border border-color-100">
+                  {" "}
+                  <CardHeader className="p-4">
+                    {" "}
+                    <CardTitle className="text-xl">Upcoming exam?</CardTitle>
+                    {/* Reduced text size */}
+                    <CardDescription>Add it right here!</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    {" "}
+                    <form onSubmit={handleSubmit}>
+                      <div className="grid w-full items-center gap-4">
+                        {" "}
+                        {/* Reduced gap */}
+                        <div className="flex flex-col space-y-1">
+                          {" "}
+                          <Label htmlFor="name" className="text-sm">
+                            Exam Name
+                          </Label>{" "}
+                          <Input
+                            id="name"
+                            placeholder="What exam is it?"
+                            value={examName}
+                            onChange={(e) => setExamName(e.target.value)}
+                            className="h-8 text-sm"
                           />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
-                </form>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button onClick={handleSubmit} className="bg-color-500">
-                  Add Exam
-                </Button>
-              </CardFooter>
-            </Card>
-          )}
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          {" "}
+                          <Label htmlFor="date" className="text-sm">
+                            Exam Date
+                          </Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id="date"
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal h-8 text-sm", // Reduced height and text size
+                                  !date && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-3 w-3" />
+                                {date ? (
+                                  format(date, "PPP")
+                                ) : (
+                                  <span>Pick exam date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={setDate}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    </form>
+                  </CardContent>
+                  <CardFooter className="flex justify-between p-4">
+                    <Button
+                      onClick={handleSubmit}
+                      className="bg-color-500 h-8 text-sm"
+                    >
+                      Add Exam
+                    </Button>
+                  </CardFooter>
+                </Card>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

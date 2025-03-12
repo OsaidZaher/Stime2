@@ -1,9 +1,8 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-
 import { useState, useMemo } from "react";
-import { StudySession, columns } from "./columns";
+import { type StudySession, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -105,9 +104,9 @@ export default function StudySessionsPage() {
   };
 
   return (
-    <div className="container mx-auto py-10 font-semibold">
+    <div className="container mx-auto py-6 md:py-10 px-4 md:px-6 font-semibold">
       <div className="text-600 space-y-4">
-        <div className="grid grid-cols-2 gap-[975px]">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
           <FindBy searchTerm={searchTerm} onSearchChange={setSearchTerm} />
           <TimeSelect
             timeFilter={timeFilter}
@@ -117,11 +116,11 @@ export default function StudySessionsPage() {
 
         {isLoading ? (
           <div className="space-y-3">
-            <div className="flex items-center space-x-4 p-4">
-              <Skeleton className="h-6 w-36" />
-              <Skeleton className="h-6 w-36" />
-              <Skeleton className="h-6 w-36" />
-              <Skeleton className="h-6 w-36" />
+            <div className="flex flex-wrap items-center gap-4 p-4">
+              <Skeleton className="h-6 w-24 sm:w-36" />
+              <Skeleton className="h-6 w-24 sm:w-36" />
+              <Skeleton className="h-6 w-24 sm:w-36" />
+              <Skeleton className="h-6 w-24 sm:w-36" />
             </div>
 
             {Array(5)
@@ -129,19 +128,21 @@ export default function StudySessionsPage() {
               .map((_, index) => (
                 <div
                   key={index}
-                  className="flex items-center space-x-4 p-4 border-t"
+                  className="flex flex-wrap items-center gap-4 p-4 border-t"
                 >
-                  <Skeleton className="h-5 w-36" />
-                  <Skeleton className="h-5 w-36" />
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-5 w-36" />
+                  <Skeleton className="h-5 w-24 sm:w-36" />
+                  <Skeleton className="h-5 w-24 sm:w-36" />
+                  <Skeleton className="h-5 w-16 sm:w-24" />
+                  <Skeleton className="h-5 w-24 sm:w-36" />
                 </div>
               ))}
           </div>
         ) : error ? (
           <p>Error loading study sessions. Please try again.</p>
         ) : (
-          <DataTable columns={columns} data={filteredData} />
+          <div className="overflow-x-auto">
+            <DataTable columns={columns} data={filteredData} />
+          </div>
         )}
       </div>
     </div>
@@ -157,7 +158,7 @@ function TimeSelect({
 }) {
   return (
     <Select value={timeFilter} onValueChange={onTimeFilterChange}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-full sm:w-[180px]">
         <SelectValue placeholder="Sort By" />
       </SelectTrigger>
       <SelectContent>
@@ -178,15 +179,15 @@ function FindBy({
   onSearchChange: (value: string) => void;
 }) {
   return (
-    <div className="relative">
+    <div className="relative w-full sm:w-auto">
       <Input
         type="text"
         placeholder="Search Topic or Subject"
-        className="max-w-ld w-56 max-h-md"
+        className="w-full sm:w-56 pr-10"
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
       />
-      <Search className="absolute left-48 top-1/2 transform -translate-y-1/2 text-500s" />
+      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
     </div>
   );
 }

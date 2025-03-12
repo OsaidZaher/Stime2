@@ -196,20 +196,25 @@ export default function TodoListCard() {
   if (error) return <div>Failed to load tasks</div>;
 
   return (
-    <Card className="w-full max-w-xl shadow-md rounded-xl overflow-hidden border border-color-100">
-      <CardHeader className="p-6 gradient-bg text-white">
-        <CardTitle className="text-2xl font-bold">My Tasks</CardTitle>
+    <Card className="w-full max-w-full md:max-w-xl shadow-md rounded-xl overflow-hidden border border-color-100">
+      <CardHeader className="p-4 sm:p-6 gradient-bg text-white">
+        <CardTitle className="text-xl sm:text-2xl font-bold">
+          My Tasks
+        </CardTitle>
         {isLoading ? (
           <Skeleton className="h-5 w-32 bg-blue-100/20" />
         ) : (
-          <p className="text-sm mt-2 text-blue-100">
+          <p className="text-xs sm:text-sm mt-2 text-blue-100">
             {completedTasksCount} of {tasks.length} tasks completed
           </p>
         )}
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         <div className="space-y-4">
-          <form onSubmit={handleAddTask} className="flex space-x-2">
+          <form
+            onSubmit={handleAddTask}
+            className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2"
+          >
             <Input
               placeholder="Add a new task"
               value={newTask}
@@ -219,7 +224,7 @@ export default function TodoListCard() {
             />
             <Button
               type="submit"
-              className="theme-background theme-hover text-slate-100"
+              className="theme-background theme-hover text-slate-100 w-full sm:w-auto"
               disabled={isLoading}
             >
               <Plus className="h-4 w-4 mr-2 theme-hover" />
@@ -253,7 +258,7 @@ export default function TodoListCard() {
                 tasks.map((task) => (
                   <motion.div
                     key={task.id}
-                    className="flex items-center space-x-3 p-3 rounded-lg light-bg  
+                    className="flex flex-wrap sm:flex-nowrap items-center space-x-2 sm:space-x-3 p-3 rounded-lg light-bg  
                     transition-colors dark:text-white"
                   >
                     <Checkbox
@@ -262,7 +267,7 @@ export default function TodoListCard() {
                       onCheckedChange={() =>
                         handleToggleTask(task.id, task.isCompleted)
                       }
-                      className="h-5 w-5 rounded-md light-bg text-theme"
+                      className="h-5 w-5 rounded-md light-bg text-theme flex-shrink-0"
                     />
                     {editingTaskId === task.id ? (
                       <Input
@@ -278,7 +283,7 @@ export default function TodoListCard() {
                     ) : (
                       <label
                         htmlFor={task.id}
-                        className={`text-sm flex-grow ${
+                        className={`text-xs sm:text-sm flex-grow break-words w-full sm:w-auto ${
                           task.isCompleted
                             ? "theme-text line-through"
                             : "text-black dark:text-white"
@@ -287,22 +292,24 @@ export default function TodoListCard() {
                         {task.task}
                       </label>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleStartEdit(task)}
-                      className="theme-text theme-hover"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="theme-text theme-hover"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex space-x-1 ml-auto mt-2 sm:mt-0 w-full sm:w-auto justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleStartEdit(task)}
+                        className="theme-text theme-hover h-8 w-8 p-0"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="theme-text theme-hover h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </motion.div>
                 ))
               )}

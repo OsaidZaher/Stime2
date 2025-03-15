@@ -1,7 +1,7 @@
 "use client";
 import LogInCard from "@/components/ui/logInCard";
 import SubjectGoalsCard from "@/components/ui/subjectGoals";
-import DashTimeCard from "@/components/ui/dashTimeCard";
+import CombinedDashboardCard from "@/components/ui/dashTimeCard";
 import TodoListCard from "@/components/ui/toDo";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -16,7 +16,7 @@ export default function Page() {
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
               <div className="flex flex-col sm:flex-row lg:flex-col gap-6">
                 <LogInCard />
-                <DashTimeCard />
+                <CombinedDashboardCard />
               </div>
               <div className="flex flex-col md:flex-row gap-6 w-full">
                 <SubjectGoalsCard />

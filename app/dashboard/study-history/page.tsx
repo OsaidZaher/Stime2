@@ -60,17 +60,14 @@ export default function StudySessionsPage() {
     fetcher
   );
 
-  // Memoized filtered data
   const filteredData = useMemo(() => {
     if (!data) return [];
 
     return data.filter((session) => {
-      // Search filter
       const matchesSearch =
         session.topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
         session.subjectName.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Time filter
       const now = new Date();
       let matchesTimeFilter = true;
 

@@ -5,7 +5,13 @@ import { DialogTrigger } from "@/components/ui/dialog";
 import type React from "react";
 import { X } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -173,12 +179,17 @@ export default function SubjectGoalsCard() {
   };
 
   return (
-    <Card className="w-full max-w-full sm:max-w-lg shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col">
+    <Card className="w-full max-w-full sm:max-w-lg shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col no-select ">
       <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 pb-2 p-4 sm:p-6">
-        <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 theme-dark" />
-          Subjects Progress
-        </CardTitle>
+        <div className="flex flex-col space-y-2">
+          <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 theme-dark" />
+            Subjects Progress
+          </CardTitle>
+          <CardDescription>
+            Track your progress across different subjects
+          </CardDescription>
+        </div>
         <div className="flex gap-2 self-end sm:self-auto">
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogTrigger asChild>

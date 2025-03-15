@@ -497,3 +497,7 @@
 .timer-up {
   margin-bottom: 2000px;
 }
+
+.no-select {
+  user-select: none;
+}

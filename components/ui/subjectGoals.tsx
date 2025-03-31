@@ -43,7 +43,7 @@ interface SubjectGoalWithSubject extends SubjectGoal {
   subject: Subject;
 }
 
-const SubjectGoalsCard_MAX = 5;
+const SubjectGoalsCard_MAX = 4;
 
 interface ApiResponse {
   subjectGoals: SubjectGoalWithSubject[];

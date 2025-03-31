@@ -313,6 +313,7 @@
 
 /* Text Colors */
 .text-color-100 {
+  
   color: var(--theme-100);
 }
 .text-color-400 {

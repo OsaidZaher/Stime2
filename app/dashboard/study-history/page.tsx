@@ -17,20 +17,18 @@ import {
 } from "@/components/ui/select";
 
 const fetcher = (url: string) =>
-  fetch(url)
-    .then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch study sessions");
-      return res.json();
-    })
-    .then((data) =>
-      data.map((session: any) => ({
-        id: session.id,
-        subjectName: session.subject.name,
-        topic: session.topic,
-        duration: calculateDuration(session.duration),
-        startTime: session.startTime,
-      }))
-    );
+  fetch(url).then(async (res) => {
+    if (!res.ok) throw new Error("Failed to fetch study sessions");
+
+    const data = await res.json();
+    return data.map((session: any) => ({
+      id: session.id,
+      subjectName: session.subject.name,
+      topic: session.topic,
+      duration: calculateDuration(session.duration),
+      startTime: session.startTime,
+    }));
+  });
 
 function calculateDuration(durationInSeconds: number): string {
   const hours = Math.floor(durationInSeconds / 3600);

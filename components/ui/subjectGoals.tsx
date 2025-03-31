@@ -1,9 +1,8 @@
 "use client";
 
-import { DialogTrigger } from "@/components/ui/dialog";
-
-import type React from "react";
-import { X } from "lucide-react";
+import { useState } from "react";
+import { X, Plus, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   Card,
@@ -19,31 +18,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
-import {
-  Pencil,
-  Plus,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  Minus,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import useSWR from "swr";
 import type { Subject, SubjectGoal } from "@prisma/client";
-import { toast } from "sonner";
-import { motion } from "framer-motion";
 
 interface SubjectGoalWithSubject extends SubjectGoal {
   subject: Subject;
 }
-
-const SubjectGoalsCard_MAX = 4;
 
 interface ApiResponse {
   subjectGoals: SubjectGoalWithSubject[];
@@ -57,19 +43,21 @@ export default function SubjectGoalsCard() {
     fetcher
   );
 
-  const [addOpen, setAddOpen] = useState(false);
-  const [addSubject, setAddSubject] = useState("");
-  const [addTarget, setAddTarget] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [newGoalOpen, setNewGoalOpen] = useState(false);
+  const [newGoal, setNewGoal] = useState({
+    subject: "",
+    target: 0,
+  });
 
-  const [editOpen, setEditOpen] = useState(false);
-  const [editSubject, setEditSubject] = useState("");
-  const [editTarget, setEditTarget] = useState<number>(0);
+  const [editGoalOpen, setEditGoalOpen] = useState(false);
+  const [editGoal, setEditGoal] = useState({
+    id: "",
+    subject: "",
+    target: 0,
+  });
 
-  const handleAddSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!addSubject || addTarget <= 0) {
+  const addStudyGoal = async () => {
+    if (!newGoal.subject || newGoal.target <= 0) {
       toast.error("Please enter a subject name and a valid target hours");
       return;
     }
@@ -79,10 +67,9 @@ export default function SubjectGoalsCard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          subject: addSubject,
-          target: Number(addTarget),
+          subject: newGoal.subject,
+          target: Number(newGoal.target),
           isCompleted: false,
-          completion: 0,
         }),
       });
 
@@ -91,9 +78,8 @@ export default function SubjectGoalsCard() {
         throw new Error(errorData.error || "Failed to add subject goal");
       }
 
-      setAddSubject("");
-      setAddTarget(0);
-      setAddOpen(false);
+      setNewGoal({ subject: "", target: 0 });
+      setNewGoalOpen(false);
       mutate();
       toast.success("Subject goal added successfully!");
     } catch (error) {
@@ -104,10 +90,8 @@ export default function SubjectGoalsCard() {
     }
   };
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!editSubject || editTarget <= 0) {
+  const updateStudyGoal = async () => {
+    if (!editGoal.subject || editGoal.target <= 0) {
       toast.error("Please enter a subject name and a valid target hours");
       return;
     }
@@ -117,8 +101,9 @@ export default function SubjectGoalsCard() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          subject: editSubject,
-          target: Number(editTarget),
+          id: editGoal.id,
+          subject: editGoal.subject,
+          target: Number(editGoal.target),
         }),
       });
 
@@ -127,9 +112,8 @@ export default function SubjectGoalsCard() {
         throw new Error(errorData.error || "Failed to update subject goal");
       }
 
-      setEditSubject("");
-      setEditTarget(0);
-      setEditOpen(false);
+      setEditGoal({ id: "", subject: "", target: 0 });
+      setEditGoalOpen(false);
       mutate();
       toast.success("Subject goal updated successfully!");
     } catch (error) {
@@ -140,23 +124,7 @@ export default function SubjectGoalsCard() {
     }
   };
 
-  const subjectGoals = data?.subjectGoals ?? [];
-  const totalPages = Math.ceil(subjectGoals.length / SubjectGoalsCard_MAX);
-
-  const currentPageGoals = subjectGoals.slice(
-    currentPage * SubjectGoalsCard_MAX,
-    (currentPage + 1) * SubjectGoalsCard_MAX
-  );
-
-  const handleNavigation = (direction: "left" | "right") => {
-    if (direction === "left" && currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    } else if (direction === "right" && currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleDelete = async (subjectGoalId: SubjectGoal["id"]) => {
+  const deleteStudyGoal = async (subjectGoalId: string) => {
     try {
       const response = await fetch("/api/functionality/subjectGoals", {
         method: "DELETE",
@@ -171,245 +139,243 @@ export default function SubjectGoalsCard() {
         throw new Error(errorData.error || "Failed to delete subject goal");
       }
 
-      console.log("subject goal deleted successfully");
-      mutate(); // Revalidate or refresh the data as needed
+      toast.success("Subject goal deleted successfully");
+      mutate();
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting subject goal:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete subject goal"
+      );
     }
   };
 
-  return (
-    <Card className="w-full max-w-full sm:max-w-lg shadow-md rounded-xl overflow-hidden border border-color-100 duration-300 flex flex-col no-select ">
-      <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 pb-2 p-4 sm:p-6">
-        <div className="flex flex-col space-y-2">
-          <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 theme-dark" />
-            Subjects Progress
-          </CardTitle>
-          <CardDescription>
-            Track your progress across different subjects
-          </CardDescription>
-        </div>
-        <div className="flex gap-2 self-end sm:self-auto">
-          <Dialog open={editOpen} onOpenChange={setEditOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-full hover:bg-primary/10"
-              >
-                <Pencil className="h-4 w-4 icon-text font-extrabold" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-xs sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-xl sm:text-2xl font-bold">
-                  Edit Subject Goal
-                </DialogTitle>
-                <DialogDescription>
-                  Adjust your study target for better time management.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleEditSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-subject">Subject</Label>
-                    <Input
-                      id="edit-subject"
-                      type="text"
-                      value={editSubject}
-                      onChange={(e) => setEditSubject(e.target.value)}
-                      placeholder="e.g., Mathematics"
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-target">Target Hours</Label>
-                    <Input
-                      id="edit-target"
-                      type="number"
-                      value={editTarget}
-                      onChange={(e) => setEditTarget(Number(e.target.value))}
-                      min="1"
-                      placeholder="e.g., 10"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="w-full">
-                    Update Goal
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+  const handleEditGoal = (goal: SubjectGoalWithSubject) => {
+    setEditGoal({
+      id: goal.id,
+      subject: goal.subject.name,
+      target: goal.target,
+    });
+    setEditGoalOpen(true);
+  };
 
-          <Dialog open={addOpen} onOpenChange={setAddOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-full hover:bg-primary/10"
-              >
-                <Plus className="h-4 w-4 icon-text font-extrabold" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-xs sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-xl sm:text-2xl font-bold">
-                  Add New Subject Goal
-                </DialogTitle>
-                <DialogDescription>
-                  Set a study target for a new subject to track your progress.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="add-subject">Subject</Label>
-                    <Input
-                      id="add-subject"
-                      type="text"
-                      value={addSubject}
-                      onChange={(e) => setAddSubject(e.target.value)}
-                      placeholder="e.g., Physics"
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="add-target">Target Hours</Label>
-                    <Input
-                      id="add-target"
-                      type="number"
-                      value={addTarget}
-                      onChange={(e) => setAddTarget(Number(e.target.value))}
-                      min="1"
-                      placeholder="e.g., 20"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="w-full">
-                    Add Goal
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </CardHeader>
+  const secondsToHours = (seconds: number): number => {
+    return parseFloat((seconds / 3600).toFixed(2));
+  };
 
-      <CardContent className="space-y-6 pt-4 sm:pt-6 flex-grow overflow-y-auto p-4 sm:p-6">
-        {isLoading ? (
-          <div className="space-y-6">
-            {[...Array(4)].map((_, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-2 w-2 rounded-full" />
-                    <Skeleton className="h-5 w-24 sm:w-32" />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Skeleton className="h-4 w-10 sm:w-12" />
-                    <Skeleton className="h-6 w-6 rounded-full" />
-                  </div>
-                </div>
-                <Skeleton className="h-2 w-full" />
-                <div className="flex justify-between">
-                  <Skeleton className="h-4 w-8 sm:w-10" />
-                  <Skeleton className="h-4 w-8 sm:w-10" />
-                </div>
-              </div>
-            ))}
+  const calculatePercentage = (
+    completionSeconds: number,
+    targetHours: number
+  ): number => {
+    const completionHours = secondsToHours(completionSeconds);
+    return parseFloat(((completionHours / targetHours) * 100).toFixed(1));
+  };
+
+  // Add a loading state
+  if (isLoading) {
+    return (
+      <Card className="lg:col-span-2 shadow-md">
+        <CardHeader>
+          <CardTitle className="text-xl">Study Goals</CardTitle>
+          <CardDescription>Your weekly study hour targets</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-40">
+            <p>Loading your study goals...</p>
           </div>
-        ) : error ? (
-          <p className="text-center text-red-500">
-            Error loading subject goals.
-          </p>
-        ) : subjectGoals.length === 0 ? (
-          <p className="text-center text-muted-foreground">
-            No subject goals added yet.
-          </p>
-        ) : (
-          <>
-            <div className="space-y-6">
-              {currentPageGoals.map((goal, index) => (
-                <motion.div
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="lg:col-span-2 shadow-md">
+        <CardHeader>
+          <CardTitle className="text-xl">Study Goals</CardTitle>
+          <CardDescription>Your weekly study hour targets</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-40">
+            <p>Error loading study goals. Please try again later.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="lg:col-span-2 shadow-md">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle className="text-xl">Study Goals</CardTitle>
+          <CardDescription>Your weekly study hour targets</CardDescription>
+        </div>
+        <Dialog open={newGoalOpen} onOpenChange={setNewGoalOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="gap-1">
+              <Plus className="h-4 w-4" />
+              Add Goal
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Study Goal</DialogTitle>
+              <DialogDescription>
+                Set a new weekly study hour target for a subject.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="subject">Subject</Label>
+                <Input
+                  id="subject"
+                  placeholder="e.g. Mathematics"
+                  value={newGoal.subject}
+                  onChange={(e) =>
+                    setNewGoal({ ...newGoal, subject: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="hours">Target Hours</Label>
+                <Input
+                  id="hours"
+                  type="number"
+                  min="1"
+                  value={newGoal.target || ""}
+                  onChange={(e) =>
+                    setNewGoal({
+                      ...newGoal,
+                      target: Number.parseInt(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setNewGoalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={addStudyGoal}>Add Goal</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={editGoalOpen} onOpenChange={setEditGoalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Study Goal</DialogTitle>
+              <DialogDescription>
+                Update your weekly study hour target.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject">Subject</Label>
+                <Input
+                  id="edit-subject"
+                  placeholder="e.g. Mathematics"
+                  value={editGoal.subject}
+                  onChange={(e) =>
+                    setEditGoal({ ...editGoal, subject: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-hours">Target Hours</Label>
+                <Input
+                  id="edit-hours"
+                  type="number"
+                  min="1"
+                  value={editGoal.target || ""}
+                  onChange={(e) =>
+                    setEditGoal({
+                      ...editGoal,
+                      target: Number.parseInt(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditGoalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={updateStudyGoal}>Update Goal</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-5">
+          {data?.subjectGoals && data.subjectGoals.length > 0 ? (
+            data.subjectGoals.map((goal) => {
+              const completionHours = secondsToHours(goal.completion);
+              const percentage = calculatePercentage(
+                goal.completion,
+                goal.target
+              );
+
+              return (
+                <div
                   key={goal.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="space-y-2"
+                  className="space-y-2 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg transition-all hover:shadow-md"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-color-700 " />
-                      <span className="text-sm sm:text-base font-medium">
-                        {goal.subject.name.charAt(0).toUpperCase() +
-                          goal.subject.name.slice(1)}
-                      </span>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <div
+                        className={`w-2 h-10 bg-blue-500 rounded-full mr-3`}
+                      ></div>
+                      <div>
+                        <h4 className="font-medium">{goal.subject.name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {completionHours}/{goal.target} hours
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs sm:text-sm text-muted-foreground">
-                        {(
-                          (goal.completion / (goal.target * 3600)) *
-                          100
-                        ).toFixed(1)}
-                        %
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <div className="text-lg font-bold">{percentage}%</div>
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => handleDelete(goal.id)}
+                        size="icon"
+                        onClick={() => handleEditGoal(goal)}
                       >
-                        <X className="h-3 w-3 sm:h-4 sm:w-4 text-slate-900 dark:*:text-slate-100 font-extrabold mt-[-10px]" />
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteStudyGoal(goal.id)}
+                      >
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                   <Progress
-                    value={(goal.completion / (goal.target * 3600)) * 100}
-                    className="h-2 bg-color-100 [&>div]:bg-color-400"
+                    value={percentage}
+                    className="h-2.5 rounded-full"
+                    indicatorClassName="bg-blue-500 rounded-full"
                   />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{Math.floor(goal.completion / 3600)} hrs</span>
-                    <span>
-                      {goal.target} {goal.target === 1 ? "hr" : "hrs"}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center h-40 text-center">
+              <p className="text-muted-foreground mb-4">
+                No study goals set yet
+              </p>
+              <Button
+                variant="outline"
+                className="gap-1"
+                onClick={() => setNewGoalOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Create your first goal
+              </Button>
             </div>
-          </>
-        )}
-      </CardContent>
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 sm:gap-4 p-3 sm:p-4 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleNavigation("left")}
-            disabled={currentPage === 0}
-            className="w-7 h-7 sm:w-8 sm:h-8 p-0"
-          >
-            <ChevronLeft className="h-3 w-3 theme-dark" />
-          </Button>
-          <span className="text-xs sm:text-sm text-muted-foreground">
-            Page {currentPage + 1} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleNavigation("right")}
-            disabled={currentPage === totalPages - 1}
-            className="w-7 h-7 sm:w-8 sm:h-8 p-0"
-          >
-            <ChevronRight className="h-3 w-3 theme-dark" />
-          </Button>
+          )}
         </div>
-      )}
+      </CardContent>
     </Card>
   );
 }

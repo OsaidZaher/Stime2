@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Priority{
+  Low,
+  Medium,
+  High
+}
+
 model User {
   id            String         @id @default(cuid())
   name          String
@@ -96,10 +102,10 @@ model SubjectGoal {
 model toDo {
   id          String   @id @default(cuid())
   task String
+  priority Priority @default(Medium)
   isCompleted Boolean  @default(false)
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  isDisplayed Boolean @default(false)
    createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

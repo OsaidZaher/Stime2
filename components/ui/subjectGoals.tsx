@@ -84,9 +84,7 @@ export default function SubjectGoalsCard() {
       toast.success("Subject goal added successfully!");
     } catch (error) {
       console.error("Error adding subject goal:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to add subject goal"
-      );
+      toast.error("Failed to add subject goal");
     }
   };
 

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const userId = session.user.id;
     const taskToDo = await prisma.toDo.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { priority: "desc" },
     });
 
     return NextResponse.json({ taskToDo });
@@ -37,25 +37,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { task, isCompleted, isDisplayed } = await request.json();
+    const { task, isCompleted, priority, dueDate } = await request.json();
     const userId = session.user.id;
 
     const newTask = await prisma.toDo.create({
       data: {
         task,
         isCompleted,
-        isDisplayed, // Include the new field
+        priority,
         userId,
+        dueDate: dueDate,
       },
     });
 
     return NextResponse.json({ newTask });
   } catch (error) {
     console.error("Error creating task:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Failed to create task" }),
-      { status: 500 }
-    );
   }
 }
 
@@ -68,7 +65,8 @@ export async function PATCH(request: NextRequest) {
       });
     }
 
-    const { id, editedTask, isCompleted, isDisplayed } = await request.json();
+    const { id, editedTask, isCompleted, priority, dueDate } =
+      await request.json();
     const userId = session.user.id;
 
     const task = await prisma.toDo.findUnique({
@@ -87,7 +85,8 @@ export async function PATCH(request: NextRequest) {
       data: {
         task: editedTask,
         isCompleted,
-        isDisplayed, // Include the new field
+        priority,
+        dueDate: dueDate !== undefined ? dueDate : null,
       },
     });
 

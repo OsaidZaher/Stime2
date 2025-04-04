@@ -52,7 +52,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ newTask });
   } catch (error) {
-    console.error("Error creating task:", error);
+    console.error(
+      error instanceof Error
+        ? "Error creating task:" + error.message
+        : "Unknown error occurred"
+    );
   }
 }
 

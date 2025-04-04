@@ -44,68 +44,37 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
 
-// Fetcher function for SWR
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-// Type definitions based on your schema
-type Priority = "high" | "medium" | "low";
-
-interface Todo {
-  id: string;
-  task: string;
-  priority: Priority;
-  dueDate: string | null;
-  isCompleted: boolean;
-}
+import type { Priority, toDo } from "@prisma/client";
 
 export default function TodoListCard() {
-  // State for new todo
   const [newTodo, setNewTodo] = useState("");
-  const [newTodoPriority, setNewTodoPriority] = useState<Priority>("medium");
+  const [newTodoPriority, setNewTodoPriority] = useState<string>("medium");
   const [newTodoDueDate, setNewTodoDueDate] = useState<Date | undefined>(
     undefined
   );
-
-  // State for edit dialog
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [editedTask, setEditedTask] = useState("");
-  const [editedPriority, setEditedPriority] = useState<Priority>("medium");
-  const [editedDueDate, setEditedDueDate] = useState<Date | undefined>(
-    undefined
-  );
-  const [editedIsCompleted, setEditedIsCompleted] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<{
+    id: string;
+    task: string;
+    priority: Priority;
+    isCompleted: boolean;
+    dueDate: Date | null;
+  } | null>(null);
 
-  // Fetch todos with SWR
-  const { data, error, isLoading } = useSWR<{ taskToDo: Todo[] }>(
-    "/api/functionality/toDo",
-    fetcher
-  );
+  // Fetch todos
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data, error, isLoading } = useSWR("/api/functionality/toDo", fetcher);
 
-  // Format date for display
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "No due date";
-    return format(new Date(dateString), "MMM d, yyyy");
-  };
-
-  // Get priority color based on priority level
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-      case "medium":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300";
-      case "low":
-        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
-      default:
-        return "bg-slate-100 text-slate-800 dark:bg-slate-900/20 dark:text-slate-300";
-    }
-  };
+  const todos = data?.taskToDo || [];
 
   // Add a new todo
   const addTodo = async () => {
-    if (!newTodo.trim()) return;
+    if (!newTodo.trim()) {
+      toast.error("Task cannot be empty");
+      return;
+    }
 
     try {
       const response = await fetch("/api/functionality/toDo", {
@@ -115,19 +84,20 @@ export default function TodoListCard() {
         },
         body: JSON.stringify({
           task: newTodo,
-          priority: newTodoPriority,
+          priority: newTodoPriority.toUpperCase(),
           isCompleted: false,
-          dueDate: newTodoDueDate ? newTodoDueDate.toISOString() : null,
+          dueDate: newTodoDueDate,
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to add task");
+      if (!response.ok) {
+        throw new Error("Failed to add task");
+      }
 
-      // Reset form and refresh data
       setNewTodo("");
       setNewTodoPriority("medium");
       setNewTodoDueDate(undefined);
-      mutate("/api/todos");
+      mutate("/api/functionality/toDo");
       toast.success("Task added successfully");
     } catch (error) {
       toast.error("Failed to add task");
@@ -137,11 +107,11 @@ export default function TodoListCard() {
 
   // Toggle todo completion status
   const toggleTodo = async (id: string) => {
-    const todo = data?.taskToDo.find((t) => t.id === id);
+    const todo = todos.find((t: toDo) => t.id === id);
     if (!todo) return;
 
     try {
-      const response = await fetch("/api/todos", {
+      const response = await fetch("/api/functionality/toDo", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -155,7 +125,9 @@ export default function TodoListCard() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update task");
+      if (!response.ok) {
+        throw new Error("Failed to update task");
+      }
 
       mutate("/api/functionality/toDo");
       toast.success("Task updated");
@@ -176,9 +148,11 @@ export default function TodoListCard() {
         body: JSON.stringify({ id }),
       });
 
-      if (!response.ok) throw new Error("Failed to delete task");
+      if (!response.ok) {
+        throw new Error("Failed to delete task");
+      }
 
-      mutate("/api/todos");
+      mutate("/api/functionality/toDo");
       toast.success("Task deleted");
     } catch (error) {
       toast.error("Failed to delete task");
@@ -187,18 +161,20 @@ export default function TodoListCard() {
   };
 
   // Open edit dialog
-  const openEditDialog = (todo: Todo) => {
-    setEditingTodo(todo);
-    setEditedTask(todo.task);
-    setEditedPriority(todo.priority);
-    setEditedDueDate(todo.dueDate ? new Date(todo.dueDate) : undefined);
-    setEditedIsCompleted(todo.isCompleted);
+  const openEditDialog = (todo: toDo) => {
+    setEditingTodo({
+      id: todo.id,
+      task: todo.task,
+      priority: todo.priority,
+      isCompleted: todo.isCompleted,
+      dueDate: todo.dueDate,
+    });
     setIsEditDialogOpen(true);
   };
 
   // Save edited todo
   const saveEditedTodo = async () => {
-    if (!editingTodo || !editedTask.trim()) return;
+    if (!editingTodo) return;
 
     try {
       const response = await fetch("/api/functionality/toDo", {
@@ -208,17 +184,19 @@ export default function TodoListCard() {
         },
         body: JSON.stringify({
           id: editingTodo.id,
-          editedTask,
-          isCompleted: editedIsCompleted,
-          priority: editedPriority,
-          dueDate: editedDueDate ? editedDueDate.toISOString() : null,
+          editedTask: editingTodo.task,
+          isCompleted: editingTodo.isCompleted,
+          priority: editingTodo.priority,
+          dueDate: editingTodo.dueDate,
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update task");
+      if (!response.ok) {
+        throw new Error("Failed to update task");
+      }
 
       setIsEditDialogOpen(false);
-      mutate("/api/todos");
+      mutate("/api/functionality/toDo");
       toast.success("Task updated");
     } catch (error) {
       toast.error("Failed to update task");
@@ -226,31 +204,50 @@ export default function TodoListCard() {
     }
   };
 
-  // Handle loading and error states
-  if (isLoading)
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "HIGH":
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
+      case "MEDIUM":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300";
+      case "LOW":
+        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
+      default:
+        return "bg-slate-100 text-slate-800 dark:bg-slate-900/20 dark:text-slate-300";
+    }
+  };
+
+  if (isLoading) {
     return (
       <Card className="lg:col-span-2 shadow-md">
         <CardHeader className="pb-3">
           <CardTitle className="text-xl">To-Do List</CardTitle>
           <CardDescription>Loading tasks...</CardDescription>
         </CardHeader>
+        <CardContent>
+          <div className="flex justify-center py-8">
+            <div className="animate-pulse">Loading...</div>
+          </div>
+        </CardContent>
       </Card>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <Card className="lg:col-span-2 shadow-md">
         <CardHeader className="pb-3">
           <CardTitle className="text-xl">To-Do List</CardTitle>
-          <CardDescription className="text-red-500">
-            Error loading tasks
-          </CardDescription>
+          <CardDescription>Error loading tasks</CardDescription>
         </CardHeader>
+        <CardContent>
+          <div className="text-red-500">
+            Failed to load tasks. Please try again later.
+          </div>
+        </CardContent>
       </Card>
     );
-
-  // Get todos from data
-  const todos = data?.taskToDo || [];
+  }
 
   return (
     <Card className="lg:col-span-2 shadow-md">
@@ -259,55 +256,40 @@ export default function TodoListCard() {
         <CardDescription>Manage your study tasks</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-5">
+        <div className="flex space-x-2 mb-5">
           <Input
             placeholder="Add a new task..."
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addTodo()}
-            className="shadow-sm flex-grow"
+            className="shadow-sm"
           />
-          <div className="flex space-x-2">
-            <Select
-              value={newTodoPriority}
-              onValueChange={(value) => setNewTodoPriority(value as Priority)}
-            >
-              <SelectTrigger className="w-[110px]">
-                <SelectValue placeholder="Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-[110px] pl-3 text-left font-normal"
-                >
-                  {newTodoDueDate ? (
-                    format(newTodoDueDate, "MMM d")
-                  ) : (
-                    <span>Due date</span>
-                  )}
-                  <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={newTodoDueDate}
-                  onSelect={setNewTodoDueDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            <Button onClick={addTodo}>Add</Button>
-          </div>
+          <Select value={newTodoPriority} onValueChange={setNewTodoPriority}>
+            <SelectTrigger className="w-[110px]">
+              <SelectValue placeholder="Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
+            </SelectContent>
+          </Select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Calendar className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarComponent
+                mode="single"
+                selected={newTodoDueDate}
+                onSelect={setNewTodoDueDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Button onClick={addTodo}>Add</Button>
         </div>
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="mb-4 w-full justify-start">
@@ -323,11 +305,11 @@ export default function TodoListCard() {
           </TabsList>
           <TabsContent value="all" className="space-y-3">
             {todos.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground">
+              <div className="text-center py-8 text-muted-foreground">
                 No tasks yet. Add your first task above!
               </div>
             ) : (
-              todos.map((todo) => (
+              todos.map((todo: toDo) => (
                 <div
                   key={todo.id}
                   className={`flex items-center justify-between p-3 rounded-lg transition-all ${
@@ -355,15 +337,17 @@ export default function TodoListCard() {
                         {todo.task}
                       </label>
                       <div className="flex items-center mt-1 space-x-2">
-                        <Badge variant="outline" className="text-xs">
-                          {formatDate(todo.dueDate)}
-                        </Badge>
+                        {todo.dueDate && (
+                          <Badge variant="outline" className="text-xs">
+                            {format(new Date(todo.dueDate), "MMM dd, yyyy")}
+                          </Badge>
+                        )}
                         <Badge
                           className={`text-xs ${getPriorityColor(
                             todo.priority
                           )}`}
                         >
-                          {todo.priority}
+                          {todo.priority.toLowerCase()}
                         </Badge>
                       </div>
                     </div>
@@ -396,14 +380,14 @@ export default function TodoListCard() {
             )}
           </TabsContent>
           <TabsContent value="pending" className="space-y-3">
-            {todos.filter((todo) => !todo.isCompleted).length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground">
-                No pending tasks. Great job!
+            {todos.filter((todo: toDo) => !todo.isCompleted).length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No pending tasks. All caught up!
               </div>
             ) : (
               todos
-                .filter((todo) => !todo.isCompleted)
-                .map((todo) => (
+                .filter((todo: toDo) => !todo.isCompleted)
+                .map((todo: toDo) => (
                   <div
                     key={todo.id}
                     className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg shadow-sm hover:shadow transition-all"
@@ -423,15 +407,17 @@ export default function TodoListCard() {
                           {todo.task}
                         </label>
                         <div className="flex items-center mt-1 space-x-2">
-                          <Badge variant="outline" className="text-xs">
-                            {formatDate(todo.dueDate)}
-                          </Badge>
+                          {todo.dueDate && (
+                            <Badge variant="outline" className="text-xs">
+                              {format(new Date(todo.dueDate), "MMM dd, yyyy")}
+                            </Badge>
+                          )}
                           <Badge
                             className={`text-xs ${getPriorityColor(
                               todo.priority
                             )}`}
                           >
-                            {todo.priority}
+                            {todo.priority.toLowerCase()}
                           </Badge>
                         </div>
                       </div>
@@ -466,14 +452,14 @@ export default function TodoListCard() {
             )}
           </TabsContent>
           <TabsContent value="completed" className="space-y-3">
-            {todos.filter((todo) => todo.isCompleted).length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground">
+            {todos.filter((todo: toDo) => todo.isCompleted).length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
                 No completed tasks yet.
               </div>
             ) : (
               todos
-                .filter((todo) => todo.isCompleted)
-                .map((todo) => (
+                .filter((todo: toDo) => todo.isCompleted)
+                .map((todo: toDo) => (
                   <div
                     key={todo.id}
                     className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg transition-all"
@@ -493,15 +479,17 @@ export default function TodoListCard() {
                           {todo.task}
                         </label>
                         <div className="flex items-center mt-1 space-x-2">
-                          <Badge variant="outline" className="text-xs">
-                            {formatDate(todo.dueDate)}
-                          </Badge>
+                          {todo.dueDate && (
+                            <Badge variant="outline" className="text-xs">
+                              {format(new Date(todo.dueDate), "MMM dd, yyyy")}
+                            </Badge>
+                          )}
                           <Badge
                             className={`text-xs opacity-70 ${getPriorityColor(
                               todo.priority
                             )}`}
                           >
-                            {todo.priority}
+                            {todo.priority.toLowerCase()}
                           </Badge>
                         </div>
                       </div>
@@ -532,29 +520,39 @@ export default function TodoListCard() {
         </Tabs>
       </CardContent>
 
-      {/* Edit Dialog */}
+      {/* Edit Task Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Task</DialogTitle>
             <DialogDescription>
-              Make changes to your task here.
+              Make changes to your task here. Click save when you're done.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <label htmlFor="task">Task</label>
+              <Label htmlFor="task">Task</Label>
               <Input
                 id="task"
-                value={editedTask}
-                onChange={(e) => setEditedTask(e.target.value)}
+                value={editingTodo?.task || ""}
+                onChange={(e) =>
+                  setEditingTodo((prev) =>
+                    prev ? { ...prev, task: e.target.value } : null
+                  )
+                }
               />
             </div>
             <div className="grid gap-2">
-              <label htmlFor="priority">Priority</label>
+              <Label htmlFor="priority">Priority</Label>
               <Select
-                value={editedPriority}
-                onValueChange={(value) => setEditedPriority(value as Priority)}
+                value={editingTodo?.priority.toLowerCase() || "medium"}
+                onValueChange={(value) =>
+                  setEditingTodo((prev) =>
+                    prev
+                      ? { ...prev, priority: value.toUpperCase() as Priority }
+                      : null
+                  )
+                }
               >
                 <SelectTrigger id="priority">
                   <SelectValue placeholder="Select priority" />
@@ -567,40 +565,38 @@ export default function TodoListCard() {
               </Select>
             </div>
             <div className="grid gap-2">
-              <label>Due Date</label>
+              <Label htmlFor="dueDate">Due Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className="w-full justify-start text-left font-normal"
                   >
-                    {editedDueDate ? (
-                      format(editedDueDate, "PPP")
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {editingTodo?.dueDate ? (
+                      format(new Date(editingTodo.dueDate), "PPP")
                     ) : (
                       <span>Pick a date</span>
                     )}
-                    <Calendar className="ml-auto h-4 w-4 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <CalendarComponent
                     mode="single"
-                    selected={editedDueDate}
-                    onSelect={setEditedDueDate}
+                    selected={
+                      editingTodo?.dueDate
+                        ? new Date(editingTodo.dueDate)
+                        : undefined
+                    }
+                    onSelect={(date) =>
+                      setEditingTodo((prev) =>
+                        prev ? { ...prev, dueDate: date || null } : null
+                      )
+                    }
                     initialFocus
                   />
                 </PopoverContent>
               </Popover>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="completed"
-                checked={editedIsCompleted}
-                onCheckedChange={(checked) =>
-                  setEditedIsCompleted(checked === true)
-                }
-              />
-              <label htmlFor="completed">Mark as completed</label>
             </div>
           </div>
           <DialogFooter>

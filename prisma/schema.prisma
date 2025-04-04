@@ -8,9 +8,9 @@ datasource db {
 }
 
 enum Priority{
-  Low
-  Medium
-  High
+  LOW
+  MEDIUM
+  HIGH
 }
 
 model User {
@@ -27,7 +27,7 @@ model User {
   subjects      Subject[]
   weeklyGoal    WeeklyGoal?
   subjectGoals  SubjectGoal[]
-  toDoList toDo[]
+  toDoList ToDo[]
 }
 
 model Subject {
@@ -99,10 +99,10 @@ model SubjectGoal {
 }
 
 
-model toDo {
+model ToDo {
   id          String   @id @default(cuid())
   task String
-  priority Priority @default(Medium)
+  priority Priority @default(MEDIUM)
   dueDate DateTime?
   isCompleted Boolean  @default(false)
   userId      String

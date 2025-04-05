@@ -46,7 +46,7 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 
-import type { Priority, toDo } from "@prisma/client";
+import type { ToDo } from "@prisma/client";
 
 export default function TodoListCard() {
   const [newTodo, setNewTodo] = useState("");
@@ -58,7 +58,7 @@ export default function TodoListCard() {
   const [editingTodo, setEditingTodo] = useState<{
     id: string;
     task: string;
-    priority: Priority;
+    priority: string;
     isCompleted: boolean;
     dueDate: Date | null;
   } | null>(null);
@@ -84,7 +84,7 @@ export default function TodoListCard() {
         },
         body: JSON.stringify({
           task: newTodo,
-          priority: newTodoPriority.toUpperCase(),
+          priority: newTodoPriority,
           isCompleted: false,
           dueDate: newTodoDueDate,
         }),
@@ -95,7 +95,7 @@ export default function TodoListCard() {
       }
 
       setNewTodo("");
-      setNewTodoPriority("medium");
+      setNewTodoPriority("Medium");
       setNewTodoDueDate(undefined);
       mutate("/api/functionality/toDo");
       toast.success("Task added successfully");
@@ -107,7 +107,7 @@ export default function TodoListCard() {
 
   // Toggle todo completion status
   const toggleTodo = async (id: string) => {
-    const todo = todos.find((t: toDo) => t.id === id);
+    const todo = todos.find((t: ToDo) => t.id === id);
     if (!todo) return;
 
     try {
@@ -161,7 +161,7 @@ export default function TodoListCard() {
   };
 
   // Open edit dialog
-  const openEditDialog = (todo: toDo) => {
+  const openEditDialog = (todo: ToDo) => {
     setEditingTodo({
       id: todo.id,
       task: todo.task,
@@ -195,9 +195,9 @@ export default function TodoListCard() {
         throw new Error("Failed to update task");
       }
 
-      setIsEditDialogOpen(false);
       mutate("/api/functionality/toDo");
       toast.success("Task updated");
+      setIsEditDialogOpen(false);
     } catch (error) {
       toast.error("Failed to update task");
       console.error(error);
@@ -205,12 +205,12 @@ export default function TodoListCard() {
   };
 
   const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "HIGH":
+    switch (priority.toLowerCase()) {
+      case "high":
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-      case "MEDIUM":
+      case "medium":
         return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300";
-      case "LOW":
+      case "low":
         return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
       default:
         return "bg-slate-100 text-slate-800 dark:bg-slate-900/20 dark:text-slate-300";
@@ -227,22 +227,6 @@ export default function TodoListCard() {
         <CardContent>
           <div className="flex justify-center py-8">
             <div className="animate-pulse">Loading...</div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className="lg:col-span-2 shadow-md">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl">To-Do List</CardTitle>
-          <CardDescription>Error loading tasks</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-red-500">
-            Failed to load tasks. Please try again later.
           </div>
         </CardContent>
       </Card>
@@ -309,7 +293,7 @@ export default function TodoListCard() {
                 No tasks yet. Add your first task above!
               </div>
             ) : (
-              todos.map((todo: toDo) => (
+              todos.map((todo: ToDo) => (
                 <div
                   key={todo.id}
                   className={`flex items-center justify-between p-3 rounded-lg transition-all ${
@@ -380,14 +364,14 @@ export default function TodoListCard() {
             )}
           </TabsContent>
           <TabsContent value="pending" className="space-y-3">
-            {todos.filter((todo: toDo) => !todo.isCompleted).length === 0 ? (
+            {todos.filter((todo: ToDo) => !todo.isCompleted).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No pending tasks. All caught up!
               </div>
             ) : (
               todos
-                .filter((todo: toDo) => !todo.isCompleted)
-                .map((todo: toDo) => (
+                .filter((todo: ToDo) => !todo.isCompleted)
+                .map((todo: ToDo) => (
                   <div
                     key={todo.id}
                     className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg shadow-sm hover:shadow transition-all"
@@ -452,14 +436,14 @@ export default function TodoListCard() {
             )}
           </TabsContent>
           <TabsContent value="completed" className="space-y-3">
-            {todos.filter((todo: toDo) => todo.isCompleted).length === 0 ? (
+            {todos.filter((todo: ToDo) => todo.isCompleted).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No completed tasks yet.
               </div>
             ) : (
               todos
-                .filter((todo: toDo) => todo.isCompleted)
-                .map((todo: toDo) => (
+                .filter((todo: ToDo) => todo.isCompleted)
+                .map((todo: ToDo) => (
                   <div
                     key={todo.id}
                     className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg transition-all"
@@ -481,7 +465,7 @@ export default function TodoListCard() {
                         <div className="flex items-center mt-1 space-x-2">
                           {todo.dueDate && (
                             <Badge variant="outline" className="text-xs">
-                              {format(new Date(todo.dueDate), "MMM dd, yyyy")}
+                              {format(new Date(todo.dueDate), "MMM dd")}
                             </Badge>
                           )}
                           <Badge
@@ -489,7 +473,7 @@ export default function TodoListCard() {
                               todo.priority
                             )}`}
                           >
-                            {todo.priority.toLowerCase()}
+                            {todo.priority}
                           </Badge>
                         </div>
                       </div>
@@ -548,9 +532,7 @@ export default function TodoListCard() {
                 value={editingTodo?.priority.toLowerCase() || "medium"}
                 onValueChange={(value) =>
                   setEditingTodo((prev) =>
-                    prev
-                      ? { ...prev, priority: value.toUpperCase() as Priority }
-                      : null
+                    prev ? { ...prev, priority: value } : null
                   )
                 }
               >

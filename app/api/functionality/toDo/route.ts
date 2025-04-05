@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         isCompleted,
         priority,
         userId,
-        dueDate: dueDate,
+        dueDate,
       },
     });
 
@@ -73,11 +73,12 @@ export async function PATCH(request: NextRequest) {
       await request.json();
     const userId = session.user.id;
 
-    const task = await prisma.toDo.findUnique({
+    // First check if the task exists and belongs to the user
+    const existingTask = await prisma.toDo.findUnique({
       where: { id },
     });
 
-    if (!task || task.userId !== userId) {
+    if (!existingTask || existingTask.userId !== userId) {
       return new NextResponse(
         JSON.stringify({ error: "Task not found or unauthorized" }),
         { status: 404 }
@@ -90,7 +91,7 @@ export async function PATCH(request: NextRequest) {
         task: editedTask,
         isCompleted,
         priority,
-        dueDate: dueDate !== undefined ? dueDate : null,
+        dueDate,
       },
     });
 

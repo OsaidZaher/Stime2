@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Priority{
-  LOW
-  MEDIUM
-  HIGH
-}
-
 model User {
   id            String         @id @default(cuid())
   name          String
@@ -102,7 +96,7 @@ model SubjectGoal {
 model ToDo {
   id          String   @id @default(cuid())
   task String
-  priority Priority @default(MEDIUM)
+  priority String @default("medium")
   dueDate DateTime?
   isCompleted Boolean  @default(false)
   userId      String
